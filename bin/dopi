@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+#
+# DOPi command line client
+#
+require 'dopi/cli'
+
+Dopi::Cli.start(ARGV)
