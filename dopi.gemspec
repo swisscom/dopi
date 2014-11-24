@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Dopi::VERSION
   spec.authors       = ["Andreas Zuber"]
   spec.email         = ["zuber@puzzle.ch"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{DOPi orchestrates puppet runs, mco calls and custom commands over different nodes}
+  spec.summary       = %q{DOPi orchestrates puppet runs, mco calls and custom commands over different nodes}
   spec.homepage      = ""
   spec.license       = "MIT"
 
@@ -23,4 +23,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
 
   spec.add_runtime_dependency "thor"
+  spec.add_runtime_dependency "hiera"
+  spec.add_runtime_dependency "mcollective-client" 
 end

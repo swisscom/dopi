@@ -1,6 +1,6 @@
 # Dopi
 
-TODO: Write a gem description
+DOPi orchestrates puppet runs, mco calls and custom commands over different nodes
 
 ## Installation
 
@@ -18,7 +18,9 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Deploy a deployment plan
+
+    $ dopi deploy deployment_plan.yaml
 
 ## Contributing
 
