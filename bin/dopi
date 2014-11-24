@@ -2,6 +2,6 @@
 #
 # DOPi command line client
 #
-require 'dopi/cli'
+require 'dopi'
 
 Dopi::Cli.start(ARGV)
