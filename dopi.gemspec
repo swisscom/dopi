@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
 
-  spec.add_runtime_dependency "thor"
+  spec.add_runtime_dependency "escort"
   spec.add_runtime_dependency "hiera"
   spec.add_runtime_dependency "mcollective-client" 
 end

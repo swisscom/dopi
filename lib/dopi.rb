@@ -6,5 +6,9 @@ require "dopi/version"
 
 
 module Dopi
-  # Your code goes here...
+
+  def self.log
+    @log ||= Logger.new(STDOUT)
+  end
+
 end

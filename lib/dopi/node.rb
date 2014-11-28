@@ -25,8 +25,7 @@ module Dopi
           if File.exists?
             facts_scope = YAML.load_file( facts_yaml ).values
           else
-            ## TODO: use proper loging tool
-            puts "Warning: No fact yaml found for #{fqdn} at #{facts_yaml}"
+            Dopi.log.warn("Warning: No fact yaml found for #{fqdn} at #{facts_yaml}")
           end
           merged_scope = facts_scope.merge( scope )
           scope = merged_scope

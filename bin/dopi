@@ -2,6 +2,34 @@
 #
 # DOPi command line client
 #
+require 'escort'
 require 'dopi'
 
-Dopi::Cli.start(ARGV)
+Escort::App.create do |app|
+  app.version Dopi::VERSION
+  app.summary "DOPi orchestrates your Puppet runs over multiple nodes. Takes any amount of plans as argument"
+
+  app.requires_arguments
+
+  # create global options out of the config class
+  app.options do |opts|
+    Dopi.configuration.instance_variables.each do |config_variable|
+      option_name = config_variable[1..-1]
+      option_default = Dopi.configuration.instance_variable_get(config_variable)
+      opts.opt option_name.to_sym, option_name, :default => option_default
+    end
+  end
+
+  app.action do |options, arguments|
+    Dopi.configure=options[:global][:options]
+    Dopi.log.level = ::Logger.const_get(options[:global][:options][:verbosity].upcase)
+
+    # create and run plan
+    arguments.each do |plan_yaml|
+      plan = Dopi::Plan.new( File.read( plan_yaml ) )
+      plan.nodes.each do |node|
+        puts node.fqdn + ' : ' + node.role
+      end
+    end
+  end
+end
