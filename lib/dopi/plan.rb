@@ -11,43 +11,18 @@ module Dopi
     def initialize( plan_yaml )
       @plan_hash  = YAML.load( plan_yaml )
 
-      create_nodes
+      # Create all the nodes from the plan hash
+      @nodes = []
+      nodes_config_hash = @plan_hash['configuration']['nodes']
+      Dopi.log.debug("Digesting the nodes configuration")
+      Dopi.log.debug(nodes_config_hash.inspect)
+      @plan_hash['nodes'].each_key do |fqdn|
+        @nodes << ::Dopi::Node.new(fqdn, nodes_config_hash[fqdn])
+      end
+
       create_steps
     end
 
-    # Create all the nodes from the plan hash
-    def create_nodes
-      @nodes = []
-      nodes_config = @plan_hash['configuration']['nodes']
-      Dopi.log.debug("Digesting the nodes configuration")
-      Dopi.log.debug(nodes_config.inspect)
-
-      @plan_hash['nodes'].each_key do |fqdn|
-        # set some basic scope variables if they are
-        # not already set
-        hostname, domain = fqdn.split( '.', 2 )
-        scope = { 'hostname' => hostname, 'domain' => domain }
-
-        # Merge with nodes config from the plan and indentify
-        # the role if it is defined here
-        role = nil
-        if nodes_config[fqdn]
-          Dopi.log.debug("Merging nodes config into scope")
-          Dopi.log.debug(nodes_config[fqdn].inspect)
-          scope.merge( nodes_config[fqdn] )
-
-          role_variable = Dopi.configuration.role_variable
-          if nodes_config[fqdn][role_variable]
-            role = nodes_config[fqdn][role_variable]
-            Dopi.log.debug("found role #{role} for node #{fqdn}")
-          else
-            Dopi.log.debug("No #{role_varibale} found for node #{fqdn}")
-          end
-        end
-
-        @nodes << ::Dopi::Node.new( fqdn, role, scope )
-      end
-    end
 
     # Create all the steps from the plan hash
     def create_steps
