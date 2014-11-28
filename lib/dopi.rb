@@ -2,6 +2,7 @@ require "dopi/cli"
 require "dopi/configure"
 require "dopi/node"
 require "dopi/plan"
+require "dopi/step"
 require "dopi/version"
 
 
