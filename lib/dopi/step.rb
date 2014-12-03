@@ -5,11 +5,13 @@
 module Dopi
   class Step
 
-    attr_reader :name, :nodes, :command
+    attr_reader :name, :nodes, :commands, :state
 
 
     def initialize(step_config_hash, all_nodes)
       @name = step_config_hash['name']
+      @commands = []
+      @state = :ready
 
       # assemble a list of the nodes assigned to the step
       @nodes = []
@@ -24,6 +26,7 @@ module Dopi
         Dopi.log.debug("No roles field found for step #{@name}")
       end
       @nodes.uniq!
+      create_commands(step_config_hash['command'])
     end
 
 
@@ -67,6 +70,25 @@ module Dopi
         raise "roles field in step #{step['name']} is not an array"
       end
       return nodes
+    end
+
+
+    def create_commands(command_hash)
+      # TODO: implement more commands
+      @nodes.each do |node|
+        @commands << Dopi::Command.new(node, command_hash)
+      end
+    end
+
+
+    def run(max_in_flight = nil)
+      # TODO: implement max in flight
+      @state = :in_progress
+      @commands.each do |command|
+        command.run
+        @state = :failed if command.state == :failed
+      end
+      @state = :done unless @state == :failed 
     end
 
 

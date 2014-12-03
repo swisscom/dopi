@@ -27,20 +27,21 @@ Escort::App.create do |app|
     # create and run plan
     arguments.each do |plan_yaml|
       plan = Dopi::Plan.new( File.read( plan_yaml ) )
-    
-      # Show all nodes with their roles
-      plan.nodes.each do |node|
-        puts node.fqdn + ' : ' + node.role
-      end
+      plan.run
 
-      # Show all steps with their nodes and
-      # the command it would execute
+      # print the stats
+      overall = 'done'
+      status = {}
       plan.steps.each do |step|
-        puts step.name
-        node_names = step.nodes.collect {|n| n.fqdn}
-        puts '  nodes : ' + node_names.inspect
+        overall = 'failed' if step.state == :failed
+        puts "Step: #{step.name} => #{step.state.to_s}"
+        step.commands.each do |command|
+          puts "  #{command.node.fqdn} => #{command.state.to_s}"
+        end
       end
-
+      puts "-------------------------"
+      puts "Plan status: #{overall}"
+      puts
     end
   end
 end

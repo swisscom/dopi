@@ -29,5 +29,13 @@ module Dopi
     end
 
 
+    def run
+      # TODO: implement max_in_flight
+      max_in_flight = 0
+      @steps.each do |step|
+        step.run(max_in_flight)
+      end
+    end
+
   end
 end

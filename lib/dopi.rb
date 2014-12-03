@@ -1,4 +1,5 @@
 require "dopi/cli"
+require "dopi/command"
 require "dopi/configure"
 require "dopi/node"
 require "dopi/plan"
