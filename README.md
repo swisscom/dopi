@@ -43,11 +43,11 @@ Help on all available options
 Command stuff:
 - [x] Commands as plugins
 - [ ] Load plugins from external paths
-- [ ] Custom command easier rewritable, facter code out into more methods
+- [x] Custom command easier rewritable, facter code out into more methods
 - [ ] implement "dop check"
 - [ ] implement "node check"
 - [ ] implement "expect exit code"
-- [ ] SSH custom command
+- [x] SSH custom command
 - [ ] SSH puppet command
 
 Plan:
