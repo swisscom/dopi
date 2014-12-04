@@ -26,7 +26,25 @@ module Dopi
         Dopi.log.debug("No roles field found for step #{@name}")
       end
       @nodes.uniq!
-      create_commands(step_config_hash['command'])
+
+      # extract the plugin name from the step hash
+      plugin_name = nil
+      if step_config_hash['command']
+        if step_config_hash['command'].class == String
+          plugin_name = command_hash
+        elsif step_config_hash['command']['name'].class == String
+          plugin_name = step_config_hash['command']['name']
+        else
+          raise "command part of step #{name} is invalid"
+        end
+      else
+        raise "No command found for step #{name}"
+      end
+      
+      # create instances from command plugin
+      @nodes.each do |node|
+        @commands << Dopi::Command.create_plugin_instance(plugin_name, node, step_config_hash['command'])
+      end
     end
 
 
@@ -70,14 +88,6 @@ module Dopi
         raise "roles field in step #{step['name']} is not an array"
       end
       return nodes
-    end
-
-
-    def create_commands(command_hash)
-      # TODO: implement more commands
-      @nodes.each do |node|
-        @commands << Dopi::Command.new(node, command_hash)
-      end
     end
 
 

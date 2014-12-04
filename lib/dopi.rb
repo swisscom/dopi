@@ -1,16 +1,11 @@
-require "dopi/cli"
-require "dopi/command"
 require "dopi/configure"
+require "dopi/log"
+require "dopi/pluginmanager"
+require "dopi/command"
 require "dopi/node"
 require "dopi/plan"
 require "dopi/step"
 require "dopi/version"
 
-
 module Dopi
-
-  def self.log
-    @log ||= Logger.new(STDOUT)
-  end
-
 end
