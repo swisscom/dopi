@@ -34,6 +34,7 @@ module Dopi
   class Configuration
     attr_accessor :use_hiera, :hiera_yaml, :facts_dir
     attr_accessor :role_variable, :role_default
+    attr_accessor :ssh_user, :ssh_key
 
     def initialize
       # Hiera defaults
@@ -44,6 +45,10 @@ module Dopi
       # Role defaults
       @role_variable = 'role'
       @role_default  = nil
+
+      # SSH defaults
+      @ssh_user = 'root'
+      @ssh_key  = File.join(ENV['HOME'], '.ssh/id_dsa')
     end
  
   end
