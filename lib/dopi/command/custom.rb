@@ -39,7 +39,7 @@ module Dopi
             @state = :done if node_verify
           end
           if @state == :ready
-            cmd_stdout, cmd_stderr, cmd_exit_code = command
+            cmd_stdout, cmd_stderr, cmd_exit_code = run_command
             @state = :failed unless parse_output(cmd_stdout)
             @state = :failed unless parse_output(cmd_stderr)
             @state = :failed unless check_exit_code(cmd_exit_code)
@@ -70,31 +70,51 @@ module Dopi
       end
 
 
-      # The command method executes the command of the step.
-      # Returns an array with stdio, sterror and exit code.
-      def command
-        if @command_hash['exec']
-          # TODO: arguments
-          #arguments = @command_hash['arguments']
-          #arguments ||= ''
-          env = @command_hash['env']
-          env ||= {}
-          command_string = @command_hash['exec'] #+ ' ' + arguments
+      def env
+        env = @command_hash['env']
+        env ||= {}
+      end
 
-          cmd_stdout = ''
-          cmd_stderr = ''
-          cmd_exit_code = Open3.popen3(env, command_string) do |stdin, stdout, stderr, wait_thr|
-            stdin.close
-            cmd_stdout = stdout.read
-            cmd_stderr = stderr.read
-            Dopi.log.debug(@node.fqdn + ":" + @name + " - " + cmd_stdout)
-            Dopi.log.debug(@node.fqdn + ":" + @name + " - " + cmd_stderr)
-            wait_thr.value
-          end
-          return cmd_stdout, cmd_stderr, cmd_exit_code
+
+      def arguments
+        arguments = @command_hash['arguments']
+        arguments ||= {}
+      end
+
+
+      def argument_string
+        arguments.flatten.join(' ')
+      end
+
+
+      def exec
+        if @command_hash['exec']
+          return @command_hash['exec']
         else
           raise "No exec part for command #{@name}"
         end
+      end
+
+
+      def command_string
+        exec + ' ' + argument_string
+      end
+
+
+      # The command method executes the command of the step.
+      # Returns an array with stdio, sterror and exit code.
+      def run_command
+        cmd_stdout = ''
+        cmd_stderr = ''
+        cmd_exit_code = Open3.popen3(env, command_string) do |stdin, stdout, stderr, wait_thr|
+          stdin.close
+          cmd_stdout = stdout.read
+          cmd_stderr = stderr.read
+          Dopi.log.debug(@node.fqdn + ":" + @name + " - " + cmd_stdout)
+          Dopi.log.debug(@node.fqdn + ":" + @name + " - " + cmd_stderr)
+          wait_thr.value
+        end
+        return cmd_stdout, cmd_stderr, cmd_exit_code
       end
 
 
