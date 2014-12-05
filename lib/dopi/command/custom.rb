@@ -106,6 +106,7 @@ module Dopi
       def run_command
         cmd_stdout = ''
         cmd_stderr = ''
+        Dopi.log.debug("Executing #{command_string} for command #{@name}")
         cmd_exit_code = Open3.popen3(env, command_string) do |stdin, stdout, stderr, wait_thr|
           stdin.close
           cmd_stdout = stdout.read
@@ -184,9 +185,13 @@ module Dopi
       end
 
       
-      def expect_exit_code
-        exit_code = 0
+
+      # Returns an array of valid exit codes or
+      def expect_exit_codes
+        exit_code = [ 0 ]
         if @command_hash['expect_exit_code'].class == Fixnum
+          exit_code = [ @command_hash['expect_exit_code'] ]
+        elsif @command_hash['expect_exit_code'].class == Array
           exit_code = @command_hash['expect_exit_code']
         elsif @command_hash['expect_exit_code'].class == String
           if @command_hash['expect_exit_code'].casecmp('all') == 0
@@ -198,12 +203,12 @@ module Dopi
 
 
       def check_exit_code(cmd_exit_code)
-        return true unless expect_exit_code
-        if expect_exit_code == cmd_exit_code
+        return true unless expect_exit_codes
+        if expect_exit_codes.include? cmd_exit_code
           return true
         else
           Dopi.log.error("Wrong exit code in command #{@name} for node #{@node.fqdn}")
-          Dopi.log.error("Exit code was #{cmd_exit_code.to_s} should be #{expect_exit_code}")
+          Dopi.log.error("Exit code was #{cmd_exit_code.to_s} should be one of #{expect_exit_codes.join(',')}")
           return false
         end
       end
