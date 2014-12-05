@@ -39,6 +39,7 @@ Help on all available options
 ### General
 - [ ] Write unit tests
 - [ ] Check how the logger initialization is done right in the CLI and GEM context
+- [ ] Implement a proper state tracker to enable resume functionality
 
 Command stuff:
 - [x] Commands as plugins

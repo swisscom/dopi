@@ -6,7 +6,7 @@ require 'yaml'
 module Dopi
   class Plan
     
-    attr_reader :nodes, :steps
+    attr_reader :nodes, :steps, :state
 
 
     def initialize( plan_yaml )
@@ -26,15 +26,22 @@ module Dopi
       @plan_hash['steps'].each do |step_config_hash|
         @steps << ::Dopi::Step.new(step_config_hash, @nodes)
       end
+      @step = :ready
     end
 
 
     def run
+      @state = :running
       # TODO: implement max_in_flight
       max_in_flight = 0
       @steps.each do |step|
         step.run(max_in_flight)
+        unless step.state == :done
+          @state = :failed
+          break
+        end
       end
+      @state = :done unless @state == :failed
     end
 
   end
