@@ -183,17 +183,28 @@ module Dopi
         return results
       end
 
+      
+      def expect_exit_code
+        exit_code = 0
+        if @command_hash['expect_exit_code'].class == Fixnum
+          exit_code = @command_hash['expect_exit_code']
+        elsif @command_hash['expect_exit_code'].class == String
+          if @command_hash['expect_exit_code'].casecmp('all') == 0
+            exit_code = nil
+          end
+        end
+        return exit_code
+      end
+
 
       def check_exit_code(cmd_exit_code)
-        expected_exit_code = 0
-        if @command_hash['expect_exit_code'].class == Fixnum
-          expected_exit_code = @command_hash['expect_exit_code']
-        end
-        if expected_exit_code == cmd_exit_code
+        return true unless expect_exit_code
+        if expect_exit_code == cmd_exit_code
           return true
         else
-          # TODO: Throw proper exception class
-          raise "Error in command #{@name} for node #{@node.fqdn} : Exit code was #{cmd_exit_code.to_s} should be #{expected_exit_code}"
+          Dopi.log.error("Wrong exit code in command #{@name} for node #{@node.fqdn}")
+          Dopi.log.error("Exit code was #{cmd_exit_code.to_s} should be #{expect_exit_code}")
+          return false
         end
       end
 
