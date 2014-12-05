@@ -46,7 +46,7 @@ Command stuff:
 - [x] Custom command easier rewritable, facter code out into more methods
 - [ ] implement "dop check"
 - [ ] implement "node check"
-- [ ] implement "expect exit code"
+- [x] implement "expect exit code"
 - [x] SSH custom command
 - [ ] SSH puppet command
 

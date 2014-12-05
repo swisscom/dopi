@@ -114,7 +114,7 @@ module Dopi
           Dopi.log.debug(@node.fqdn + ":" + @name + " - " + cmd_stderr)
           wait_thr.value
         end
-        return cmd_stdout, cmd_stderr, cmd_exit_code
+        return cmd_stdout, cmd_stderr, cmd_exit_code.exitstatus
       end
 
 
@@ -185,9 +185,16 @@ module Dopi
 
 
       def check_exit_code(cmd_exit_code)
-        # TODO: implement
-        # @command_hash['expect_exit_code']
-        return true
+        expected_exit_code = 0
+        if @command_hash['expect_exit_code'].class == Fixnum
+          expected_exit_code = @command_hash['expect_exit_code']
+        end
+        if expected_exit_code == cmd_exit_code
+          return true
+        else
+          # TODO: Throw proper exception class
+          raise "Error in command #{@name} for node #{@node.fqdn} : Exit code was #{cmd_exit_code.to_s} should be #{expected_exit_code}"
+        end
       end
 
 
