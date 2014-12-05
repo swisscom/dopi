@@ -22,5 +22,6 @@ end
 # load standard command plugins
 require 'dopi/command/custom'
 require 'dopi/command/ssh_custom'
+require 'dopi/command/ssh_puppet_run'
 
 # TODO: load plugins from the plugin paths
