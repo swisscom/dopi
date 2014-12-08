@@ -35,8 +35,8 @@ module Dopi
       if step_config_hash['command']
         if step_config_hash['command'].class == String
           plugin_name = step_config_hash['command']
-        elsif step_config_hash['command']['name'].class == String
-          plugin_name = step_config_hash['command']['name']
+        elsif step_config_hash['command']['plugin'].class == String
+          plugin_name = step_config_hash['command']['plugin']
           command_hash = step_config_hash['command']
         else
           raise "command part of step #{name} is invalid"

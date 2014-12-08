@@ -19,7 +19,7 @@ module Dopi
           @name = command_hash
           @command_hash = {}
         elsif command_hash.class == Hash
-          @name = command_hash['name']
+          @name = command_hash['plugin']
           @command_hash = command_hash
         else
           # TODO: throw proper exception class
