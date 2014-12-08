@@ -32,8 +32,12 @@ module Dopi
 
     def run
       @state = :running
-      # TODO: implement max_in_flight
-      max_in_flight = 0
+      max_in_flight = 1
+      if @plan_hash['plan']
+        if @plan_hash['plan']['max_in_flight'].class == Fixnum
+          max_in_flight = @plan_hash['plan']['max_in_flight']
+        end
+      end
       @steps.each do |step|
         step.run(max_in_flight)
         unless step.state == :done
