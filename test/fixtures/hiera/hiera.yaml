@@ -1,0 +1,10 @@
+:backends:
+    - yaml
+:hierarchy:
+    - "hosts/%{::clientcert}"
+    - "domains/%{::domain}"
+    - "roles/%{::my_role}_%{::my_step}"
+    - "roles/%{::my_role}"
+    - defaults
+:yaml:
+   :datadir: test/fixtures/hiera/hieradata
