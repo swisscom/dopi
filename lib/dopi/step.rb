@@ -11,6 +11,7 @@ module Dopi
     def initialize(step_config_hash, all_nodes)
       @name = step_config_hash['name']
       @commands = []
+      @threads = []
       @state = :ready
 
       # assemble a list of the nodes assigned to the step
@@ -91,11 +92,33 @@ module Dopi
     end
 
 
-    def run(max_in_flight = nil)
-      # TODO: implement max in flight
+    def threads_running
+      count = 0
+      @threads.each do |thread|
+        count += 1 if thread.status
+      end
+      Dopi.log.debug("Currently running threads: #{count}")
+      count
+    end
+
+
+    def run(max_in_flight)
       @state = :in_progress
+      # create and run the command threads
       @commands.each do |command|
-        command.run
+        # wait with thread creation until we have less
+        # than configured in flight
+        while threads_running >= max_in_flight do
+          sleep(0.1)
+        end
+        @threads << Thread.new { command.run }
+      end
+      # wait until all the threads have terminated
+      until threads_running > 0 do
+        sleep(0.1)
+      end
+      # create the step state from the command stated
+      @commands.each do |command|
         @state = :failed if command.state == :failed
       end
       @state = :done unless @state == :failed 
