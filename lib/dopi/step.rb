@@ -117,7 +117,7 @@ module Dopi
         @threads << Thread.new { command.run }
       end
       # wait until all the threads have terminated
-      until threads_running > 0 do
+      while threads_running > 0 do
         sleep(0.1)
       end
       # create the step state from the command stated
