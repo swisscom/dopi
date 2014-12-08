@@ -49,7 +49,7 @@ Command stuff:
 - [ ] implement "node check"
 - [x] implement "expect exit code"
 - [x] SSH custom command
-- [ ] SSH puppet command
+- [x] SSH puppet command
 
 Plan:
 - [ ] Create hiera example structure and test Hiera stuff
