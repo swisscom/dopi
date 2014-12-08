@@ -1,6 +1,7 @@
 #
 # This class loades a deployment plan
 #
+require 'puppet'
 require 'hiera'
 
 module Dopi
@@ -15,7 +16,12 @@ module Dopi
       # set some basic scope variables if they are
       # not already set
       hostname, domain = fqdn.split('.', 2)
-      scope = { 'hostname' => hostname, 'domain' => domain }
+      scope = {
+        '::fqdn' => fqdn,
+        '::clientcert' => fqdn,
+        '::hostname' => hostname,
+        '::domain' => domain
+      }
 
       if node_config_hash
         Dopi.log.debug("Merging nodes config into scope")
@@ -26,10 +32,11 @@ module Dopi
       end
 
       if Dopi.configuration.use_hiera
-        overwrite_role_from_hiera(fqdn, scope)
+        overwrite_role_from_hiera(fqdn, scope=scope)
       end
 
       raise "No role found for node #{fqdn}" if role.nil?
+      Dopi.log.info("Role for node #{fqdn} is : #{@role}")
     end
 
 
@@ -52,7 +59,7 @@ module Dopi
       if Dopi.configuration.facts_dir
         facts_yaml = File.join(Dopi.configuration.facts_dir, fqdn + '.yaml')
         facts_scope = {}
-        if File.exists?
+        if File.exists? facts_yaml
           facts_scope = YAML.load_file(facts_yaml).values
         else
           Dopi.log.warn("Warning: No fact yaml found for #{fqdn} at #{facts_yaml}")
@@ -61,7 +68,19 @@ module Dopi
         scope = merged_scope
       end
 
-      @role = Hiera.lookup(Dopi.configuration.role_variable, @role, scope)
+      # add top scope marker for all variables
+      hiera_scope = {}
+      scope.each do |key, value|
+        if key =~ /^::/
+          hiera_scope[key] = value
+        else
+          hiera_scope['::' + key] = value
+        end
+      end
+
+      Dopi.log.debug("Loaded scope for #{fqdn}:")
+      Dopi.log.debug(hiera_scope.inspect)
+      @role = @@hiera.lookup(Dopi.configuration.role_variable, @role, hiera_scope)
     end
 
   end

@@ -24,5 +24,6 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "escort"
   spec.add_runtime_dependency "hiera"
+  spec.add_runtime_dependency "puppet"
   spec.add_runtime_dependency "mcollective-client" 
 end
