@@ -8,9 +8,20 @@ module Dopi
     class SshCustom < Dopi::Command::Custom
 
       def ssh_command_string
+        options = ""
+        unless Dopi.configuration.ssh_option_challenge_response_authentication
+          options << ' -o ChallengeResponseAuthentication=no'
+        end
+        unless Dopi.configuration.ssh_option_password_authentication
+          options << ' -o PasswordAuthentication=no'
+        end
+        unless Dopi.configuration.ssh_option_strict_host_key_checking
+          options << ' -o StrictHostKeyChecking=no'
+        end
+
         user = Dopi.configuration.ssh_user
         key  = Dopi.configuration.ssh_key
-        "ssh -i #{key} #{user}@#{node.fqdn}"
+        "ssh -i #{key}#{options} #{user}@#{node.fqdn}"
       end
 
       def command_string
