@@ -55,7 +55,7 @@ Plan:
 - [ ] Create hiera example structure and test Hiera stuff
 
 Steps:
-- [ ] Implement "max in flight" and parallel execution
+- [x] Implement "max in flight" and parallel execution
 
 CLI:
 - [ ] Config file
