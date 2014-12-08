@@ -28,13 +28,16 @@ module Dopi
       end
       @nodes.uniq!
 
-      # extract the plugin name from the step hash
+      # extract the plugin name and the command_hash 
+      # from the step hash
       plugin_name = nil
+      command_hash = {}
       if step_config_hash['command']
         if step_config_hash['command'].class == String
-          plugin_name = command_hash
+          plugin_name = step_config_hash['command']
         elsif step_config_hash['command']['name'].class == String
           plugin_name = step_config_hash['command']['name']
+          command_hash = step_config_hash['command']
         else
           raise "command part of step #{name} is invalid"
         end
@@ -44,7 +47,7 @@ module Dopi
       
       # create instances from command plugin
       @nodes.each do |node|
-        @commands << Dopi::Command.create_plugin_instance(plugin_name, node, step_config_hash['command'])
+        @commands << Dopi::Command.create_plugin_instance(plugin_name, node, command_hash)
       end
     end
 
