@@ -52,7 +52,7 @@ Command stuff:
 - [x] SSH puppet command
 
 Plan:
-- [ ] Create hiera example structure and test Hiera stuff
+- [x] Create hiera example structure and test Hiera stuff
 
 Steps:
 - [x] Implement "max in flight" and parallel execution
