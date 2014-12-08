@@ -9,4 +9,8 @@ module Dopi
     @log ||= Logger.new(STDOUT)
   end
 
+  def self.logger=(logger)
+    @logger = logger
+  end
+
 end
