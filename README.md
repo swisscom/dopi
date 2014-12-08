@@ -56,6 +56,7 @@ Plan:
 
 Steps:
 - [x] Implement "max in flight" and parallel execution
+- [ ] Fail step during run if a single node fails
 
 CLI:
 - [ ] Config file
