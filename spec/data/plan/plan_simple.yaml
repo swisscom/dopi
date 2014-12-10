@@ -1,0 +1,43 @@
+nodes:
+
+  mysql01.example.com:
+  web01.example.com:
+  web02.example.com:
+  haproxy01.example.com:
+  haproxy02.example.com:
+
+configuration:
+  nodes:
+    mysql01.example.com:
+      my_role: mysql
+    web01.example.com:
+      my_role: httpd
+    web02.example.com:
+      my_role: httpd
+    haproxy01.example.com:
+      my_role: haproxy
+    haproxy02.example.com:
+      my_role: haproxy
+
+plan:
+  max_in_flight: 2
+
+steps:
+
+    - name: simple_step_1
+      nodes: all
+      command:
+          plugin: custom
+          exec: 'echo'
+          arguments:
+            'Hello World':
+
+    - name: simple_step_2
+      nodes: all
+      command:
+          plugin: custom
+          exec: 'echo'
+          arguments:
+            'Hello Universe':
+
+
