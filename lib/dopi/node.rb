@@ -7,80 +7,69 @@ require 'hiera'
 module Dopi
 
   class Node
-    attr_reader :fqdn, :role
+    attr_reader :fqdn
 
-    def initialize(fqdn, node_config_hash)
+    def initialize(fqdn, node_config)
       @fqdn = fqdn
-      @role = Dopi.configuration.role_default
+      @node_config = node_config
+    end
 
-      # set some basic scope variables if they are
-      # not already set
-      hostname, domain = fqdn.split('.', 2)
-      scope = {
-        '::fqdn' => fqdn,
-        '::clientcert' => fqdn,
+    def hostname
+      @hostname ||= @fqdn.split('.', 2)[0]
+    end
+
+    def domain
+      @domain ||= @fqdn.split('.', 2)[1]
+    end 
+
+    def basic_scope
+      @basic_scope ||= {
+        '::fqdn' => @fqdn,
+        '::clientcert' => @fqdn,
         '::hostname' => hostname,
         '::domain' => domain
       }
-
-      if node_config_hash
-        Dopi.log.debug("Merging nodes config into scope")
-        Dopi.log.debug(node_config_hash.inspect)
-        scope.merge(node_config_hash)
-
-        overwrite_role_from_hash(node_config_hash)
-      end
-
-      if Dopi.configuration.use_hiera
-        overwrite_role_from_hiera(fqdn, scope=scope)
-      end
-
-      raise "No role found for node #{fqdn}" if role.nil?
-      Dopi.log.info("Role for node #{fqdn} is : #{@role}")
     end
 
-
-    def overwrite_role_from_hash(node_config_hash)
-      role_variable = Dopi.configuration.role_variable
-      if node_config_hash[role_variable]
-        @role = node_config_hash[role_variable]
-        Dopi.log.debug("found role #{role} for node #{fqdn} in plan yaml")
+    def facts
+      facts_yaml = File.join(Dopi.configuration.facts_dir, @fqdn + '.yaml')
+      if File.exists? facts_yaml
+        YAML.load_file(facts_yaml).values
       else
-        Dopi.log.debug("No #{role_varibale} found for node #{fqdn} in plan yaml")
+        Dopi.log.warning("No facts found for node #{@fqdn} at #{facts_yaml}")
+        {}
       end
     end
 
+    def ensure_global_namespace(fact)
+      fact =~ /^::/ ? fact : '::' + fact
+    end
 
-    def overwrite_role_from_hiera(fqdn, scope)
+    def scope
+      merged_scope = facts.merge(basic_scope)
+      @scope = Hash[merged_scope.map {|fact,value| [ensure_global_namespace(fact), value ]}]
+    end
+
+    def role_default
+      if Dopi.configuration.role_default
+        Dopi.configuration.role_default
+      else
+        raise "No role found for #{fqdn} and no default role defined"
+      end
+    end
+
+    def role_from_config
+      conf_role = @node_config[Dopi.configuration.role_variable]
+      conf_role.nil? ? role_default : conf_role
+    end
+
+    def role_from_hiera
       @@hiera ||= Hiera.new(:config => Dopi.configuration.hiera_yaml)
+      @@hiera.lookup(Dopi.configuration.role_variable, role_from_config, scope)
+    end
 
-      # Load the scope from facts if the 
-      # directory is configured
-      if Dopi.configuration.facts_dir
-        facts_yaml = File.join(Dopi.configuration.facts_dir, fqdn + '.yaml')
-        facts_scope = {}
-        if File.exists? facts_yaml
-          facts_scope = YAML.load_file(facts_yaml).values
-        else
-          Dopi.log.warn("Warning: No fact yaml found for #{fqdn} at #{facts_yaml}")
-        end
-        merged_scope = facts_scope.merge(scope)
-        scope = merged_scope
-      end
-
-      # add top scope marker for all variables
-      hiera_scope = {}
-      scope.each do |key, value|
-        if key =~ /^::/
-          hiera_scope[key] = value
-        else
-          hiera_scope['::' + key] = value
-        end
-      end
-
-      Dopi.log.debug("Loaded scope for #{fqdn}:")
-      Dopi.log.debug(hiera_scope.inspect)
-      @role = @@hiera.lookup(Dopi.configuration.role_variable, @role, hiera_scope)
+    def role
+      @role ||= Dopi.configuration.use_hiera ? role_from_hiera : role_from_config
     end
 
   end
