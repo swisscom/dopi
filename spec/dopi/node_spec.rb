@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Dopi::Node do
 
   before :all do
-    #Dopi.log.level = ::Logger::ERROR
+    Dopi.log.level = ::Logger::ERROR
 
     Dopi.configure do |config|
       config.role_variable = 'my_role'
