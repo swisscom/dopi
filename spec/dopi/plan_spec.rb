@@ -21,6 +21,28 @@ describe Dopi::Plan do
     end
   end
 
+  describe '#configuration_hash' do
+    it 'extracts the configuration hash out of the plan hash' do
+      expect(@plan.configuration_hash).to be_an_instance_of Hash
+      expect(@plan.configuration_hash['nodes']).to be_an_instance_of Hash
+    end
+  end
+
+  describe '#nodes_configuration_hash' do
+    it 'extracts the nodes configuration hash out of the configuration hash' do
+      expect(@plan.nodes_configuration_hash).to be_an_instance_of Hash
+      expect(@plan.nodes_configuration_hash['web01.example.com']).to be_an_instance_of Hash
+    end
+  end
+
+  describe '#steps_array' do
+    it 'extracts the steps array out of the plan hash' do
+      expect(@plan.steps_array).to be_an_instance_of Array
+      expect(@plan.steps_array[0]).to be_an_instance_of Hash
+      expect(@plan.steps_array[1]).to be_an_instance_of Hash
+    end
+  end
+
   describe '#nodes' do
     it 'creates 5 nodes' do
       expect(@plan.nodes.length).to be 5

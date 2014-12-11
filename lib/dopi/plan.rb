@@ -11,22 +11,41 @@ module Dopi
 
     def initialize( plan_yaml )
       @plan_hash  = YAML.load( plan_yaml )
+      @state = :ready
+    end
 
-      # Create all the nodes from the plan hash
-      @nodes = []
-      nodes_config_hash = @plan_hash['configuration']['nodes']
-      Dopi.log.debug("Digesting the nodes configuration")
-      Dopi.log.debug(nodes_config_hash.inspect)
-      @plan_hash['nodes'].each_key do |fqdn|
-        @nodes << ::Dopi::Node.new(fqdn, nodes_config_hash[fqdn])
-      end
 
-      # Create all the steps from the plan hash
-      @steps = []
-      @plan_hash['steps'].each do |step_config_hash|
-        @steps << ::Dopi::Step.new(step_config_hash, @nodes)
+    def configuration_hash
+      @configuration_hash ||= if @plan_hash['configuration']
+        @plan_hash['configuration']
+      else
+        Dopi.log.warn("No configuration section found in plan file")
+        {}
       end
-      @step = :ready
+    end
+
+
+    def nodes_configuration_hash
+       @nodes_configuration_hash ||= configuration_hash['nodes'] ? configuration_hash['nodes'] : {}
+    end
+
+
+    def steps_array
+      @steps_array ||= @plan_hash['steps'] ? @plan_hash['steps'] : []
+    end
+
+
+    def nodes
+      @nodes ||= nodes_configuration_hash.map do |fqdn, node_config|
+        ::Dopi::Node.new(fqdn, node_config)
+      end
+    end
+
+
+    def steps
+      @steps ||= steps_array.map do |step_hash|
+        ::Dopi::Step.new(step_hash, nodes)
+      end
     end
 
 
