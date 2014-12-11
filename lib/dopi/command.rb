@@ -20,6 +20,7 @@ end
 
 
 # load standard command plugins
+require 'dopi/command/dummy'
 require 'dopi/command/custom'
 require 'dopi/command/ssh_custom'
 require 'dopi/command/ssh_puppet_run'
