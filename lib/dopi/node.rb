@@ -51,16 +51,12 @@ module Dopi
     end
 
     def role_default
-      if Dopi.configuration.role_default
-        Dopi.configuration.role_default
-      else
+      Dopi.configuration.role_default or
         raise "No role found for #{fqdn} and no default role defined"
-      end
     end
 
     def role_from_config
-      conf_role = @node_config[Dopi.configuration.role_variable]
-      conf_role.nil? ? role_default : conf_role
+      @node_config[Dopi.configuration.role_variable] || role_default
     end
 
     def role_from_hiera

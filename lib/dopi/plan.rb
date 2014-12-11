@@ -16,22 +16,17 @@ module Dopi
 
 
     def configuration_hash
-      @configuration_hash ||= if @plan_hash['configuration']
-        @plan_hash['configuration']
-      else
-        Dopi.log.warn("No configuration section found in plan file")
-        {}
-      end
+      @configuration_hash ||= @plan_hash['configuration'] || {}
     end
 
 
     def nodes_configuration_hash
-       @nodes_configuration_hash ||= configuration_hash['nodes'] ? configuration_hash['nodes'] : {}
+       @nodes_configuration_hash ||= configuration_hash['nodes'] || {}
     end
 
 
     def steps_array
-      @steps_array ||= @plan_hash['steps'] ? @plan_hash['steps'] : []
+      @steps_array ||= @plan_hash['steps'] || []
     end
 
 
