@@ -36,7 +36,7 @@ module Dopi
       if File.exists? facts_yaml
         YAML.load_file(facts_yaml).values
       else
-        Dopi.log.warning("No facts found for node #{@fqdn} at #{facts_yaml}")
+        Dopi.log.warn("No facts found for node #{@fqdn} at #{facts_yaml}")
         {}
       end
     end
