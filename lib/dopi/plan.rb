@@ -42,9 +42,29 @@ module Dopi
     end
 
 
+    def nodes_by_fqdns(fqdns)
+      case fqdns
+        when 'all' then nodes
+        when Array then nodes.select {|node| fqdns.include? node.fqdn}
+        else []
+      end
+    end
+
+
+    def nodes_by_roles(roles)
+      case roles
+        when 'all' then nodes
+        when Array then nodes.select {|node| roles.include? node.role}
+        else []
+      end
+    end
+
+
     def steps
       @steps ||= steps_array.map do |step_hash|
-        ::Dopi::Step.new(step_hash, nodes)
+        raise "No name specified for step", step_hash unless step_hash['name'].class == String
+        nodes = (nodes_by_fqdns(step_hash['nodes']) + nodes_by_roles(step_hash['roles'])).uniq
+        ::Dopi::Step.new(step_hash['name'], step_hash['command'], nodes)
       end
     end
 

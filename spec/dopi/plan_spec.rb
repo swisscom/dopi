@@ -43,6 +43,20 @@ describe Dopi::Plan do
     end
   end
 
+  describe '#nodes_by_fqdns' do
+    it 'takes an array of fqdns and returns an array of nodes' do
+      fqdns = ['web01.example.com', 'web02.example.com']
+      nodes = @plan.nodes_by_fqdns(fqdns)
+      expect(nodes.length).to be 2
+      nodes.each {|node| expect(fqdns).to include node.fqdn}
+    end
+  end
+
+  describe '# nodes_by_roles' do
+    it 'takes an array of fqdns and returns an array of nodes' do
+    end
+  end
+
   describe '#nodes' do
     it 'creates 5 nodes' do
       expect(@plan.nodes.length).to be 5
