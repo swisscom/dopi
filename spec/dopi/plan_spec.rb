@@ -69,6 +69,12 @@ describe Dopi::Plan do
     end
   end
 
+  describe '#max_in_flight' do
+    it 'returns the max_in_flight value from the plan file' do
+      expect(@plan.max_in_flight).to be 2
+    end
+  end
+
   describe '#run' do
     pending
   end

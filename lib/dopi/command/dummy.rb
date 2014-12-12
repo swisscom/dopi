@@ -14,10 +14,12 @@ module Dopi
       end
 
       def run
+        state_run
         Dopi.log.info("running dummy command for node: #{node.fqdn}")
         if @command_hash.class == Hash
           Dopi.log.info("command hash was: #{@command_hash.inspect}")
         end
+        state_finish
       end
 
     end

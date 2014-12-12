@@ -4,6 +4,7 @@
 
 module Dopi
   class Command
+    include Dopi::State
 
     def self.inherited(klass)
       PluginManager << klass

@@ -7,12 +7,11 @@ module Dopi
   class Command
     class Custom < Dopi::Command
 
-      attr_reader :node, :name, :state, :command_hash
+      attr_reader :node, :name, :command_hash
 
     public
 
       def initialize(node, command_hash = nil)
-        @state = :ready
         @node = node
 
         if command_hash.class == String
@@ -29,29 +28,30 @@ module Dopi
 
 
       def run
+        state_run
         Dopi.log.debug("Running command #{@name} on #{@node.fqdn}")
         begin 
           # verify state if needed first
-          if @state == :ready && @command_hash['dop_verify_cmd']
-            @state = :done if dop_verify
+          if state_running? && @command_hash['dop_verify_cmd']
+            state_finish if dop_verify
           end
-          if @state == :ready && @command_hash['node_verify_cmd']
-            @state = :done if node_verify
+          if state_running? && @command_hash['node_verify_cmd']
+            state_finish if node_verify
           end
-          if @state == :ready
+          if state_running?
             cmd_stdout, cmd_stderr, cmd_exit_code = run_command
-            @state = :failed unless parse_output(cmd_stdout)
-            @state = :failed unless parse_output(cmd_stderr)
-            @state = :failed unless check_exit_code(cmd_exit_code)
-            @state = :done   unless @state == :failed
+            state_fail unless parse_output(cmd_stdout)
+            state_fail unless parse_output(cmd_stderr)
+            state_fail unless check_exit_code(cmd_exit_code)
           else
             Dopi.log.info("Nothing to do for command #{@name}")
           end
         rescue Exception => e
           Dopi.log.error("An error occured when executing #{@name}")
-          @state = :failed
+          state_fail
           raise e
         end
+        state_finish unless state_failed?
       end
 
 

@@ -5,13 +5,13 @@ require 'yaml'
 
 module Dopi
   class Plan
-    
-    attr_reader :nodes, :steps, :state
 
+    include Dopi::State
 
     def initialize( plan_yaml )
       @plan_hash  = YAML.load( plan_yaml )
-      @state = :ready
+      #state_add_children(steps)
+      steps.each{|step| state_add_child(step)}
     end
 
 
@@ -64,22 +64,17 @@ module Dopi
     end
 
 
+    def max_in_flight
+      @plan_hash['plan'] && @plan_hash['plan']['max_in_flight'] || nodes.length
+    end
+
+
     def run
-      @state = :running
-      max_in_flight = 1
-      if @plan_hash['plan']
-        if @plan_hash['plan']['max_in_flight'].class == Fixnum
-          max_in_flight = @plan_hash['plan']['max_in_flight']
-        end
-      end
-      @steps.each do |step|
+      state_run
+      steps.each do |step|
         step.run(max_in_flight)
-        unless step.state == :done
-          @state = :failed
-          break
-        end
+        break if state_failed? 
       end
-      @state = :done unless @state == :failed
     end
 
   end

@@ -32,16 +32,13 @@ Escort::App.create do |app|
       # print the stats
       overall = 'done'
       status = {}
+      puts "Plan status: #{plan.state.to_s}"
       plan.steps.each do |step|
-        overall = 'failed' if step.state == :failed
-        puts "Step: #{step.name} => #{step.state.to_s}"
+        puts "[#{step.state.to_s}] #{step.name}"
         step.commands.each do |command|
-          puts "  #{command.node.fqdn} => #{command.state.to_s}"
+          puts "  [#{command.state.to_s}] #{command.node.fqdn}"
         end
       end
-      puts "-------------------------"
-      puts "Plan status: #{overall}"
-      puts
     end
   end
 end

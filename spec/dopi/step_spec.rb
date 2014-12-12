@@ -31,4 +31,8 @@ describe Dopi::Step do
     end
   end
 
+  describe '#run' do
+    pending
+  end
+
 end
