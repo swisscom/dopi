@@ -1,7 +1,9 @@
 #
 # Step
 #
- 
+
+require 'parallel'
+
 module Dopi
   class Step
     include Dopi::State
@@ -12,7 +14,6 @@ module Dopi
       @name = name
       @command_hash = command_hash
       @nodes = nodes
-      @threads = []
 
       commands.each{|command| state_add_child(command)}
       raise "nodes list for step #{name} is empty" if @nodes.empty?
@@ -39,23 +40,12 @@ module Dopi
     end
 
 
-    def threads_running
-      @threads.count {|thread| thread.status}
-    end
-
-
     def run(max_in_flight)
       state_run
-      commands.each do |command|
-        while threads_running >= max_in_flight do
-          sleep(0.1)
-        end
-        break if state_failed?
-        @threads << Thread.new { command.run }
-      end
-      # wait until all the threads have terminated
-      while threads_running > 0 do
-        sleep(0.1)
+
+      Parallel.each(commands, in_threads: max_in_flight) do |command|
+        raise Parallel::Break if state_failed?
+        command.run
       end
     end
 

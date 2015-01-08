@@ -10,7 +10,7 @@ module Dopi
   end
 
   def self.logger=(logger)
-    @logger = logger
+    @log = logger
   end
 
 end
