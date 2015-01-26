@@ -3,6 +3,12 @@
 #
 
 module Dopi
+  class CommandParsingError < StandardError
+  end
+
+  class CommandExecutionError < StandardError
+  end
+
   class Command
     include Dopi::State
 
@@ -14,6 +20,12 @@ module Dopi
       plugin_type = PluginManager.get_plugin_name(self) + '/'
       Dopi.log.debug("Creating instance of plugin #{plugin_type + plugin_name}")
       PluginManager.create_instance(plugin_type + plugin_name, node, command_hash)
+    end
+
+    def initialize(plugin_name, node, command_hash = {})
+      @name         = plugin_name.split('/').last
+      @node         = node
+      @command_hash = command_hash
     end
 
   end

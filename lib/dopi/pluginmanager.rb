@@ -19,7 +19,7 @@ module Dopi
 
     def self.create_instance(plugin_name, *args)
       begin
-        @plugins[plugin_name].new(*args)
+        @plugins[plugin_name].new(plugin_name, *args)
       rescue Exception => e
         raise("Could not create instance of plugin #{plugin_name}: #{e}")
       end

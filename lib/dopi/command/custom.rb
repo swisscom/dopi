@@ -11,22 +11,6 @@ module Dopi
 
     public
 
-      def initialize(node, command_hash = nil)
-        @node = node
-
-        if command_hash.class == String
-          @name = command_hash
-          @command_hash = {}
-        elsif command_hash.class == Hash
-          @name = command_hash['plugin']
-          @command_hash = command_hash
-        else
-          # TODO: throw proper exception class
-          raise "The command in a step has to be a String or a Hash"
-        end
-      end
-
-
       def run
         state_run
         Dopi.log.debug("Running command #{@name} on #{@node.fqdn}")
