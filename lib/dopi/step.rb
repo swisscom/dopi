@@ -45,7 +45,7 @@ module Dopi
 
       Parallel.each(commands, in_threads: max_in_flight) do |command|
         raise Parallel::Break if state_failed?
-        command.run
+        command.meta_run
       end
     end
 

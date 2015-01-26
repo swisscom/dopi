@@ -28,6 +28,22 @@ module Dopi
       @command_hash = command_hash
     end
 
+    def meta_run
+      state_run
+      Dopi.log.debug("Running command #{@name} on #{@node.fqdn}")
+      begin
+        run
+      rescue Exception => e
+        state_fail
+        raise e
+      end
+      state_finish unless state_failed?
+    end
+
+    def run
+      raise Dopi::CommandExecutionError, "No run method implemented in plugin #{@name}"
+    end
+
   end
 end
 

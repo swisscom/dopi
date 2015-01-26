@@ -12,30 +12,21 @@ module Dopi
     public
 
       def run
-        state_run
-        Dopi.log.debug("Running command #{@name} on #{@node.fqdn}")
-        begin 
-          # verify state if needed first
-          if state_running? && @command_hash['dop_verify_cmd']
-            state_finish if dop_verify
-          end
-          if state_running? && @command_hash['node_verify_cmd']
-            state_finish if node_verify
-          end
-          if state_running?
-            cmd_stdout, cmd_stderr, cmd_exit_code = run_command
-            state_fail unless parse_output(cmd_stdout)
-            state_fail unless parse_output(cmd_stderr)
-            state_fail unless check_exit_code(cmd_exit_code)
-          else
-            Dopi.log.info("Nothing to do for command #{@name}")
-          end
-        rescue Exception => e
-          Dopi.log.error("An error occured when executing #{@name}")
-          state_fail
-          raise e
+        # verify state if needed first
+        if state_running? && @command_hash['dop_verify_cmd']
+          state_finish if dop_verify
         end
-        state_finish unless state_failed?
+        if state_running? && @command_hash['node_verify_cmd']
+          state_finish if node_verify
+        end
+        if state_running?
+          cmd_stdout, cmd_stderr, cmd_exit_code = run_command
+          state_fail unless parse_output(cmd_stdout)
+          state_fail unless parse_output(cmd_stderr)
+          state_fail unless check_exit_code(cmd_exit_code)
+        else
+          Dopi.log.info("Nothing to do for command #{@name}")
+        end
       end
 
 
