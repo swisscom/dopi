@@ -28,11 +28,22 @@ module Dopi
       @command_hash = command_hash
     end
 
+    def verify_commands
+      @verify_commands ||= []
+    end
+
     def meta_run
       state_run
       Dopi.log.debug("Running command #{@name} on #{@node.fqdn}")
       begin
-        run
+        if state_running? && verify_commands.any?
+          state_finish if verify_commands.all? {|command| command.meta_run}
+        end
+        if state_running?
+          run
+        else
+          Dopi.log.info("Nothing to do for command #{@name} on #{@node.fqdn}")
+        end
       rescue Exception => e
         state_fail
         raise e

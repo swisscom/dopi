@@ -12,38 +12,17 @@ module Dopi
     public
 
       def run
-        # verify state if needed first
-        if state_running? && @command_hash['dop_verify_cmd']
-          state_finish if dop_verify
-        end
-        if state_running? && @command_hash['node_verify_cmd']
-          state_finish if node_verify
-        end
         if state_running?
           cmd_stdout, cmd_stderr, cmd_exit_code = run_command
           state_fail unless parse_output(cmd_stdout)
           state_fail unless parse_output(cmd_stderr)
           state_fail unless check_exit_code(cmd_exit_code)
         else
-          Dopi.log.info("Nothing to do for command #{@name}")
         end
       end
 
 
     private
-
-
-      def dop_verify
-        # TODO: implement
-        false
-      end
-
-
-      def node_verify
-        # TODO: implement
-        false
-      end
-
 
       def env
         env = @command_hash['env']
