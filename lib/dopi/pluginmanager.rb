@@ -4,6 +4,9 @@
 #
 
 module Dopi
+  class PluginLoaderError < StandardError
+  end
+
   module PluginManager
 
     @plugins = {}
@@ -11,7 +14,8 @@ module Dopi
     def self.<<(plugin_klass)
       plugin_name = get_plugin_name(plugin_klass)
 
-      raise "Plugin class #{plugin_klass.to_s} (#{plugin_name}) already loaded" if @plugins[plugin_name]
+      raise Dopi::PluginLoaderError,
+        "Plugin class #{plugin_klass.to_s} (#{plugin_name}) already loaded" if @plugins[plugin_name]
 
       @plugins[plugin_name] = plugin_klass
       Dopi.log.debug("Registering Plugin #{plugin_name} with class #{plugin_klass}")
@@ -21,7 +25,7 @@ module Dopi
       begin
         @plugins[plugin_name].new(plugin_name, *args)
       rescue Exception => e
-        raise("Could not create instance of plugin #{plugin_name}: #{e}")
+        raise PluginLoaderError, "Could not create instance of plugin #{plugin_name}: #{e.message}"
       end
     end
 
