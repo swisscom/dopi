@@ -68,7 +68,7 @@ module Dopi
           Dopi.log.debug(@node.fqdn + ":" + @name + " - " + cmd_stderr)
           wait_thr.value
         end
-        return cmd_stdout, cmd_stderr, cmd_exit_code.exitstatus
+        [ cmd_stdout, cmd_stderr, cmd_exit_code.exitstatus ]
       end
 
 

@@ -94,11 +94,17 @@ steps:
               warning:
                   - '^Warning: '
 
+    - name: 'Make sure we can login to all nodes'
+      nodes: all
+      command:
+          plugin: ssh/wait_for_login
+          plugin_timeout: 30
+
     - name: ssh_test_run
       nodes:
         - mysql01.example.com
       command:
-          plugin: ssh_custom
+          plugin: ssh/custom
           exec: "echo 'Warning: bla bla'"
           arguments: {}
           env:
@@ -117,11 +123,11 @@ steps:
     - name: run_puppet
       nodes: all
       command:
-          plugin: ssh_puppet_run
+          plugin: ssh/puppet_agent_run
           arguments:
               '--noop':
 
     - name: run_puppet2
       nodes: all
-      command: ssh_puppet_run
+      command: ssh/puppet_agent_run
 

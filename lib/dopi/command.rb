@@ -1,6 +1,8 @@
 #
 # This class loades the dopi command plugins
 #
+require 'timeout'
+
 
 module Dopi
   class CommandParsingError < StandardError
@@ -28,8 +30,23 @@ module Dopi
       @command_hash = command_hash
     end
 
+    def default_plugin_timeout
+      300
+    end
+
+    # TODO: Use dop_common validation helper here as soon
+    # as it is implemented
+    def parse_plugin_timeout
+      @command_hash['plugin_timeout'].class == Fixnum ?
+        @command_hash['plugin_timeout'] : default_plugin_timeout
+    end
+
+    def plugin_timeout
+      @plugin_timeout ||= parse_plugin_timeout
+    end
+
     def verify_commands
-      Dopi.log.warning('Verify command parsing is not implemented yet') if @command_hash[:verify_commands]
+      Dopi.log.warning('Verify command parsing is not implemented yet') if @command_hash['verify_commands']
       @verify_commands ||= []
     end
 
@@ -37,14 +54,19 @@ module Dopi
       state_run
       Dopi.log.debug("Running command #{@name} on #{@node.fqdn}")
       begin
-        if state_running? && verify_commands.any?
-          state_finish if verify_commands.all? {|command| command.meta_run}
+        Timeout::timeout(plugin_timeout) do
+          if state_running? && verify_commands.any?
+            state_finish if verify_commands.all? {|command| command.meta_run}
+          end
+          if state_running?
+            run ? state_finish : state_fail
+          else
+            Dopi.log.info("Nothing to do for command #{@name} on #{@node.fqdn}")
+          end
         end
-        if state_running?
-          run ? state_finish : state_fail
-        else
-          Dopi.log.info("Nothing to do for command #{@name} on #{@node.fqdn}")
-        end
+      rescue Timeout::Error
+        state_fail
+        Dopi.log.error("Command #{@name} timed out on #{@node.fqdn}")
       rescue Exception => e
         state_fail
         raise e
@@ -62,7 +84,8 @@ end
 # load standard command plugins
 require 'dopi/command/dummy'
 require 'dopi/command/custom'
-require 'dopi/command/ssh_custom'
-require 'dopi/command/ssh_puppet_run'
+require 'dopi/command/ssh/custom'
+require 'dopi/command/ssh/puppet_agent_run'
+require 'dopi/command/ssh/wait_for_login'
 
 # TODO: load plugins from the plugin paths
