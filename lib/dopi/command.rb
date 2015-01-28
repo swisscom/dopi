@@ -40,7 +40,7 @@ module Dopi
           state_finish if verify_commands.all? {|command| command.meta_run}
         end
         if state_running?
-          run
+          run ? state_finish : state_fail
         else
           Dopi.log.info("Nothing to do for command #{@name} on #{@node.fqdn}")
         end
@@ -48,7 +48,6 @@ module Dopi
         state_fail
         raise e
       end
-      state_finish unless state_failed?
     end
 
     def run

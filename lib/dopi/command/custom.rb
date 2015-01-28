@@ -12,13 +12,12 @@ module Dopi
     public
 
       def run
-        if state_running?
-          cmd_stdout, cmd_stderr, cmd_exit_code = run_command
-          state_fail unless parse_output(cmd_stdout)
-          state_fail unless parse_output(cmd_stderr)
-          state_fail unless check_exit_code(cmd_exit_code)
-        else
-        end
+        result = []
+        cmd_stdout, cmd_stderr, cmd_exit_code = run_command
+        result << parse_output(cmd_stdout)
+        result << parse_output(cmd_stderr)
+        result << check_exit_code(cmd_exit_code)
+        result.all?
       end
 
 
