@@ -29,6 +29,7 @@ module Dopi
     end
 
     def verify_commands
+      Dopi.log.warning('Verify command parsing is not implemented yet') if @command_hash[:verify_commands]
       @verify_commands ||= []
     end
 
