@@ -1,25 +1,29 @@
 #
 # This class loads a deployment plan
 #
+require 'forwardable'
 require 'yaml'
+require 'dop_common'
 
 module Dopi
   class Plan
+    extend Forwardable
     include Dopi::State
 
-    attr_reader :steps
-
-    def initialize( plan_yaml )
-      @mutex = Mutex.new
-      @plan_hash  = YAML.load( plan_yaml )
-
-      @steps = build_steps
-      #state_add_children(steps)
-      steps.each{|step| state_add_child(step)}
+    def self.create_plan_from_yaml(plan_yaml)
+      Dopi::Plan.create_plan_from_hash(YAML.load(plan_yaml))
     end
 
-    def abort!
-      @mutex.synchronize {  @abort = true }
+    def self.create_plan_from_hash(plan_hash)
+      plan_parser = DopCommon::Plan.new(plan_hash)
+      Dopi::Plan.new(plan_parser)
+    end
+
+    def initialize(plan_parser)
+      @mutex = Mutex.new
+      @plan_parser = plan_parser
+
+      steps.each{|step| state_add_child(step)}
     end
 
     def run
@@ -34,36 +38,29 @@ module Dopi
       @mutex.synchronize { @abort }
     end
 
-    def configuration_hash
-      @configuration_hash ||= @plan_hash['configuration'] || {}
+    def abort!
+      @mutex.synchronize { @abort = true }
     end
 
+  private
 
-    def nodes_configuration_hash
-       @nodes_configuration_hash ||= configuration_hash['nodes'] || {}
-    end
-
-
-    def steps_array
-      @steps_array ||= @plan_hash['steps'] || []
-    end
-
+    def_delegator  :@plan_parser, :nodes, :parsed_nodes
+    def_delegator  :@plan_parser, :steps, :parsed_steps
+    def_delegators :@plan_parser, :max_in_flight
 
     def nodes
-      @nodes ||= nodes_configuration_hash.map do |fqdn, node_config|
-        ::Dopi::Node.new(fqdn, node_config)
+      @nodes ||= parsed_nodes.map do |parsed_node|
+        ::Dopi::Node.new(parsed_node)
       end
     end
 
-
-    def nodes_by_fqdns(fqdns)
-      case fqdns
+    def nodes_by_names(names)
+      case names
         when 'all' then nodes
-        when Array then nodes.select {|node| fqdns.include? node.fqdn}
+        when Array then nodes.select {|node| names.include? node.name}
         else []
       end
     end
-
 
     def nodes_by_roles(roles)
       case roles
@@ -73,18 +70,11 @@ module Dopi
       end
     end
 
-
-    def build_steps
-      steps_array.map do |step_hash|
-        raise "No name specified for step", step_hash unless step_hash['name'].class == String
-        nodes = (nodes_by_fqdns(step_hash['nodes']) + nodes_by_roles(step_hash['roles'])).uniq
-        ::Dopi::Step.new(step_hash['name'], step_hash['command'], nodes)
+    def steps
+      @steps ||= parsed_steps.map do |parsed_step|
+        nodes = (nodes_by_names(parsed_step.nodes) + nodes_by_roles(parsed_step.roles)).uniq
+        ::Dopi::Step.new(parsed_step, nodes)
       end
-    end
-
-
-    def max_in_flight
-      @plan_hash['plan'] && @plan_hash['plan']['max_in_flight'] || nodes.length
     end
 
   end

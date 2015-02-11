@@ -26,7 +26,7 @@ Escort::App.create do |app|
 
     # create and run plan
     arguments.each do |plan_yaml|
-      plan = Dopi::Plan.new( File.read( plan_yaml ) )
+      plan = Dopi::Plan.create_plan_from_yaml( File.read( plan_yaml ) )
       plan.run
 
       # print the stats

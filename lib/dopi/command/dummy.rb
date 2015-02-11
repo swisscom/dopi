@@ -9,9 +9,9 @@ module Dopi
     class Dummy < Dopi::Command
 
       def run
-        Dopi.log.info("running dummy command for node: #{node.fqdn}")
+        Dopi.log.info("running dummy command for node: #{node.name}")
         if @command_hash.class == Hash
-          Dopi.log.info("command hash was: #{@command_hash.inspect}")
+          Dopi.log.info("command hash was: #{hash.inspect}")
         end
       end
 

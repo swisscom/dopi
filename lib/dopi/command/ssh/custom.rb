@@ -21,7 +21,7 @@ module Dopi
 
           user = Dopi.configuration.ssh_user
           key  = Dopi.configuration.ssh_key
-          "ssh -i #{key}#{options} #{user}@#{node.fqdn}"
+          "ssh -i #{key}#{options} #{user}@#{node.name}"
         end
 
         def command_string

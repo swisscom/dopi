@@ -1,42 +1,49 @@
 #
 # This class loades a deployment plan
 #
+require 'forwardable'
 require 'puppet'
 require 'hiera'
 
 module Dopi
-
   class Node
-    attr_reader :fqdn
+    extend Forwardable
 
-    def initialize(fqdn, node_config)
-      @fqdn = fqdn
-      @node_config = node_config
+    def initialize(node_parser)
+      @node_parser = node_parser
     end
 
+    def_delegators :@node_parser, :name
+
+    def role
+      @role ||= Dopi.configuration.use_hiera ? role_from_hiera : role_from_config
+    end
+
+  private
+
     def hostname
-      @hostname ||= @fqdn.split('.', 2)[0]
+      @hostname ||= @name.split('.', 2)[0]
     end
 
     def domain
-      @domain ||= @fqdn.split('.', 2)[1]
+      @domain ||= @name.split('.', 2)[1]
     end 
 
     def basic_scope
       @basic_scope ||= {
-        '::fqdn' => @fqdn,
-        '::clientcert' => @fqdn,
+        '::fqdn' => @name,
+        '::clientcert' => @name,
         '::hostname' => hostname,
         '::domain' => domain
       }
     end
 
     def facts
-      facts_yaml = File.join(Dopi.configuration.facts_dir, @fqdn + '.yaml')
+      facts_yaml = File.join(Dopi.configuration.facts_dir, @name + '.yaml')
       if File.exists? facts_yaml
         YAML.load_file(facts_yaml).values
       else
-        Dopi.log.warn("No facts found for node #{@fqdn} at #{facts_yaml}")
+        Dopi.log.warn("No facts found for node #{@name} at #{facts_yaml}")
         {}
       end
     end
@@ -52,20 +59,18 @@ module Dopi
 
     def role_default
       Dopi.configuration.role_default or
-        raise "No role found for #{fqdn} and no default role defined"
+        raise "No role found for #{@name} and no default role defined"
     end
 
+    # TODO: replace this with a proper lookup method if
+    # the configuration parsing is implemented in dop_common
     def role_from_config
-      @node_config[Dopi.configuration.role_variable] || role_default
+      role_default
     end
 
     def role_from_hiera
       @@hiera ||= Hiera.new(:config => Dopi.configuration.hiera_yaml)
       @@hiera.lookup(Dopi.configuration.role_variable, role_from_config, scope)
-    end
-
-    def role
-      @role ||= Dopi.configuration.use_hiera ? role_from_hiera : role_from_config
     end
 
   end

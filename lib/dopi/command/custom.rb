@@ -24,13 +24,13 @@ module Dopi
     private
 
       def env
-        env = @command_hash['env']
+        env = hash['env']
         env ||= {}
       end
 
 
       def arguments
-        arguments = @command_hash['arguments']
+        arguments = hash['arguments']
         arguments ||= {}
       end
 
@@ -41,10 +41,10 @@ module Dopi
 
 
       def exec
-        if @command_hash['exec']
-          return @command_hash['exec']
+        if hash['exec']
+          return hash['exec']
         else
-          raise "No exec part for command #{@name}"
+          raise "No exec part for command #{name}"
         end
       end
 
@@ -59,13 +59,13 @@ module Dopi
       def run_command
         cmd_stdout = ''
         cmd_stderr = ''
-        Dopi.log.debug("Executing #{command_string} for command #{@name}")
+        Dopi.log.debug("Executing #{command_string} for command #{name}")
         cmd_exit_code = Open3.popen3(env, command_string) do |stdin, stdout, stderr, wait_thr|
           stdin.close
           cmd_stdout = stdout.read
           cmd_stderr = stderr.read
-          Dopi.log.debug(@node.fqdn + ":" + @name + " - " + cmd_stdout)
-          Dopi.log.debug(@node.fqdn + ":" + @name + " - " + cmd_stderr)
+          Dopi.log.debug(@node.name + ":" + name + " - " + cmd_stdout)
+          Dopi.log.debug(@node.name + ":" + name + " - " + cmd_stderr)
           wait_thr.value
         end
         [ cmd_stdout, cmd_stderr, cmd_exit_code.exitstatus ]
@@ -89,24 +89,24 @@ module Dopi
         if parser_patterns.class == Hash
           patterns = parser_patterns
         end
-        if @command_hash['parse_output'].class == Hash
-          patterns = @command_hash['parse_output']
+        if hash['parse_output'].class == Hash
+          patterns = hash['parse_output']
         end
         if patterns.nil?
-          Dopi.log.debug("No patterns defined to parse the output of command #{@name}")
+          Dopi.log.debug("No patterns defined to parse the output of command #{name}")
           return true
         else
           if patterns['error'].class == Array
             errors = match_patterns(raw_output, patterns['error'])
             errors.each do |error|
-              Dopi.log.error("ERROR detected in output of command #{@name}:")
+              Dopi.log.error("ERROR detected in output of command #{name}:")
               Dopi.log.error(error)
             end
           end
           if patterns['warning'].class == Array
             warnings = match_patterns(raw_output, patterns['warning'])
             warnings.each do |warning|
-              Dopi.log.warn("Warning detected in output of command #{@name}:")
+              Dopi.log.warn("Warning detected in output of command #{name}:")
               Dopi.log.warn(warning)
             end
           end
@@ -131,7 +131,7 @@ module Dopi
             end
           rescue RegexpError => e
             # TODO: Throw proper exception class
-            raise "Error while parsing regular expression #{pattern} for command #{@name}"
+            raise "Error while parsing regular expression #{pattern} for command #{name}"
           end
         end
         return results
@@ -160,7 +160,7 @@ module Dopi
         if expect_exit_codes.include? cmd_exit_code
           return true
         else
-          Dopi.log.error("Wrong exit code in command #{@name} for node #{@node.fqdn}")
+          Dopi.log.error("Wrong exit code in command #{name} for node #{@node.name}")
           Dopi.log.error("Exit code was #{cmd_exit_code.to_s} should be one of #{expect_exit_codes.join(',')}")
           return false
         end

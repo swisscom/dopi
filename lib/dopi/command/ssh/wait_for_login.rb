@@ -42,25 +42,26 @@ module Dopi
           true
         end
 
-        # TODO: Use dop_common validation helper here as soon
-        # as it is implemented
-        def parse_connection_timeout
-          @command_hash['connection_timeout'].class == Fixnum ?
-            @command_hash['connection_timeout'] : DEFAULT_CONNECTION_TIMEOUT
-        end
-
         def connection_timeout
-          @connection_timeout ||= parse_connection_timeout
+          @connection_timeout ||= connection_timeout_valid? ?
+            hash['connection_timeout'] : DEFAULT_CONNECTION_TIMEOUT
         end
 
-        # TODO: Use dop_common validation helper here as soon
-        # as it is implemented
-        def parse_interval
-          @command_hash['interval'].class == Fixnum ? @command_hash['interval'] : DEFAULT_INTERVAL
+        def connection_timeout_valid?
+          return false if hash['connection_timeout'].nil? # is optional
+          hash['connection_timeout'].class == Fixnum or
+            raise CommandParsingError, "Plugin #{name}: the value of 'connection_timeout' has to be a number"
         end
 
         def interval
-          @interval ||= parse_interval
+          @interval ||= interval_valid? ?
+            hash['interval'] : DEFAULT_INTERVAL
+        end
+
+        def interval_valid?
+          return false if hash['interval'].nil? # is optional
+          hash['interval'].class == Fixnum or
+            raise CommandParsingError, "Plugin #{name}: the value of 'interval' has to be a number"
         end
 
       end
