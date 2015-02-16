@@ -27,13 +27,9 @@ module Dopi
       end
     end
 
-  private
-
-    def_delegators :@step_parser, :command
-
     def commands
       @commands ||= @nodes.map do |node|
-        Dopi::Command.create_plugin_instance(command.plugin, node, command)
+        Dopi::Command.create_plugin_instance(@step_parser.command.plugin, node, @step_parser.command)
       end
     end
 

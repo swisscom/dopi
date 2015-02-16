@@ -36,7 +36,7 @@ Escort::App.create do |app|
       plan.steps.each do |step|
         puts "[#{step.state.to_s}] #{step.name}"
         step.commands.each do |command|
-          puts "  [#{command.state.to_s}] #{command.node.fqdn}"
+          puts "  [#{command.state.to_s}] #{command.node.name}"
         end
       end
     end

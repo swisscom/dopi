@@ -42,17 +42,24 @@ module Dopi
       @mutex.synchronize { @abort = true }
     end
 
-  private
-
-    def_delegator  :@plan_parser, :nodes, :parsed_nodes
-    def_delegator  :@plan_parser, :steps, :parsed_steps
-    def_delegators :@plan_parser, :max_in_flight
-
     def nodes
       @nodes ||= parsed_nodes.map do |parsed_node|
         ::Dopi::Node.new(parsed_node)
       end
     end
+
+    def steps
+      @steps ||= parsed_steps.map do |parsed_step|
+        nodes = (nodes_by_names(parsed_step.nodes) + nodes_by_roles(parsed_step.roles)).uniq
+        ::Dopi::Step.new(parsed_step, nodes)
+      end
+    end
+
+  private
+
+    def_delegator  :@plan_parser, :nodes, :parsed_nodes
+    def_delegator  :@plan_parser, :steps, :parsed_steps
+    def_delegators :@plan_parser, :max_in_flight
 
     def nodes_by_names(names)
       case names
@@ -67,13 +74,6 @@ module Dopi
         when 'all' then nodes
         when Array then nodes.select {|node| roles.include? node.role}
         else []
-      end
-    end
-
-    def steps
-      @steps ||= parsed_steps.map do |parsed_step|
-        nodes = (nodes_by_names(parsed_step.nodes) + nodes_by_roles(parsed_step.roles)).uniq
-        ::Dopi::Step.new(parsed_step, nodes)
       end
     end
 

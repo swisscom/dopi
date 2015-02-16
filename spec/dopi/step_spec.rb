@@ -7,17 +7,18 @@ describe Dopi::Step do
   end
 
   before :each do
-    command_hash = {
-      'plugin' => 'custom',
-      'exec'   => 'echo',
-      'arguments' => {
-        'Hello World' => nil
+    hash = {
+      :name      => 'Test step',
+      :command   => {
+        :plugin    => 'custom',
+        :exec      => 'echo',
+        :arguments => 'Hello World'
       }
     }
     @nodes = []
-    @nodes << Dopi::Node.new('web01.example.com', {'role' => 'role1'})
-    @nodes << Dopi::Node.new('web02.example.com', {'role' => 'role2'})
-    @step = Dopi::Step.new('test_step', command_hash, @nodes)
+    @nodes << Dopi::Node.new(DopCommon::Node.new('web01.example.com', {'role' => 'role1'}))
+    @nodes << Dopi::Node.new(DopCommon::Node.new('web02.example.com', {'role' => 'role2'}))
+    @step = Dopi::Step.new(DopCommon::Step.new(hash), @nodes)
   end
 
   describe '#new' do
@@ -26,7 +27,7 @@ describe Dopi::Step do
     end
 
     it 'takes a name, a plugin name, a list of nodes and returns a Dopi::Step object' do
-      step = Dopi::Step.new('test_step', 'dummy', @nodes)
+      step = Dopi::Step.new(DopCommon::Step.new({:name => 'dummy', :command => 'dummy'}), @nodes)
       expect(step).to be_an_instance_of Dopi::Step
     end
   end

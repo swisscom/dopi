@@ -22,28 +22,28 @@ module Dopi
   private
 
     def hostname
-      @hostname ||= @name.split('.', 2)[0]
+      @hostname ||= name.split('.', 2)[0]
     end
 
     def domain
-      @domain ||= @name.split('.', 2)[1]
+      @domain ||= name.split('.', 2)[1]
     end 
 
     def basic_scope
       @basic_scope ||= {
-        '::fqdn' => @name,
-        '::clientcert' => @name,
+        '::fqdn' => name,
+        '::clientcert' => name,
         '::hostname' => hostname,
         '::domain' => domain
       }
     end
 
     def facts
-      facts_yaml = File.join(Dopi.configuration.facts_dir, @name + '.yaml')
+      facts_yaml = File.join(Dopi.configuration.facts_dir, name + '.yaml')
       if File.exists? facts_yaml
         YAML.load_file(facts_yaml).values
       else
-        Dopi.log.warn("No facts found for node #{@name} at #{facts_yaml}")
+        Dopi.log.warn("No facts found for node #{name} at #{facts_yaml}")
         {}
       end
     end
@@ -59,7 +59,7 @@ module Dopi
 
     def role_default
       Dopi.configuration.role_default or
-        raise "No role found for #{@name} and no default role defined"
+        raise "No role found for #{name} and no default role defined"
     end
 
     # TODO: replace this with a proper lookup method if

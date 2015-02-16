@@ -26,6 +26,8 @@ module Dopi
       PluginManager.create_instance(plugin_type + plugin_name, node, command_parser)
     end
 
+    attr_reader :node
+
     def initialize(node, command_parser)
       @node           = node
       @command_parser = command_parser

@@ -7,8 +7,6 @@ module Dopi
   class Command
     class Custom < Dopi::Command
 
-      attr_reader :node, :name, :command_hash
-
     public
 
       def run
@@ -19,7 +17,6 @@ module Dopi
         result << check_exit_code(cmd_exit_code)
         result.all?
       end
-
 
     private
 
@@ -142,12 +139,12 @@ module Dopi
       # Returns an array of valid exit codes or
       def expect_exit_codes
         exit_code = [ 0 ]
-        if @command_hash['expect_exit_code'].class == Fixnum
-          exit_code = [ @command_hash['expect_exit_code'] ]
-        elsif @command_hash['expect_exit_code'].class == Array
-          exit_code = @command_hash['expect_exit_code']
-        elsif @command_hash['expect_exit_code'].class == String
-          if @command_hash['expect_exit_code'].casecmp('all') == 0
+        if hash['expect_exit_code'].class == Fixnum
+          exit_code = [ hash['expect_exit_code'] ]
+        elsif hash['expect_exit_code'].class == Array
+          exit_code = hash['expect_exit_code']
+        elsif hash['expect_exit_code'].class == String
+          if hash['expect_exit_code'].casecmp('all') == 0
             exit_code = nil
           end
         end
