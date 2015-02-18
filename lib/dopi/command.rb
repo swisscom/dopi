@@ -58,6 +58,16 @@ module Dopi
       end
     end
 
+    def meta_valid?
+      validity = valid?
+      begin
+        validity = false unless verify_commands.all?{|c| c.meta_valid? }
+      rescue PluginLoaderError => e
+        Dopi.log.error("Step #{name}: Can't load plugin #{@tep_parser.command.plugin}: #{e.message}")
+      end
+      validity
+    end
+
   private
 
     def_delegator  :@command_parser, :verify_commands, :parsed_verify_commands
@@ -65,6 +75,10 @@ module Dopi
 
     def run
       raise Dopi::CommandExecutionError, "No run method implemented in plugin #{name}"
+    end
+
+    def valid?
+      Dopi.log.warn("No valid? method implemented in plugin #{name}. Validation not possible")
     end
 
     def verify_commands

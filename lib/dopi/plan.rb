@@ -42,6 +42,17 @@ module Dopi
       @mutex.synchronize { @abort = true }
     end
 
+    # The main validation work is done in the dop_common
+    # parser. We just add the command plugin parsers
+    def valid?
+      validity = @plan_parser.valid?
+      begin
+        validity = false unless steps.all?{|s| s.command_plugin_valid? }
+      rescue Exception => e
+        Dopi.log.warn("Plan: Can't validate the command plugins because of a previous error")
+      end
+    end
+
     def nodes
       @nodes ||= parsed_nodes.map do |parsed_node|
         ::Dopi::Node.new(parsed_node)
