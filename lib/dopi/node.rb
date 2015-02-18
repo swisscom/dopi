@@ -6,6 +6,9 @@ require 'puppet'
 require 'hiera'
 
 module Dopi
+  class NoRoleFoundError < StandardError
+  end
+
   class Node
     extend Forwardable
 
@@ -58,8 +61,12 @@ module Dopi
     end
 
     def role_default
-      Dopi.configuration.role_default or
-        raise "No role found for #{name} and no default role defined"
+      if Dopi.configuration.role_default
+        Dopi.configuration.role_default
+      else
+        Dopi.log.warn("No role found for #{name} and no default role defined.")
+        '-'
+      end
     end
 
     # TODO: replace this with a proper lookup method if
