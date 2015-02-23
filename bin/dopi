@@ -1,44 +1,103 @@
 #!/usr/bin/env ruby
-#
-# DOPi command line client
-#
-require 'escort'
+require 'gli'
 require 'dopi'
+require 'yaml'
+require 'fileutils'
 
-Escort::App.create do |app|
-  app.version Dopi::VERSION
-  app.summary "DOPi orchestrates your Puppet runs over multiple nodes. Takes any amount of plans as argument"
+include GLI::App
 
-  app.requires_arguments
+program_desc 'DOPi Command line Client'
+version Dopi::VERSION
 
-  # create global options out of the config class
-  app.options do |opts|
-    Dopi.configuration.instance_variables.each do |config_variable|
-      option_name = config_variable[1..-1]
-      option_default = Dopi.configuration.instance_variable_get(config_variable)
-      opts.opt option_name.to_sym, option_name, :default => option_default
-    end
-  end
+subcommand_option_handling :normal
+arguments :strict
 
-  app.action do |options, arguments|
-    Dopi.configure=options[:global][:options]
-    Dopi.log.level = ::Logger.const_get(options[:global][:options][:verbosity].upcase)
+desc 'Specify the Dopi configuration file.'
+default_value 'etc/dop/dopi.conf'
+arg_name 'config_file'
+flag [:c,:config_file]
 
-    # create and run plan
-    arguments.each do |plan_yaml|
-      plan = Dopi::Plan.create_plan_from_yaml( File.read( plan_yaml ) )
-      plan.run
+desc 'Specify the directory where dopi will cache data about the plans'
+default_value '/var/lib/dop/plans/'
+arg_name 'plan_dir'
+flag [:p,:plan_dir]
 
-      # print the stats
-      overall = 'done'
-      status = {}
-      puts "Plan status: #{plan.state.to_s}"
-      plan.steps.each do |step|
-        puts "[#{step.state.to_s}] #{step.name}"
-        step.commands.each do |command|
-          puts "  [#{command.state.to_s}] #{command.node.name}"
-        end
-      end
+desc 'Verbosity of the command line tool'
+default_value 'warn'
+arg_name 'Verbosity'
+flag [:v,:verbosity]
+
+
+pre do |global,command,options,args|
+  Dopi.logger = Logger.new(STDERR)
+  Dopi.log.level = ::Logger.const_get(global[:verbosity].upcase)
+  @cache = Dopi::Cache.new(global[:plan_dir])
+  true
+end
+
+
+def print_state(plan)
+  plan.steps.each do |step|
+    puts "[#{step.state.to_s}] #{step.name}"
+    step.commands.each do |command|
+      puts "  [#{command.state.to_s}] #{command.node.name}"
     end
   end
 end
+
+
+desc 'Add a new plan file to the plan cache'
+arg_name 'plan_file'
+command :add do |c|
+  c.action do |global_options,options,args|
+    help_now!('Specify a plan file to add') if args.empty?
+    help_now!('You can only add one plan') if args.length > 1
+    puts @cache.add(args[0])
+  end
+end
+
+
+desc 'Show the list of plans in the dopi plan cache'
+command :list do |c|
+  c.action do |global_options,options,args|
+    puts @cache.list()
+  end
+end
+
+
+desc 'Remove an existing plan from the plan cache'
+arg_name 'id'
+command :remove do |c|
+  c.action do |global_options,options,args|
+    help_now!('Specify a plan id to remove') if args.empty?
+    help_now!('You can only remove one plan') if args.length > 1
+    puts @cache.remove(args[0])
+  end
+end
+
+
+desc 'Show plan details and state'
+arg_name 'id'
+command :show do |c|
+  c.action do |global_options,options,args|
+    help_now!('Specify a plan id to show') if args.empty?
+    help_now!('You can only show one plan') if args.length > 1
+    print_state(@cache.get(args[0]))
+  end
+end
+
+
+desc 'Run the plan'
+arg_name 'id'
+command :run do |c|
+  c.action do |global_options,options,args|
+    help_now!('Specify a plan id to run') if args.empty?
+    help_now!('You can only run one plan') if args.length > 1
+    plan = @cache.get(args[0])
+    plan.run
+    print_state(plan)
+  end
+end
+
+exit run(ARGV)
+

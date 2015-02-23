@@ -1,10 +1,13 @@
+infrastructures:
+  bla: {}
+
 nodes:
 
-  mysql01.example.com:
-  web01.example.com:
-  web02.example.com:
-  haproxy01.example.com:
-  haproxy02.example.com:
+  mysql01.example.com: {}
+  web01.example.com: {}
+  web02.example.com: {}
+  haproxy01.example.com: {}
+  haproxy02.example.com: {}
 
 configuration:
   nodes:

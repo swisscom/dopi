@@ -7,6 +7,7 @@ require "dopi/node"
 require "dopi/plan"
 require "dopi/step"
 require "dopi/version"
+require "dopi/cache"
 
 module Dopi
 end

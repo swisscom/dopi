@@ -18,7 +18,6 @@ module Dopi
         "Plugin class #{plugin_klass.to_s} (#{plugin_name}) already loaded" if @plugins[plugin_name]
 
       @plugins[plugin_name] = plugin_klass
-      Dopi.log.debug("Registering Plugin #{plugin_name} with class #{plugin_klass}")
     end
 
     def self.create_instance(plugin_name, *args)
