@@ -42,17 +42,59 @@ Install the gem
 
     $ gem install dopi
 
-Run a deployment plan
-
-    $ dopi deployment_plan.yaml
-
 Help on all available options
 
-    $ dopi --help
+    $ dopi help
 
 ### Usage Example
 
-TODO: Write CLI example after CLI rewrite
+First you have to add a plan to the plan cache:
+
+    $ dopi add spec/data/plan/example_deploment_plan_test.yaml 
+    3addf8efff12351fa87c901cfacfe1f8edeb9557589b3bde544630dcb7eedc49 
+
+This will return a plan identifier which can be used to run other
+commands on that plan. You can get a list of all the plans in the
+cache by running:
+
+    $ dopi list
+    3addf8efff12351fa87c901cfacfe1f8edeb9557589b3bde544630dcb7eedc49
+
+You can get information about the state of a plan with the show command
+and the id of the plan:
+
+    $ dopi show 3addf8efff12351fa87c901cfacfe1f8edeb9557589b3bde544630dcb7eedc49
+    [ready] test_run
+      [ready] mysql01.example.com
+      [ready] web01.example.com
+      [ready] web02.example.com
+      [ready] haproxy01.example.com
+      [ready] haproxy02.example.com
+    [ready] Make sure we can login to all nodes
+      [ready] mysql01.example.com
+      [ready] web01.example.com
+      [ready] web02.example.com
+      [ready] haproxy01.example.com
+      [ready] haproxy02.example.com
+    [ready] ssh_test_run
+      [ready] mysql01.example.com
+    [ready] run_puppet
+      [ready] mysql01.example.com
+      [ready] web01.example.com
+      [ready] web02.example.com
+      [ready] haproxy01.example.com
+      [ready] haproxy02.example.com
+    [ready] run_puppet2
+      [ready] mysql01.example.com
+      [ready] web01.example.com
+      [ready] web02.example.com
+      [ready] haproxy01.example.com
+      [ready] haproxy02.example.com
+
+You can run the plan with the run command and the id:
+
+    $ dopi run 3addf8efff12351fa87c901cfacfe1f8edeb9557589b3bde544630dcb7eedc49
+
 
 ## Plan File Format
 
