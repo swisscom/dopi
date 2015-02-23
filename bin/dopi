@@ -12,23 +12,71 @@ version Dopi::VERSION
 subcommand_option_handling :normal
 arguments :strict
 
-desc 'Specify the Dopi configuration file.'
-default_value 'etc/dop/dopi.conf'
-arg_name 'config_file'
-flag [:c,:config_file]
-
-desc 'Specify the directory where dopi will cache data about the plans'
-default_value '/var/lib/dop/plans/'
-arg_name 'plan_dir'
-flag [:p,:plan_dir]
-
 desc 'Verbosity of the command line tool'
-default_value 'warn'
+default_value 'WARN'
 arg_name 'Verbosity'
 flag [:v,:verbosity]
 
+desc 'Show stacktrace on crash'
+switch [:t,:trace]
+
+#
+# DOPi Configuration
+#
+config_file Dopi.configuration.config_file
+
+desc 'Specify the directory where DOPi will cache data about the plans'
+default_value Dopi.configuration.plan_dir
+arg_name 'DIR'
+flag [:p,:plan_dir]
+
+desc 'Use Hiera to get the role for the nodes'
+default_value Dopi.configuration.use_hiera
+switch [:h,:use_hiera]
+
+desc 'Specify the hiera configuration file'
+default_value Dopi.configuration.hiera_yaml
+arg_name 'YAML'
+flag [:hiera_yaml]
+
+desc 'Specify the directory where dopi can find facts'
+default_value Dopi.configuration.facts_dir
+arg_name 'DIR'
+flag [:facts_dir]
+
+desc 'Set the name of the variable DPOi should use as the roles variable'
+default_value Dopi.configuration.role_variable
+arg_name 'VARIABLE_NAME'
+flag [:role_variable]
+
+desc 'Set the default value for the node role'
+default_value Dopi.configuration.role_default
+arg_name 'ROLE'
+flag [:role_default]
+
+desc 'Set the default ssh user'
+default_value Dopi.configuration.ssh_user
+arg_name 'USERNAME'
+flag [:ssh_user]
+
+desc 'Set the default ssh key'
+default_value Dopi.configuration.ssh_key
+arg_name 'SSHKEY'
+flag [:ssh_key]
+
 
 pre do |global,command,options,args|
+  Dopi.configure do |config|
+    plan_dir = global[:plan_dir]
+    use_hiera = global[:use_hiera]
+    hiera_yaml = global[:hiera_yaml]
+    facts_dir = global[:facts_dir]
+    role_variable = global[:role_variable]
+    role_default = global[:role_default]
+    ssh_user = global[:ssh_user]
+    ssh_key = global[:ssh_key]
+  end
+  ENV['GLI_DEBUG'] = 'true' if global[:trace] == true
   Dopi.logger = Logger.new(STDERR)
   Dopi.log.level = ::Logger.const_get(global[:verbosity].upcase)
   @cache = Dopi::Cache.new(global[:plan_dir])

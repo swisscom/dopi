@@ -1,4 +1,4 @@
-clouds:
+infrastructures:
   management:
     type: rhev
     endpoint: https://rhev.example.com/api/
