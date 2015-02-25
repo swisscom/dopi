@@ -46,8 +46,7 @@ module Dopi
       @plan_dir    = '/var/lib/dop/plans/'
 
       # Hiera defaults
-      @use_hiera  = false
-      @hiera_yaml = '/etc/hiera.yaml'
+      @hiera_yaml = '/etc/puppet/hiera.yaml'
       @facts_dir  = '/var/lib/puppet/yaml/facts/'
 
       # Role defaults

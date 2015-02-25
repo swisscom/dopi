@@ -12,14 +12,15 @@ module Dopi
   class Node
     extend Forwardable
 
-    def initialize(node_parser)
+    def initialize(node_parser, configuration)
       @node_parser = node_parser
+      @configuration = configuration
     end
 
     def_delegators :@node_parser, :name
 
     def role
-      @role ||= Dopi.configuration.use_hiera ? role_from_hiera : role_from_config
+      @role ||= role_from_hiera || role_from_config || role_default
     end
 
   private
@@ -69,15 +70,20 @@ module Dopi
       end
     end
 
-    # TODO: replace this with a proper lookup method if
-    # the configuration parsing is implemented in dop_common
+    # This should also resolve over hiera and there should be no need to resolve
+    # it internaly. There is currently a problem with the Plan cache which parses
+    # the plan and needs to resolve the role before Hiera can access the plan
     def role_from_config
-      role_default
+      begin
+        @configuration.lookup("hosts/#{name}", Dopi.configuration.role_variable, scope)
+      rescue DopCommon::ConfigurationValueNotFound
+        nil
+      end
     end
 
     def role_from_hiera
       @@hiera ||= Hiera.new(:config => Dopi.configuration.hiera_yaml)
-      @@hiera.lookup(Dopi.configuration.role_variable, role_from_config, scope)
+      @@hiera.lookup(Dopi.configuration.role_variable, nil, scope)
     end
 
   end

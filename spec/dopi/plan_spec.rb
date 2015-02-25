@@ -11,8 +11,8 @@ describe Dopi::Plan do
   end
 
   before :each do
-    plan_yaml = 'spec/data/plan/plan_simple.yaml'
-    @plan = Dopi::Plan.create_plan_from_yaml( File.read( plan_yaml ) )
+    plan_file = 'spec/data/plan/plan_simple.yaml'
+    @plan = Dopi::Plan.create_plan_from_file(plan_file)
   end
 
   describe '#new' do

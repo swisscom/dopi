@@ -13,10 +13,10 @@ module Dopi
     end
 
     def add(plan_file)
-      id = get_id(plan_file)
+      id = Dopi::Plan.get_id_from_file(plan_file)
       raise StandardError, 'Plan was already added. Remove to readd the plan' if id_exists?(id)
 
-      plan = Dopi::Plan.create_plan_from_hash(YAML.load_file(plan_file))
+      plan = Dopi::Plan.create_plan_from_file(plan_file)
       raise StandardError, 'Plan not valid, did not add' unless plan.valid?
 
       File.open(dump_file(id), 'w') { |file| file.write(YAML::dump(plan)) }
@@ -43,10 +43,6 @@ module Dopi
     end
 
   private
-
-    def get_id(plan_file)
-      Digest::SHA2.file(plan_file).hexdigest
-    end
 
     def id_exists?(id)
       File.exists?(dump_file(id))
