@@ -41,7 +41,10 @@ module Dopi
       begin
         Timeout::timeout(plugin_timeout) do
           if state_running? && verify_commands.any?
-            state_finish if verify_commands.all? {|command| command.meta_run}
+            state_finish if verify_commands.all? do |command| 
+              command.meta_run
+              command.state_done?
+            end
           end
           if state_running?
             run ? state_finish : state_fail
@@ -97,5 +100,7 @@ require 'dopi/command/custom'
 require 'dopi/command/ssh/custom'
 require 'dopi/command/ssh/puppet_agent_run'
 require 'dopi/command/ssh/wait_for_login'
+require 'dopi/command/ssh/file_exists'
+require 'dopi/command/ssh/file_contains'
 
 # TODO: load plugins from the plugin paths
