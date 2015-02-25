@@ -67,14 +67,13 @@ flag [:ssh_key]
 
 pre do |global,command,options,args|
   Dopi.configure do |config|
-    plan_dir = global[:plan_dir]
-    use_hiera = global[:use_hiera]
-    hiera_yaml = global[:hiera_yaml]
-    facts_dir = global[:facts_dir]
-    role_variable = global[:role_variable]
-    role_default = global[:role_default]
-    ssh_user = global[:ssh_user]
-    ssh_key = global[:ssh_key]
+    config.plan_dir =      global[:plan_dir]
+    config.hiera_yaml =    global[:hiera_yaml]
+    config.facts_dir =     global[:facts_dir]
+    config.role_variable = global[:role_variable]
+    config.role_default =  global[:role_default]
+    config.ssh_user =      global[:ssh_user]
+    config.ssh_key =       global[:ssh_key]
   end
   ENV['GLI_DEBUG'] = 'true' if global[:trace] == true
   Dopi.logger = Logger.new(STDERR)
