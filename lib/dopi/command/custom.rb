@@ -1,6 +1,7 @@
 #
 # DOPi command base class
 #
+# TODO: Refactor
 require 'open3'
 
 module Dopi
@@ -21,14 +22,23 @@ module Dopi
     private
 
       def env
-        env = hash['env']
-        env ||= {}
+        @env ||= env_valid? ?
+          hash[:env] : {}
       end
 
+      # Needs more validation
+      def env_valid?
+        return false unless @hash.kind_of?(Hash)
+      end
 
       def arguments
-        arguments = hash['arguments']
-        arguments ||= {}
+        @arguments ||= arguments_valid? ?
+          hash[:arguments] : {}
+      end
+
+      # Needs more validation
+      def arguments_valid?
+        return false unless @hash.kind_of?(Hash)
       end
 
 
@@ -38,8 +48,8 @@ module Dopi
 
 
       def exec
-        if hash['exec']
-          return hash['exec']
+        if hash[:exec]
+          return hash[:exec]
         else
           raise "No exec part for command #{name}"
         end
@@ -86,29 +96,29 @@ module Dopi
         if parser_patterns.class == Hash
           patterns = parser_patterns
         end
-        if hash['parse_output'].class == Hash
-          patterns = hash['parse_output']
+        if hash.class == Hash && hash[:parse_output].class == Hash
+          patterns = hash[:parse_output]
         end
         if patterns.nil?
           Dopi.log.debug("No patterns defined to parse the output of command #{name}")
           return true
         else
-          if patterns['error'].class == Array
-            errors = match_patterns(raw_output, patterns['error'])
+          if patterns[:error].class == Array
+            errors = match_patterns(raw_output, patterns[:error])
             errors.each do |error|
               Dopi.log.error("ERROR detected in output of command #{name}:")
               Dopi.log.error(error)
             end
           end
-          if patterns['warning'].class == Array
-            warnings = match_patterns(raw_output, patterns['warning'])
+          if patterns[:warning].class == Array
+            warnings = match_patterns(raw_output, patterns[:warning])
             warnings.each do |warning|
               Dopi.log.warn("Warning detected in output of command #{name}:")
               Dopi.log.warn(warning)
             end
           end
         end
-        if @command_hash['fail_on_warning']
+        if hash[:fail_on_warning]
           return false unless warnings.empty?
         end
         return false unless errors.empty?
@@ -139,13 +149,15 @@ module Dopi
       # Returns an array of valid exit codes or
       def expect_exit_codes
         exit_code = [ 0 ]
-        if hash['expect_exit_code'].class == Fixnum
-          exit_code = [ hash['expect_exit_code'] ]
-        elsif hash['expect_exit_code'].class == Array
-          exit_code = hash['expect_exit_code']
-        elsif hash['expect_exit_code'].class == String
-          if hash['expect_exit_code'].casecmp('all') == 0
-            exit_code = nil
+        if hash.class == Hash
+          if hash[:expect_exit_code].class == Fixnum
+            exit_code = [ hash[:expect_exit_code] ]
+          elsif hash[:expect_exit_code].class == Array
+            exit_code = hash[:expect_exit_code]
+          elsif hash[:expect_exit_code].class == String
+            if hash[:expect_exit_code].casecmp('all') == 0
+              exit_code = nil
+            end
           end
         end
         return exit_code
