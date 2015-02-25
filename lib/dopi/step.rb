@@ -21,7 +21,7 @@ module Dopi
 
     def run(max_in_flight)
       state_run
-      Parallel.each(commands, in_threads: max_in_flight) do |command|
+      Parallel.each(commands, :in_threads => max_in_flight) do |command|
         raise Parallel::Break if state_failed?
         command.meta_run
       end
