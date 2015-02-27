@@ -26,9 +26,9 @@ switch [:t,:trace]
 config_file Dopi.configuration.config_file
 
 desc 'Specify the directory where DOPi will cache data about the plans'
-default_value Dopi.configuration.plan_dir
+default_value Dopi.configuration.plan_cache_dir
 arg_name 'DIR'
-flag [:p,:plan_dir]
+flag [:p,:plan_cache_dir]
 
 desc 'Use Hiera to get the role for the nodes'
 default_value Dopi.configuration.use_hiera
@@ -67,18 +67,18 @@ flag [:ssh_key]
 
 pre do |global,command,options,args|
   Dopi.configure do |config|
-    config.plan_dir =      global[:plan_dir]
-    config.hiera_yaml =    global[:hiera_yaml]
-    config.facts_dir =     global[:facts_dir]
-    config.role_variable = global[:role_variable]
-    config.role_default =  global[:role_default]
-    config.ssh_user =      global[:ssh_user]
-    config.ssh_key =       global[:ssh_key]
+    config.plan_cache_dir = global[:plan_cache_dir]
+    config.hiera_yaml =     global[:hiera_yaml]
+    config.facts_dir =      global[:facts_dir]
+    config.role_variable =  global[:role_variable]
+    config.role_default =   global[:role_default]
+    config.ssh_user =       global[:ssh_user]
+    config.ssh_key =        global[:ssh_key]
   end
   ENV['GLI_DEBUG'] = 'true' if global[:trace] == true
   Dopi.logger = Logger.new(STDERR)
   Dopi.log.level = ::Logger.const_get(global[:verbosity].upcase)
-  @cache = Dopi::Cache.new(global[:plan_dir])
+  @plan_cache = DopCommon::PlanCache.new(global[:plan_cache_dir])
   true
 end
 
@@ -99,7 +99,9 @@ command :add do |c|
   c.action do |global_options,options,args|
     help_now!('Specify a plan file to add') if args.empty?
     help_now!('You can only add one plan') if args.length > 1
-    puts @cache.add(args[0])
+    id = @plan_cache.add(args[0])
+    Dopi.load_plan(id)
+    puts id
   end
 end
 
@@ -107,7 +109,7 @@ end
 desc 'Show the list of plans in the dopi plan cache'
 command :list do |c|
   c.action do |global_options,options,args|
-    puts @cache.list()
+    puts @plan_cache.list()
   end
 end
 
@@ -118,7 +120,7 @@ command :remove do |c|
   c.action do |global_options,options,args|
     help_now!('Specify a plan id to remove') if args.empty?
     help_now!('You can only remove one plan') if args.length > 1
-    puts @cache.remove(args[0])
+    puts @plan_cache.remove(args[0])
   end
 end
 
@@ -129,7 +131,7 @@ command :show do |c|
   c.action do |global_options,options,args|
     help_now!('Specify a plan id to show') if args.empty?
     help_now!('You can only show one plan') if args.length > 1
-    print_state(@cache.get(args[0]))
+    print_state(Dopi.load_plan(args[0]))
   end
 end
 
@@ -140,9 +142,15 @@ command :run do |c|
   c.action do |global_options,options,args|
     help_now!('Specify a plan id to run') if args.empty?
     help_now!('You can only run one plan') if args.length > 1
-    plan = @cache.get(args[0])
-    plan.run
-    print_state(plan)
+    begin
+      plan = Dopi.load_plan(args[0])
+      plan.run
+      Dopi.save_plan(plan)
+      print_state(plan)
+    rescue Dopi::StateTransitionError => e
+      Dopi.log.error(e.message)
+      exit_now!("Some steps are in a state where they can't be started again. Try to reset the plan.")
+    end
   end
 end
 

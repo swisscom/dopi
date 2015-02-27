@@ -10,25 +10,11 @@ module Dopi
     extend Forwardable
     include Dopi::State
 
-    def self.get_id_from_file(plan_file)
-      Digest::SHA2.file(plan_file).hexdigest
-    end
-
-    def self.create_plan_from_file(plan_file)
-      Dopi::Plan.create_plan_from_hash(YAML.load_file(plan_file))
-    end
-
-    def self.create_plan_from_yaml(plan_yaml)
-      Dopi::Plan.create_plan_from_hash(YAML.load(plan_yaml))
-    end
-
-    def self.create_plan_from_hash(plan_hash)
-      plan_parser = DopCommon::Plan.new(plan_hash)
-      Dopi::Plan.new(plan_parser)
-    end
-
-    def initialize(plan_parser)
+    attr_reader :id
+ 
+    def initialize(plan_parser, plan_id)
       @mutex = Mutex.new
+      @id = plan_id
       @plan_parser = plan_parser
 
       steps.each{|step| state_add_child(step)}
@@ -76,10 +62,6 @@ module Dopi
         nodes = (nodes_by_names(parsed_step.nodes) + nodes_by_roles(parsed_step.roles)).uniq
         ::Dopi::Step.new(parsed_step, nodes)
       end
-    end
-
-    def find_node(name)
-      nodes.find{|node| node.name == name}
     end
 
   private
