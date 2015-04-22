@@ -27,20 +27,18 @@ plan:
 
 steps:
 
-    - name: simple_step_1
-      nodes: all
-      command:
-          plugin: custom
-          exec: 'echo'
-          arguments:
-            'Hello World':
+  - name: simple_step_1
+    nodes: all
+    command:
+      plugin: custom
+      exec: 'echo'
+      arguments:
+        'Hello World':
 
-    - name: simple_step_2
-      nodes: all
-      command:
-          plugin: custom
-          exec: 'echo'
-          arguments:
-            'Hello Universe':
-
-
+  - name: simple_step_2
+    nodes: all
+    command:
+      plugin: custom
+      exec: 'echo'
+      arguments:
+        'Hello Universe':
