@@ -28,7 +28,7 @@ module Dopi
 
       # Needs more validation
       def env_valid?
-        return false unless @hash.kind_of?(Hash)
+        hash[:env].kind_of?(Hash)
       end
 
       def arguments
@@ -38,7 +38,7 @@ module Dopi
 
       # Needs more validation
       def arguments_valid?
-        return false unless @hash.kind_of?(Hash)
+        hash[:arguments].kind_of?(Hash)
       end
 
 
@@ -83,7 +83,7 @@ module Dopi
       # it to the command. This can be overwritten by
       # the 'parse_output' section in the plan
       def parser_patterns
-        nil 
+        nil
       end
 
 
@@ -125,7 +125,7 @@ module Dopi
         return true
       end
 
-      
+
       # takes an array of patterns and a string to match
       # returns every line with a match
       def match_patterns(raw_output, patterns)
@@ -144,7 +144,7 @@ module Dopi
         return results
       end
 
-      
+
 
       # Returns an array of valid exit codes or
       def expect_exit_codes

@@ -1,7 +1,6 @@
 #
 # SSH custom command
 #
-
 module Dopi
   class Command
     class Ssh
