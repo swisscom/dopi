@@ -167,17 +167,16 @@ module Dopi
       end
 
 
-
-      # Returns an array of valid exit codes or
+      # Returns an array of valid exit codes or nil
       def expect_exit_codes
         exit_code = [ 0 ]
         if hash.class == Hash
-          if hash[:expect_exit_code].class == Fixnum
-            exit_code = [ hash[:expect_exit_code] ]
-          elsif hash[:expect_exit_code].class == Array
-            exit_code = hash[:expect_exit_code]
-          elsif hash[:expect_exit_code].class == String
-            if hash[:expect_exit_code].casecmp('all') == 0
+          if hash[:expect_exit_codes].class == Fixnum
+            exit_code = [ hash[:expect_exit_codes] ]
+          elsif hash[:expect_exit_codes].class == Array
+            exit_code = hash[:expect_exit_codes]
+          elsif hash[:expect_exit_codes].class == String
+            if hash[:expect_exit_codes].casecmp('all') == 0
               exit_code = nil
             end
           end
