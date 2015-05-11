@@ -26,24 +26,35 @@ module Dopi
           hash[:env] : {}
       end
 
-      # Needs more validation
       def env_valid?
-        hash[:env].kind_of?(Hash)
+        return false unless hash.kind_of?(Hash) # plugin may not have parameters
+        return false if hash[:env].nil? # env is optional
+        hash[:arguments].kind_of?(Array) or
+          raise PlanParsingError, "The value for 'env' hast to be a Hash" 
       end
+
 
       def arguments
         @arguments ||= arguments_valid? ?
           hash[:arguments] : {}
       end
 
-      # Needs more validation
       def arguments_valid?
-        hash[:arguments].kind_of?(Hash)
+        return false unless hash.kind_of?(Hash) # plugin may not have parameters
+        return false if hash[:arguments].nil? # arguments are optional
+        hash[:arguments].kind_of?(Hash) or
+          hash[:arguments].kind_of?(Array) or
+          hash[:arguments].kind_of?(String) or
+          raise PlanParsingError, "The value for 'arguments' hast to be an Array, Hash or String"
       end
 
 
       def argument_string
-        arguments.flatten.join(' ')
+        case arguments
+        when Hash   then arguments.to_a.flatten.join(' ')
+        when Array  then arguments.flatten.join(' ')
+        when String then arguments
+        end
       end
 
 
