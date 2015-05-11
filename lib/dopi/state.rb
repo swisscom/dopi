@@ -47,6 +47,13 @@ module Dopi
       end
     end
 
+    def state_reset_with_children
+      state_reset if state_failed?
+      if state_children_failed?
+        state_children.each {|child| child.state_reset_with_children }
+      end
+    end
+
     def state_ready?
       state_evaluate_children
       state == :ready

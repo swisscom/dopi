@@ -171,5 +171,19 @@ module Wrapper
     end
   end
 
+
+  desc 'Reset a failed plan'
+  arg_name 'id'
+  command :reset do |c|
+    c.action do |global_options,options,args|
+      help_now!('Specify a plan id to run') if args.empty?
+      help_now!('You can only run one plan') if args.length > 1
+      plan = Dopi.load_plan(args[0])
+      plan.reset
+      Dopi.save_plan(plan)
+      print_state(plan)
+    end
+  end
+
   exit run(ARGV)
 end
