@@ -67,7 +67,17 @@ module Wrapper
   arg_name 'SSHKEY'
   flag [:ssh_key]
 
+  desc 'Set ssh option ChallengeResponseAuthentication (This is set to no by DOPi by default)'
+  default_value Dopi.configuration.ssh_option_challenge_response_authentication
+  switch [:ssh_option_challenge_response_authentication]
 
+  desc 'Set ssh option PasswordAuthentication (This is set to no by DOPi by default)'
+  default_value Dopi.configuration.ssh_option_password_authentication
+  switch [:ssh_option_password_authentication]
+
+  desc 'Set ssh option StrictHostKeyChecking (This is set to no by DOPi by default)'
+  default_value Dopi.configuration.ssh_option_strict_host_key_checking
+  switch [:ssh_option_strict_host_key_checking]
 
   pre do |global,command,options,args|
     Dopi.configure do |config|
@@ -78,6 +88,9 @@ module Wrapper
       config.role_default =   global[:role_default]
       config.ssh_user =       global[:ssh_user]
       config.ssh_key =        global[:ssh_key]
+      config.ssh_option_challenge_response_authentication = global[:ssh_option_challenge_response_authentication]
+      config.ssh_option_password_authentication =           global[:ssh_option_password_authentication]
+      config.ssh_option_strict_host_key_checking =          global[:ssh_option_strict_host_key_checking]
     end
     ENV['GLI_DEBUG'] = 'true' if global[:trace] == true
     Dopi.logger = Logger.new(STDERR)
