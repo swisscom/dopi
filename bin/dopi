@@ -47,7 +47,7 @@ module Wrapper
   arg_name 'DIR'
   flag [:facts_dir]
 
-  desc 'Set the name of the variable DPOi should use as the roles variable'
+  desc 'Set the name of the variable DOPi should use as the roles variable'
   default_value Dopi.configuration.role_variable
   arg_name 'VARIABLE_NAME'
   flag [:role_variable]
