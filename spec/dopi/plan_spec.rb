@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'yaml'
 
 describe Dopi::Plan do
 
@@ -12,7 +13,8 @@ describe Dopi::Plan do
 
   before :each do
     plan_file = 'spec/data/plan/plan_simple.yaml'
-    @plan = Dopi::Plan.create_plan_from_file(plan_file)
+    plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
+    @plan = Dopi::Plan.new(plan_parser, 'fakeid')
   end
 
   describe '#new' do
