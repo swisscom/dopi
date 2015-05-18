@@ -36,9 +36,7 @@ module Dopi
     attr_accessor :use_hiera, :hiera_yaml, :facts_dir
     attr_accessor :role_variable, :role_default
     attr_accessor :ssh_user, :ssh_key,
-                  :ssh_option_challenge_response_authentication,
-                  :ssh_option_password_authentication,
-                  :ssh_option_strict_host_key_checking
+                  :ssh_pass_auth, :ssh_check_host_key
 
     def initialize
       # Defaults
@@ -56,9 +54,8 @@ module Dopi
       # SSH defaults
       @ssh_user = 'root'
       @ssh_key  = File.join(ENV['HOME'], '.ssh/id_dsa')
-      @ssh_option_challenge_response_authentication = false
-      @ssh_option_password_authentication = false
-      @ssh_option_strict_host_key_checking = false
+      @ssh_pass_auth = false
+      @ssh_check_host_key = false
     end
  
   end

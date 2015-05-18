@@ -78,6 +78,7 @@ module Dopi
         cmd_stdout = ''
         cmd_stderr = ''
         Dopi.log.debug("Executing #{command_string} for command #{name}")
+        Dopi.log.debug("Environment: #{env.to_s}")
         cmd_exit_code = Open3.popen3(env, command_string) do |stdin, stdout, stderr, wait_thr|
           stdin.close
           cmd_stdout = stdout.read

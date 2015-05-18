@@ -67,30 +67,25 @@ module Wrapper
   arg_name 'SSHKEY'
   flag [:ssh_key]
 
-  desc 'Set ssh option ChallengeResponseAuthentication (This is set to no by DOPi by default)'
-  default_value Dopi.configuration.ssh_option_challenge_response_authentication
-  switch [:ssh_option_challenge_response_authentication]
+  desc 'Allow ssh logins with password (this is disabled by default. This will need the sshpass tool to be installed)'
+  default_value Dopi.configuration.ssh_pass_auth
+  switch [:ssh_pass_auth]
 
-  desc 'Set ssh option PasswordAuthentication (This is set to no by DOPi by default)'
-  default_value Dopi.configuration.ssh_option_password_authentication
-  switch [:ssh_option_password_authentication]
-
-  desc 'Set ssh option StrictHostKeyChecking (This is set to no by DOPi by default)'
-  default_value Dopi.configuration.ssh_option_strict_host_key_checking
-  switch [:ssh_option_strict_host_key_checking]
+  desc 'Force ssh to check the host keys (this is disabled by default because we usually deal with new hosts)'
+  default_value Dopi.configuration.ssh_check_host_key
+  switch [:ssh_check_host_key]
 
   pre do |global,command,options,args|
     Dopi.configure do |config|
-      config.plan_cache_dir = global[:plan_cache_dir]
-      config.hiera_yaml =     global[:hiera_yaml]
-      config.facts_dir =      global[:facts_dir]
-      config.role_variable =  global[:role_variable]
-      config.role_default =   global[:role_default]
-      config.ssh_user =       global[:ssh_user]
-      config.ssh_key =        global[:ssh_key]
-      config.ssh_option_challenge_response_authentication = global[:ssh_option_challenge_response_authentication]
-      config.ssh_option_password_authentication =           global[:ssh_option_password_authentication]
-      config.ssh_option_strict_host_key_checking =          global[:ssh_option_strict_host_key_checking]
+      config.plan_cache_dir =     global[:plan_cache_dir]
+      config.hiera_yaml =         global[:hiera_yaml]
+      config.facts_dir =          global[:facts_dir]
+      config.role_variable =      global[:role_variable]
+      config.role_default =       global[:role_default]
+      config.ssh_user =           global[:ssh_user]
+      config.ssh_key =            global[:ssh_key]
+      config.ssh_pass_auth =      global[:ssh_pass_auth]
+      config.ssh_check_host_key = global[:ssh_check_host_key]
     end
     ENV['GLI_DEBUG'] = 'true' if global[:trace] == true
     Dopi.logger = Logger.new(STDERR)
@@ -182,6 +177,24 @@ module Wrapper
       plan.reset
       Dopi.save_plan(plan)
       print_state(plan)
+    end
+  end
+
+
+  desc 'Add a plan, run it and then remove it again (This is mainly for testing)'
+  arg_name 'plan_file'
+  command :oneshot do |c|
+    c.action do |global_options,options,args|
+      help_now!('Specify a plan file to add') if args.empty?
+      help_now!('You can only add one plan') if args.length > 1
+      id = @plan_cache.add(args[0])
+      begin
+        plan = Dopi.load_plan(id)
+        plan.run
+        print_state(plan)
+      ensure
+        @plan_cache.remove(id)
+      end
     end
   end
 
