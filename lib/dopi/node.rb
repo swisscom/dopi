@@ -12,15 +12,19 @@ module Dopi
   class Node
     extend Forwardable
 
-    def initialize(node_parser, configuration)
+    def initialize(node_parser, plan)
       @node_parser = node_parser
-      @configuration = configuration
+      @plan = plan
     end
 
     def_delegators :@node_parser, :name
 
     def role
       @role ||= role_from_hiera || role_from_config || role_default
+    end
+
+    def ssh_root_pass
+      @sshpass ||= ssh_root_pass_from_hiera || @plan.ssh_root_pass
     end
 
   private
@@ -61,6 +65,10 @@ module Dopi
       @scope = Hash[merged_scope.map {|fact,value| [ensure_global_namespace(fact), value ]}]
     end
 
+    def hiera
+      @@hiera ||= Hiera.new(:config => Dopi.configuration.hiera_yaml)
+    end
+
     def role_default
       if Dopi.configuration.role_default
         Dopi.configuration.role_default
@@ -75,15 +83,20 @@ module Dopi
     # the plan and needs to resolve the role before Hiera can access the plan
     def role_from_config
       begin
-        @configuration.lookup("hosts/#{name}", Dopi.configuration.role_variable, scope)
+        @plan.configuration.lookup("hosts/#{name}", Dopi.configuration.role_variable, scope)
       rescue DopCommon::ConfigurationValueNotFound
         nil
       end
     end
 
     def role_from_hiera
-      @@hiera ||= Hiera.new(:config => Dopi.configuration.hiera_yaml)
-      @@hiera.lookup(Dopi.configuration.role_variable, nil, scope)
+      return nil unless Dopi.configuration.use_hiera
+      hiera.lookup(Dopi.configuration.role_variable, nil, scope)
+    end
+
+    def ssh_root_pass_from_hiera
+      return nil unless Dopi.configuration.use_hiera
+      hiera.lookup('ssh_root_pass', nil, scope)
     end
 
   end

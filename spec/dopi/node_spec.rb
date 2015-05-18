@@ -8,15 +8,17 @@ describe Dopi::Node do
     Dopi.configure do |config|
       config.role_variable = 'my_role'
       config.role_default = 'default_role'
-      config.use_hiera = true 
       config.hiera_yaml = 'spec/data/hiera/hiera.yaml'
+      config.use_hiera  = true
       config.facts_dir = 'spec/data/facts'
     end
   end
 
   before :each do
-    node_parser = DopCommon::Node.new('web01.example.com', {'my_role' => 'config_role'})
-    @node = Dopi::Node.new(node_parser)
+    plan_file = 'spec/data/plan/plan_simple.yaml'
+    plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
+    @plan = Dopi::Plan.new(plan_parser, 'fakeid')
+    @node = @plan.nodes.find {|node| node.name == 'web01.example.com'}
   end
 
   describe '#new' do
@@ -30,6 +32,17 @@ describe Dopi::Node do
       expect(@node.role).to eq 'hiera_role'
     end
   end
-    
+
+  describe '#ssh_root_pass' do
+    it 'should return the default root password' do
+      Dopi.configuration.use_hiera = false
+      expect(@node.ssh_root_pass).to eq 'pass_from_plan'
+    end
+    it 'should return the root password from hiera' do
+      Dopi.configuration.use_hiera = true
+      expect(@node.ssh_root_pass).to eq 'pass_from_hiera'
+    end
+  end
+
 end
 

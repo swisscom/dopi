@@ -10,7 +10,7 @@ module Dopi
     extend Forwardable
     include Dopi::State
 
-    attr_reader :id
+    attr_reader :id, :plan_parser
  
     def initialize(plan_parser, plan_id)
       @mutex = Mutex.new
@@ -20,7 +20,7 @@ module Dopi
       steps.each{|step| state_add_child(step)}
     end
 
-    def_delegators :@plan_parser, :configuration
+    def_delegators :@plan_parser, :configuration, :ssh_root_pass 
 
     def run
       state_run
@@ -57,7 +57,7 @@ module Dopi
 
     def nodes
       @nodes ||= parsed_nodes.map do |parsed_node|
-        ::Dopi::Node.new(parsed_node, @plan_parser.configuration)
+        ::Dopi::Node.new(parsed_node, self)
       end
     end
 

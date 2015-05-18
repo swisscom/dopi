@@ -24,6 +24,7 @@ configuration:
 
 plan:
   max_in_flight: 2
+  ssh_root_pass: 'pass_from_plan'
 
 steps:
 

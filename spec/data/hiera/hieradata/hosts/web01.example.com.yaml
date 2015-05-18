@@ -1,1 +1,2 @@
 my_role: hiera_role
+ssh_root_pass: pass_from_hiera
