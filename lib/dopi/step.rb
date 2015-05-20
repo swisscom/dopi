@@ -17,13 +17,20 @@ module Dopi
       raise "nodes list for step #{name} is empty" if @nodes.empty?
     end
 
-    def_delegators :@step_parser, :name
+    def_delegators :@step_parser, :name, :canary_host
 
     def run(max_in_flight)
       state_run
-      Parallel.each(commands, :in_threads => max_in_flight) do |command|
-        raise Parallel::Break if state_failed?
-        command.meta_run
+      commands_copy = commands.dup
+      if canary_host
+        pick = rand(commands_copy.length - 1)
+        commands_copy.delete_at(pick).meta_run
+      end
+      unless state_failed?
+        Parallel.each(commands_copy, :in_threads => max_in_flight) do |command|
+          raise Parallel::Break if state_failed?
+          command.meta_run
+        end
       end
     end
 

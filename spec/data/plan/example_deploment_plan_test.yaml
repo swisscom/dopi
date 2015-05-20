@@ -105,6 +105,7 @@ steps:
 
   - name: 'Initial Puppet run to configure puppet'
     nodes: all
+    canary_host: true
     command:
       plugin: ssh/puppet_agent_run
       verify_commands:
