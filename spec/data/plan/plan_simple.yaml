@@ -19,8 +19,6 @@ configuration:
       my_role: httpd
     haproxy01.example.com:
       my_role: haproxy
-    haproxy02.example.com:
-      my_role: haproxy
 
 plan:
   max_in_flight: 2

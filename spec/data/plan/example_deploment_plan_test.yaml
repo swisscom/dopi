@@ -43,13 +43,6 @@ nodes:
       int: dhcp
     flavor: small
 
-  haproxy02.example.com:
-    cloud: lamp
-    image: rhel6
-    nets:
-      int: dhcp
-    flavor: small
-
 configuration:
   hosts:
     mysql01.example.com:
@@ -71,6 +64,7 @@ configuration:
 
 plan:
   max_in_flight: 2
+  ssh_root_pass: 'vagrant'
 
 steps:
   - name: 'Make sure we can login to all nodes'
@@ -78,6 +72,21 @@ steps:
     command:
       plugin: ssh/wait_for_login
       plugin_timeout: 600
+
+  - name: 'Install Puppetlabs Repo'
+    nodes: all
+    command:
+      plugin: ssh/custom
+      verify_commands:
+        - plugin: ssh/file_exists
+          file: /etc/yum.repos.d/puppetlabs.repo
+      exec: rpm
+      arguments: '-ivh http://yum.puppetlabs.com/puppetlabs-release-el-5.noarch.rpm'
+      expect_exit_codes: 0
+      fail_on_warning: False
+      parse_output:
+        error:
+          - 'Not Found'
 
   - name: 'Install Puppet'
     nodes: all
@@ -87,7 +96,7 @@ steps:
         - plugin: ssh/file_exists
           file: /usr/bin/puppet
       exec: yum
-      arguments: 'install puppet'
+      arguments: '--assumeyes install puppet'
       expect_exit_codes: 0
       fail_on_warning: False
       parse_output:
@@ -101,11 +110,11 @@ steps:
       verify_commands:
         - plugin: ssh/file_contains
           file: /etc/puppet/puppet.conf
-          pattern: puppet.example.com
+          pattern: puppetmaster.example.com
       arguments:
-        - '--server puppet.example.com'
+        - '--server puppetmaster.example.com'
         - '--environment production'
-        - '--tags puppet::client'
+        - '--tags puppet'
 
   - name: 'Configure the MySQL server'
     nodes:
