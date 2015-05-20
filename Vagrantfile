@@ -13,7 +13,10 @@ Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = 'baremettle/centos-6.5'
-  config.librarian_puppet.puppetfile_dir = "spec/vagrant/puppet"
+
+  config.ssh.username = 'root'
+  config.ssh.password = 'vagrant'
+  config.ssh.insert_key = 'true'
 
   test_machines = {
     'mysql01' => {
@@ -30,19 +33,21 @@ Vagrant.configure(2) do |config|
     }
   }
 
-  config.vm.define 'puppetmaster', primary: true do |puppetmaster|
-    puppetmaster.vm.hostname = 'puppetmaster.example.com'
-    
-    puppetmaster.vm.network :private_network,
-      :ip => '192.168.122.101',
-      :libvirt__network_name => 'default'
-
-    hosts_file = ""
-    test_machines.each do |host, data|
-      hosts_file << "#{data[:ip]} #{host}.example.com #{host}\n"
-    end
-    puppetmaster.vm.provision 'shell', inline: "echo '#{hosts_file}' >> /etc/hosts"
-  end
+  #config.vm.define 'puppetmaster', primary: true do |puppetmaster|
+  #  puppetmaster.vm.hostname = 'puppetmaster.example.com'
+  #
+  #  puppetmaster.vm.network :private_network,
+  #    :ip => '192.168.122.101',
+  #    :libvirt__network_name => 'default'
+  #
+  #  puppetmaster.librarian_puppet.puppetfile_dir = "spec/vagrant/puppet"
+  #
+  #  hosts_file = ""
+  #  test_machines.each do |host, data|
+  #    hosts_file << "#{data[:ip]} #{host}.example.com #{host}\n"
+  #  end
+  #  puppetmaster.vm.provision 'shell', inline: "echo '#{hosts_file}' >> /etc/hosts"
+  #end
 
   test_machines.keys.each do |name|
     config.vm.define name do |server|
