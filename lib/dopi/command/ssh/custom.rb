@@ -1,7 +1,6 @@
 #
 # SSH custom command
 #
-require 'mkmf'
 
 module Dopi
   class Command
@@ -9,7 +8,9 @@ module Dopi
       class Custom < Dopi::Command::Custom
 
         def sshpass_bin
-          @sshpass_bin ||= find_executable('sshpass')
+          @sshpass_bin ||= ENV['PATH'].split(':').map{|p| File.join(p, 'sshpass')}.find do |f|
+            File.exists?(f) && File.executable?(f)
+          end
         end
 
         def sshpass_env
