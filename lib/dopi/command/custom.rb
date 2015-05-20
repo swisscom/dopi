@@ -81,10 +81,18 @@ module Dopi
         Dopi.log.debug("Environment: #{env.to_s}")
         cmd_exit_code = Open3.popen3(env, command_string) do |stdin, stdout, stderr, wait_thr|
           stdin.close
-          cmd_stdout = stdout.read
-          cmd_stderr = stderr.read
-          Dopi.log.debug(@node.name + ":" + name + " - " + cmd_stdout)
-          Dopi.log.debug(@node.name + ":" + name + " - " + cmd_stderr)
+          until ( stdout.eof? && stderr.eof? )
+            unless stdout.eof?
+              line = stdout.readline
+              cmd_stdout << line
+              Dopi.log.info(@node.name + ":" + name + " - " + line)
+            end
+            unless stderr.eof?
+              line = stderr.readline
+              cmd_stderr << line
+              Dopi.log.error(@node.name + ":" + name + " - " + line)
+            end
+          end
           wait_thr.value
         end
         [ cmd_stdout, cmd_stderr, cmd_exit_code.exitstatus ]
