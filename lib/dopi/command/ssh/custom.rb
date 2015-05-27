@@ -39,8 +39,16 @@ module Dopi
           "#{sshpass_cmd}ssh -i #{key}#{options} #{user}@#{@node.name}"
         end
 
+        def escape_string(string)
+          string.gsub('"', '\"')
+        end
+
+        def env_string
+          escape_string(env.collect{|k,v| "#{k}=#{v}"}.join(' '))
+        end
+
         def command_string
-          ssh_command_string + ' ' + super
+          ssh_command_string + " \"#{env_string} #{escape_string(super)}\""
         end
 
         def env
