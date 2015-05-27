@@ -29,8 +29,8 @@ module Dopi
       def env_valid?
         return false unless hash.kind_of?(Hash) # plugin may not have parameters
         return false if hash[:env].nil? # env is optional
-        hash[:arguments].kind_of?(Array) or
-          raise PlanParsingError, "The value for 'env' hast to be a Hash" 
+        hash[:env].kind_of?(Hash) or
+          raise CommandParsingError, "The value for 'env' hast to be a Hash" 
       end
 
 
@@ -45,7 +45,7 @@ module Dopi
         hash[:arguments].kind_of?(Hash) or
           hash[:arguments].kind_of?(Array) or
           hash[:arguments].kind_of?(String) or
-          raise PlanParsingError, "The value for 'arguments' hast to be an Array, Hash or String"
+          raise CommandParsingError, "The value for 'arguments' hast to be an Array, Hash or String"
       end
 
 
