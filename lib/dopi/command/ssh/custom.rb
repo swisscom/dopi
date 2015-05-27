@@ -40,7 +40,7 @@ module Dopi
         end
 
         def escape_string(string)
-          string.gsub('"', '\"')
+          string.gsub("\\", "\\\\\\\\").gsub('"', '\\"')
         end
 
         def env_string

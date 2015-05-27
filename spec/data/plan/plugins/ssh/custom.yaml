@@ -35,3 +35,13 @@ steps:
       env:
         'MYVAR': 'MYVALUE'
 
+  - name: 'test correct escaping of commands'
+    nodes:
+      - web01.example.com
+    command:
+      plugin: ssh/custom
+      exec: 'echo'
+      arguments: '\"${MYVAR}\" > /tmp/test2'
+      env:
+        'MYVAR': 'MYVALUE'
+
