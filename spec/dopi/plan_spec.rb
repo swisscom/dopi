@@ -35,8 +35,23 @@ describe Dopi::Plan do
     end
   end
 
-  describe '#run' do
+  describe '#reset' do
     pending
+  end
+
+  describe '#run' do
+    it 'successfuly run some simple steps' do
+      expect(@plan.state_ready?).to be true
+      @plan.run
+      expect(@plan.state_done?).to be true
+    end
+    it 'skip steps that are already done' do
+      expect(@plan.state_ready?).to be true
+      @plan.run
+      expect(@plan.state_done?).to be true
+      @plan.run
+      expect(@plan.state_done?).to be true
+    end
   end
 
 end

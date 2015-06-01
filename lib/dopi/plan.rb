@@ -23,6 +23,10 @@ module Dopi
     def_delegators :@plan_parser, :configuration, :ssh_root_pass 
 
     def run
+      if state_done?
+        Dopi.log.info("Plan is in state 'done'. Nothing to do")
+        return
+      end
       state_run
       steps.each do |step|
         step.run(max_in_flight)

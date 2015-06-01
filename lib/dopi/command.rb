@@ -38,6 +38,10 @@ module Dopi
     def_delegator :@command_parser, :plugin, :name
 
     def meta_run
+      if state_done?
+        Dopi.log.info("Command #{name} on node #{@node.name} is in state 'done'. Skipping")
+        return
+      end
       state_run
       Dopi.log.debug("Running command #{name} on #{@node.name}")
       begin

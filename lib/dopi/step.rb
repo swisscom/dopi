@@ -20,6 +20,10 @@ module Dopi
     def_delegators :@step_parser, :name, :canary_host
 
     def run(max_in_flight)
+      if state_done?
+        Dopi.log.info("Step #{name} is in state 'done'. Skipping")
+        return
+      end
       state_run
       commands_copy = commands.dup
       if canary_host
