@@ -26,6 +26,7 @@ module Dopi
           unless Dopi.configuration.ssh_pass_auth && sshpass_bin && sshpass_env
             options << ' -o ChallengeResponseAuthentication=no'
             options << ' -o PasswordAuthentication=no'
+            options << " -i #{Dopi.configuration.ssh_key}"
             if Dopi.configuration.ssh_pass_auth
               Dopi.log.warn('ssh password login disabled because sshpass is not installed') unless sshpass_bin
               Dopi.log.warn("ssh password login disabled because no root password found for node #{@node.name}") unless sshpass_env
@@ -35,8 +36,7 @@ module Dopi
             options << ' -o StrictHostKeyChecking=no'
           end
           user = Dopi.configuration.ssh_user
-          key  = Dopi.configuration.ssh_key
-          "#{sshpass_cmd}ssh -i #{key}#{options} #{user}@#{@node.name}"
+          "#{sshpass_cmd}ssh #{options} #{user}@#{@node.name}"
         end
 
         def escape_string(string)
