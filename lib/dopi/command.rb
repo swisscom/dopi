@@ -1,6 +1,7 @@
 #
 # This class loades the dopi command plugins
 #
+require 'dop_common'
 require 'forwardable'
 require 'timeout'
 
@@ -15,6 +16,7 @@ module Dopi
   class Command
     extend Forwardable
     include Dopi::State
+    include DopCommon::Validator
 
     def self.inherited(klass)
       PluginManager << klass
@@ -82,8 +84,8 @@ module Dopi
       raise Dopi::CommandExecutionError, "No run method implemented in plugin #{name}"
     end
 
-    def valid?
-      Dopi.log.warn("No validation method implemented in plugin #{name}. Validation not possible")
+    def validate
+      Dopi.log.warn("No 'validate' method implemented in plugin #{name}. Validation not possible")
       true
     end
 

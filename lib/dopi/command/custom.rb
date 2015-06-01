@@ -10,6 +10,11 @@ module Dopi
 
     public
 
+      def validate
+        log_validation_method('env_valid?', CommandParsingError)
+        log_validation_method('arguments_valid?', CommandParsingError)
+      end
+
       def run
         result = []
         cmd_stdout, cmd_stderr, cmd_exit_code = run_command

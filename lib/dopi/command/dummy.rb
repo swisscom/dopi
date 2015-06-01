@@ -8,6 +8,10 @@ module Dopi
   class Command
     class Dummy < Dopi::Command
 
+      def validate
+        true
+      end
+
       def run
         Dopi.log.info("running dummy command for node: #{node.name}")
         if @command_hash.class == Hash

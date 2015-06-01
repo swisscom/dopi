@@ -42,6 +42,11 @@ module Dopi
           true
         end
 
+        def validate
+          log_validation_method('connection_timeout_valid?', CommandParsingError)
+          log_validation_method('interval_valid?', CommandParsingError)
+        end
+
         def connection_timeout
           @connection_timeout ||= connection_timeout_valid? ?
             hash[:connection_timeout] : DEFAULT_CONNECTION_TIMEOUT

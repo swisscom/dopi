@@ -26,6 +26,10 @@ module Dopi
             hash[:file] : nil
         end
 
+        def validate
+          log_validation_method('file_valid?', CommandParsingError)
+        end
+
         def file_valid?
           hash[:file] or
             raise CommandParsingError, "Plugin #{name}: The key 'file' needs to be specified"
