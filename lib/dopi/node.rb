@@ -90,7 +90,7 @@ module Dopi
     # the plan and needs to resolve the role before Hiera can access the plan
     def role_from_config
       begin
-        @plan.configuration.lookup("hosts/#{name}", Dopi.configuration.role_variable, scope)
+        @plan.configuration.lookup("nodes/#{name}", Dopi.configuration.role_variable, scope)
       rescue DopCommon::ConfigurationValueNotFound
         nil
       end
