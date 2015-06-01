@@ -7,10 +7,9 @@ describe Dopi::Node do
 
     Dopi.configure do |config|
       config.role_variable = 'my_role'
-      config.role_default = 'default_role'
-      config.hiera_yaml = 'spec/data/hiera/hiera.yaml'
-      config.use_hiera  = true
-      config.facts_dir = 'spec/data/facts'
+      config.role_default  = 'default_role'
+      config.hiera_yaml    = 'spec/data/hiera/hiera.yaml'
+      config.facts_dir     = 'spec/data/facts'
     end
   end
 

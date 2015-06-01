@@ -44,6 +44,7 @@ module Dopi
       @plan_cache_dir    = '/var/lib/dop/plans/'
 
       # Hiera defaults
+      @use_hiera  = true
       @hiera_yaml = '/etc/puppet/hiera.yaml'
       @load_facts = false
       @facts_dir  = '/var/lib/puppet/yaml/facts/'

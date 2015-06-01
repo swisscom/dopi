@@ -82,6 +82,7 @@ module Wrapper
   pre do |global,command,options,args|
     Dopi.configure do |config|
       config.plan_cache_dir =     global[:plan_cache_dir]
+      config.use_hiera =          global[:use_hiera]
       config.hiera_yaml =         global[:hiera_yaml]
       config.facts_dir =          global[:facts_dir]
       config.load_facts =         global[:load_facts]
