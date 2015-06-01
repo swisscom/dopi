@@ -36,6 +36,7 @@ module Dopi
         end
 
         def validate
+          super
           log_validation_method('file_valid?', CommandParsingError)
           log_validation_method('pattern_valid?', CommandParsingError)
         end
