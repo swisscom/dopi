@@ -109,6 +109,27 @@ module Wrapper
     end
   end
 
+  def plan_valid?(plan_file)
+    plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
+    plan = Dopi::Plan.new(plan_parser, 'fakeid')
+    plan.valid?
+  end
+
+
+  desc 'Validate a plan file'
+  arg_name 'plan_file'
+  command :validate do |c|
+    c.action do |global_options,options,args|
+      help_now!('Specify a plan file to add') if args.empty?
+      help_now!('You can only add one plan') if args.length > 1
+      if plan_valid?(args[0])
+        puts "Plan is valid"
+      else
+        exit_now!("Plan is NOT valid")
+      end
+    end
+  end
+
 
   desc 'Add a new plan file to the plan cache'
   arg_name 'plan_file'
