@@ -61,12 +61,14 @@ module Dopi
       end
     end
 
-    def meta_valid?
+    def meta_valid?(step_name)
       validity = valid?
-      begin
-        validity = false unless verify_commands.all?{|c| c.meta_valid? }
-      rescue PluginLoaderError => e
-        Dopi.log.error("Step #{name}: Can't load plugin #{@tep_parser.command.plugin}: #{e.message}")
+      validity = false unless verify_commands.all? do |verify_command|
+        begin
+          verify_command.meta_valid?(step_name)
+        rescue PluginLoaderError => e
+          Dopi.log.error("Step #{step_name}: Can't load plugin #{verify_command.plugin}: #{e.message}")
+        end
       end
       validity
     end
@@ -81,7 +83,8 @@ module Dopi
     end
 
     def valid?
-      Dopi.log.warn("No valid? method implemented in plugin #{name}. Validation not possible")
+      Dopi.log.warn("No validation method implemented in plugin #{name}. Validation not possible")
+      true
     end
 
     def verify_commands

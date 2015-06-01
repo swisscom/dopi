@@ -35,13 +35,11 @@ module Dopi
     end
 
     def command_plugin_valid?
-      dummy_node = Dopi::Node.new(DopCommon::Node('dummy.example.com', {}))
       begin
-        command = Dopi::Command.create_plugin_instance(@step_parser.command.plugin, dummy_node, @step_parser.command)
-        return command.meta_valid?
+        commands.first.meta_valid?(name)
       rescue PluginLoaderError => e
-        Dopi.log.error("Step #{name}: Can't load plugin #{@tep_parser.command.plugin}: #{e.message}")
-        return false
+        Dopi.log.error("Step #{name}: Can't load plugin #{@step_parser.command.plugin}: #{e.message}")
+        false
       end
     end
 

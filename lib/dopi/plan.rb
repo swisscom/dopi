@@ -47,13 +47,14 @@ module Dopi
     def valid?
       validity = @plan_parser.valid?
       begin
-        validity = false unless steps.all?{|s| s.command_plugin_valid? }
+        validity = false unless steps.all?{|step| step.command_plugin_valid? }
       rescue Dopi::NoRoleFoundError => e
         Dopi.log.warn(e.message) 
       rescue StandardError => e
         Dopi.log.error(e.message)
         Dopi.log.warn("Plan: Can't validate the command plugins because of a previous error")
       end
+      validity
     end
 
     def nodes
