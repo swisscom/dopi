@@ -35,6 +35,7 @@ module Dopi
           unless Dopi.configuration.ssh_check_host_key
             options << ' -o StrictHostKeyChecking=no'
           end
+          options << ' -q' if quiet
           user = Dopi.configuration.ssh_user
           "#{sshpass_cmd}ssh #{options} #{user}@#{@node.name}"
         end
@@ -53,6 +54,22 @@ module Dopi
 
         def env
           @ssh_env ||= super.merge(sshpass_env || {}) 
+        end
+
+        def validate
+          super
+          log_validation_method('quiet_valid?', CommandParsingError)
+        end
+
+        def quiet
+          @quiet || quiet_valid? ? hash[:quiet] : true
+        end
+
+        def quiet_valid?
+          return false unless hash.kind_of?(Hash)
+          return false if hash[:quiet].nil? # is optional
+          hash[:quiet].kind_of?(TrueClass) or hash[:quiet].kind_of?(FalseClass) or
+            raise ComandParsingError, "Plugin #{name}: The value for quiet must be boolean"
         end
 
       end
