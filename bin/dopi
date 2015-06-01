@@ -137,9 +137,13 @@ module Wrapper
     c.action do |global_options,options,args|
       help_now!('Specify a plan file to add') if args.empty?
       help_now!('You can only add one plan') if args.length > 1
-      id = @plan_cache.add(args[0])
-      Dopi.load_plan(id)
-      puts id
+      if plan_valid?(args[0])
+        id = @plan_cache.add(args[0])
+        Dopi.load_plan(id)
+        puts id
+      else
+        exit_now!("An error occured while parsing the plan. Plan was not added.")
+      end
     end
   end
 
