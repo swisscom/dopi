@@ -42,6 +42,10 @@ module Wrapper
   arg_name 'YAML'
   flag [:hiera_yaml]
 
+  desc 'Try to load the scope for the nodes from existing facts'
+  default_value Dopi.configuration.load_facts
+  switch [:load_facts]
+
   desc 'Specify the directory where dopi can find facts'
   default_value Dopi.configuration.facts_dir
   arg_name 'DIR'
@@ -80,6 +84,7 @@ module Wrapper
       config.plan_cache_dir =     global[:plan_cache_dir]
       config.hiera_yaml =         global[:hiera_yaml]
       config.facts_dir =          global[:facts_dir]
+      config.load_facts =         global[:load_facts]
       config.role_variable =      global[:role_variable]
       config.role_default =       global[:role_default]
       config.ssh_user =           global[:ssh_user]

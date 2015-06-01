@@ -47,6 +47,7 @@ module Dopi
     end
 
     def facts
+      return {} unless Dopi.configuration.load_facts
       facts_yaml = File.join(Dopi.configuration.facts_dir, name + '.yaml')
       if File.exists? facts_yaml
         YAML.load_file(facts_yaml).values

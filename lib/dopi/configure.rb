@@ -33,7 +33,7 @@ module Dopi
 
   class Configuration
     attr_accessor :config_file, :plan_cache_dir
-    attr_accessor :use_hiera, :hiera_yaml, :facts_dir
+    attr_accessor :use_hiera, :hiera_yaml, :load_facts, :facts_dir
     attr_accessor :role_variable, :role_default
     attr_accessor :ssh_user, :ssh_key,
                   :ssh_pass_auth, :ssh_check_host_key
@@ -45,6 +45,7 @@ module Dopi
 
       # Hiera defaults
       @hiera_yaml = '/etc/puppet/hiera.yaml'
+      @load_facts = false
       @facts_dir  = '/var/lib/puppet/yaml/facts/'
 
       # Role defaults
