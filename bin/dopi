@@ -16,7 +16,7 @@ module Wrapper
   arguments :strict
 
   desc 'Verbosity of the command line tool'
-  default_value 'WARN'
+  default_value 'INFO'
   arg_name 'Verbosity'
   flag [:v,:verbosity]
 
