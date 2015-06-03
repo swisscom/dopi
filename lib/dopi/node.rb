@@ -4,6 +4,7 @@
 require 'forwardable'
 require 'puppet'
 require 'hiera'
+require 'yaml'
 
 module Dopi
   class NoRoleFoundError < StandardError
@@ -67,13 +68,15 @@ module Dopi
     end
 
     def hiera
-      # Create a new Hiera object if the config has changed
       @@hiera_config ||= ''
+      # Create a new Hiera object if the config has changed
       unless Dopi.configuration.hiera_yaml == @@hiera_config
         @@hiera_config = Dopi.configuration.hiera_yaml
-        @@hiera = nil
+        config = YAML.load_file(@@hiera_config)
+        config[:logger] = 'dopi'
+        @@hiera = Hiera.new(:config => config)
       end
-      @@hiera ||= Hiera.new(:config => Dopi.configuration.hiera_yaml)
+      @@hiera
     end
 
     def role_default
