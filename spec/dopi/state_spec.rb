@@ -6,10 +6,6 @@ end
 
 describe Dopi::State do
 
-  before :all do
-    Dopi.log.level = ::Logger::ERROR
-  end
-
   before :each do
     @child_state1 = StateTestKlass.new
     @child_state2 = StateTestKlass.new

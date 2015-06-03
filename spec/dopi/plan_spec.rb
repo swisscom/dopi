@@ -4,8 +4,6 @@ require 'yaml'
 describe Dopi::Plan do
 
   before :all do
-    Dopi.log.level = ::Logger::ERROR
-
     Dopi.configure do |config|
       config.role_variable = 'my_role'
     end

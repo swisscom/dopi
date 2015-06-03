@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe Dopi::Command do
 
-  before :all do
-    Dopi.log.level = ::Logger::DEBUG
-  end
-
   before :each do
     plan_file = 'spec/data/plan/plan_simple.yaml'
     plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
