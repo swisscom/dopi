@@ -7,7 +7,7 @@ require 'dop_common'
 module Dopi
 
   def self.log
-    @log ||= Dopi.logger(Logger.new(STDOUT))
+    @log ||= Dopi.logger = Logger.new(STDOUT)
   end
 
   def self.logger=(logger)
