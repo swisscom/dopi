@@ -68,7 +68,8 @@ module Dopi
     end
 
     def hiera
-      @@hiera_config ||= ''
+      @@hiera ||= nil
+      @@hiera_config ||= nil
       # Create a new Hiera object if the config has changed
       unless Dopi.configuration.hiera_yaml == @@hiera_config
         @@hiera_config = Dopi.configuration.hiera_yaml
