@@ -43,6 +43,10 @@ module Dopi
         return
       end
       state_run
+      verify_commands.each do |verify_command|
+        verify_command.state_reset if verify_command.state_failed?
+        # TODO: Reset done state as well. We should always rerun validation commands
+      end
       Dopi.log.debug("Running command #{name} on #{@node.name}")
       begin
         Timeout::timeout(plugin_timeout) do
