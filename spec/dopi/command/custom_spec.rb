@@ -28,7 +28,31 @@ describe Dopi::Command do
   end
 
   describe '#arguments' do
-    pending
+    it 'should return an empty hash if nothing is specified' do
+      command_parser = DopCommon::Command.new({:plugin => 'custom'})
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect(command.arguments).to eq("")
+    end
+    it 'should return a correct string if arguments are specified as a String' do
+      command_parser = DopCommon::Command.new({:plugin => 'custom', :arguments => "my custom arguments"})
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect(command.arguments).to eq("my custom arguments")
+    end
+    it 'should return a correct string if arguments are specified as an Array' do
+      command_parser = DopCommon::Command.new({:plugin => 'custom', :arguments => ['my', 'custom', 'arguments']})
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect(command.arguments).to eq("my custom arguments")
+    end
+    it 'should return a correct string if arguments are specified as a Hash' do
+      command_parser = DopCommon::Command.new({:plugin => 'custom', :arguments => {'my' =>  'custom', 'arguments' => ''}})
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect(command.arguments).to eq("my custom arguments ")
+    end
+    it 'will raise and error if arguments is not a String, Array or Hash' do
+      command_parser = DopCommon::Command.new({:plugin => 'custom', :arguments => 2})
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect{command.arguments}.to raise_error Dopi::CommandParsingError
+    end
   end
 
   describe '#expect_exit_codes' do
