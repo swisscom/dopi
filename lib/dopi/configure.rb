@@ -32,7 +32,7 @@ module Dopi
   end
 
   class Configuration
-    attr_accessor :config_file, :plan_cache_dir
+    attr_accessor :trace, :config_file, :plan_cache_dir
     attr_accessor :use_hiera, :hiera_yaml, :load_facts, :facts_dir
     attr_accessor :role_variable, :role_default
     attr_accessor :ssh_user, :ssh_key,
@@ -40,8 +40,9 @@ module Dopi
 
     def initialize
       # Defaults
-      @config_file = '/etc/dop/dopi.conf'
-      @plan_cache_dir    = '/var/lib/dop/plans/'
+      @trace          = false
+      @config_file    = '/etc/dop/dopi.conf'
+      @plan_cache_dir = '/var/lib/dop/plans/'
 
       # Hiera defaults
       @use_hiera  = true
