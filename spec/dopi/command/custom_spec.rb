@@ -9,6 +9,24 @@ describe Dopi::Command do
     @node = @plan.nodes.find {|node| node.name == 'web01.example.com'}
   end
 
+  describe '#exec' do
+    it 'should return the exec value if specified' do
+      command_parser = DopCommon::Command.new({:plugin => 'custom', :exec => 'echo'})
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect(command.exec).to eq('echo')
+    end
+    it 'will raise and error if exec is not specified' do
+      command_parser = DopCommon::Command.new({:plugin => 'custom'})
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect{command.exec}.to raise_error Dopi::CommandParsingError
+    end
+    it 'will raise and error if exec is not a String' do
+      command_parser = DopCommon::Command.new({:plugin => 'custom', :exec => 2})
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect{command.exec}.to raise_error Dopi::CommandParsingError
+    end
+  end
+
   describe '#env' do
     it 'should return the defaults hash if nothing is specified' do
       command_parser = DopCommon::Command.new({:plugin => 'custom'})

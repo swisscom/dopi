@@ -7,17 +7,20 @@
 #
 # Plugin Settings:
 #
-# arguments
+# exec
+# The command the plugin should execute for every node.
+#
+# arguments (optional)
 # The arguments for the command. This can be set by a string
 # as an array or as a hash. All the elements of the hash and
 # the array will be flattened and joined with a space.
 # default: ""
 #
-# env
+# env (optional)
 # The environment variables that should be set
 # default: { DOP_NODE_FQDN => fqdn_of_node }
 #
-# expect_exit_codes
+# expect_exit_codes (optional)
 # The exit codes DOPi should expect if the program terminates.
 # It the program exits with an exit code not listed here, DOPi
 # will mark the run as failed. The values can be a number, an
@@ -35,6 +38,7 @@ module Dopi
     public
 
       def validate
+        log_validation_method('exec_valid?', CommandParsingError)
         log_validation_method('env_valid?', CommandParsingError)
         log_validation_method('arguments_valid?', CommandParsingError)
         log_validation_method('expect_exit_codes_valid?', CommandParsingError)
@@ -47,6 +51,11 @@ module Dopi
         result << parse_output(cmd_stderr)
         result << check_exit_code(cmd_exit_code)
         result.all?
+      end
+
+      def exec
+        @exec ||= exec_valid? ?
+          hash[:exec] : nil
       end
 
       def env
@@ -65,6 +74,13 @@ module Dopi
       end
 
     private
+
+      def exec_valid?
+        hash[:exec] or
+          raise CommandParsingError, "No command to execute in 'exec' defined"
+        hash[:exec].kind_of?(String) or
+          raise CommandParsingError, "The value for 'exec' has to be a String"
+      end
 
       def env_valid?
         return false unless hash.kind_of?(Hash) # plugin may not have parameters
@@ -114,14 +130,6 @@ module Dopi
         true
       end
 
-
-      def exec
-        if hash[:exec]
-          return hash[:exec]
-        else
-          raise "No exec part for command #{name}"
-        end
-      end
 
 
       def command_string
