@@ -1,0 +1,4 @@
+forge "https://forge.puppetlabs.com"
+
+mod 'dop-role_base',         :path => './dop-role_base'
+mod 'dop-role_puppetmaster', :path => './dop-role_puppetmaster'

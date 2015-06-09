@@ -1,0 +1,17 @@
+{
+  "name": "dop-role_puppetmaster",
+  "version": "0.0.1",
+  "author": "Andreas Zuber",
+  "summary": "Role Module which installs a Puppet Master",
+  "license": "Apache 2.0",
+  "source": "",
+  "project_page": null,
+  "issues_url": null,
+  "dependencies": [
+    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"},
+    {"name":"puppet-mcollective","version_requirement":">= 2.1.1"},
+    {"name":"theforeman-puppet","version_requirement":">= 3.0.0"},
+    {"name":"theforeman-foreman","version_requirement":">= 3.0.2"}
+  ]
+}
+

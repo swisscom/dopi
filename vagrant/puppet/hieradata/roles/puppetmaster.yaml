@@ -1,0 +1,13 @@
+
+foreman::foreman_url: %{fqdn}
+foreman::unattended: false
+foreman::authentication: false
+
+puppet::server: true
+puppet::server_foreman: true
+puppet::server_rttendedeports: 'store'
+puppet::server_external_nodes: ''
+puppet::hiera_config: '/vagrant/vagrant/puppet/hiera.yaml'
+
+mcollective::middleware: true
+

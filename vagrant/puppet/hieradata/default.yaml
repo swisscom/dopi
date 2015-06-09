@@ -1,0 +1,6 @@
+
+puppet::puppetmaster: 'puppetmaster.example.com'
+puppet::runmode: 'none'
+
+mcollective::middleware_hosts:
+    - 'puppetmaster.example.com'
