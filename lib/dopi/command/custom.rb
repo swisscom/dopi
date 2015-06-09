@@ -1,5 +1,29 @@
+# DOPi Plugin: Custom Command
 #
-# DOPi command base class
+# This DOPi Plugin will execute a customized command on the
+# node DOPi is running on. It will run the command once per
+# node in the step and export the node fqdn in the
+# environment variable DOP_NODE_FQDN
+#
+# Plugin Settings:
+#
+# arguments
+# The arguments for the command. This can be set by a string
+# as an array or as a hash. All the elements of the hash and
+# the array will be flattened and joined with a space.
+# default: ""
+#
+# env
+# The environment variables that should be set
+# default: { DOP_NODE_FQDN => fqdn_of_node }
+#
+# expect_exit_codes
+# The exit codes DOPi should expect if the program terminates.
+# It the program exits with an exit code not listed here, DOPi
+# will mark the run as failed. The values can be a number, an
+# array of numbers or :all for all possible exit codes.
+# default: 0
+#
 #
 # TODO: Refactor
 require 'open3'
@@ -27,7 +51,7 @@ module Dopi
 
       def env
         @env ||= env_valid? ?
-          hash[:env] : {}
+          env_defaults.merge(hash[:env]) : env_defaults
       end
 
       def arguments
@@ -47,6 +71,10 @@ module Dopi
         return false if hash[:env].nil? # env is optional
         hash[:env].kind_of?(Hash) or
           raise CommandParsingError, "The value for 'env' has to be a hash"
+      end
+
+      def env_defaults
+        { 'DOP_NODE_FQDN' => @node.name }
       end
 
       def arguments_valid?

@@ -10,15 +10,15 @@ describe Dopi::Command do
   end
 
   describe '#env' do
-    it 'should return an empty hash if nothing is specified' do
+    it 'should return the defaults hash if nothing is specified' do
       command_parser = DopCommon::Command.new({:plugin => 'custom'})
       command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
-      expect(command.env).to eq({})
+      expect(command.env).to eq({'DOP_NODE_FQDN' => @node.name})
     end
-    it 'should return a correct hash if it is specified' do
+    it 'should return the specified hash merged with the defaults' do
       command_parser = DopCommon::Command.new({:plugin => 'custom', :env => {'MYVAR' => 'MYVALUE'}})
       command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
-      expect(command.env).to eq({'MYVAR' => 'MYVALUE'})
+      expect(command.env).to eq({'DOP_NODE_FQDN' => @node.name, 'MYVAR' => 'MYVALUE'})
     end
     it 'will raise and error if env is not a hash' do
       command_parser = DopCommon::Command.new({:plugin => 'custom', :env => 2})
