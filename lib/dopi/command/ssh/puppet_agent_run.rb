@@ -10,6 +10,10 @@ module Dopi
           'puppet agent --test'
         end
 
+        def expect_exit_codes_defaults
+          [ 0, 2 ]
+        end
+
       end
     end
   end

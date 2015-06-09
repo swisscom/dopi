@@ -70,7 +70,7 @@ module Dopi
 
       def expect_exit_codes
         @expect_exit_codes ||= expect_exit_codes_valid? ?
-          hash[:expect_exit_codes] : 0
+          hash[:expect_exit_codes] : expect_exit_codes_defaults
       end
 
     private
@@ -130,7 +130,9 @@ module Dopi
         true
       end
 
-
+      def expect_exit_codes_defaults
+        0
+      end
 
       def command_string
         exec + ' ' + arguments
