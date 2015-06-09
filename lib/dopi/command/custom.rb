@@ -13,6 +13,7 @@ module Dopi
       def validate
         log_validation_method('env_valid?', CommandParsingError)
         log_validation_method('arguments_valid?', CommandParsingError)
+        log_validation_method('expect_exit_codes_valid?', CommandParsingError)
       end
 
       def run
@@ -24,24 +25,28 @@ module Dopi
         result.all?
       end
 
-    private
-
       def env
         @env ||= env_valid? ?
           hash[:env] : {}
       end
 
+      def arguments
+        @arguments ||= arguments_valid? ?
+          parse_arguments : ""
+      end
+
+      def expect_exit_codes
+        @expect_exit_codes ||= expect_exit_codes_valid? ?
+          hash[:expect_exit_codes] : 0
+      end
+
+    private
+
       def env_valid?
         return false unless hash.kind_of?(Hash) # plugin may not have parameters
         return false if hash[:env].nil? # env is optional
         hash[:env].kind_of?(Hash) or
-          raise CommandParsingError, "The value for 'env' hast to be a Hash" 
-      end
-
-
-      def arguments
-        @arguments ||= arguments_valid? ?
-          hash[:arguments] : {}
+          raise CommandParsingError, "The value for 'env' has to be a hash"
       end
 
       def arguments_valid?
@@ -53,13 +58,32 @@ module Dopi
           raise CommandParsingError, "The value for 'arguments' hast to be an Array, Hash or String"
       end
 
-
-      def argument_string
-        case arguments
-        when Hash   then arguments.to_a.flatten.join(' ')
-        when Array  then arguments.flatten.join(' ')
-        when String then arguments
+      def parse_arguments
+        case hash[:arguments]
+        when Hash   then hash[:arguments].to_a.flatten.join(' ')
+        when Array  then hash[:arguments].flatten.join(' ')
+        when String then hash[:arguments]
+        else ""
         end
+      end
+
+      def expect_exit_codes_valid?
+        return false unless hash.kind_of?(Hash) # plugin may not have parameters
+        return false if hash[:expect_exit_codes].nil? # expect_exit_codes is optional
+        hash[:expect_exit_codes].kind_of?(Fixnum) or
+          hash[:expect_exit_codes].kind_of?(String) or
+          hash[:expect_exit_codes].kind_of?(Symbol) or
+          hash[:expect_exit_codes].kind_of?(Array) or
+          raise CommandParsingError, "The value for 'expect_exit_codes' hast to be a number or an array of numbers or :all"
+        if hash[:expect_exit_codes].kind_of?(String) || hash[:expect_exit_codes].kind_of?(Symbol)
+          ['all', 'All', 'ALL', :all].include? hash[:expect_exit_codes] or
+            raise CommandParsingError, "Unknown keyword for expect_exit_codes. This has to be a number, an array or :all"
+        end
+        if hash[:expect_exit_codes].kind_of?(Array)
+          hash[:expect_exit_codes].all?{|exit_code| exit_code.kind_of?(Fixnum)} or
+            raise CommandParsingError, "The array in 'expect_exit_codes' can only contain numbers"
+        end
+        true
       end
 
 
@@ -73,7 +97,7 @@ module Dopi
 
 
       def command_string
-        exec + ' ' + argument_string
+        exec + ' ' + arguments
       end
 
 
@@ -171,36 +195,27 @@ module Dopi
         return results
       end
 
+      def check_exit_code(cmd_exit_code)
+        exit_code_ok = case expect_exit_codes
+        when 'all', 'ALL', 'All', :all then true
+        when Array then expect_exit_codes.include?(cmd_exit_code)
+        when Fixnum then expect_exit_codes == cmd_exit_code
+        else false
+        end
 
-      # Returns an array of valid exit codes or nil
-      def expect_exit_codes
-        exit_code = [ 0 ]
-        if hash.class == Hash
-          if hash[:expect_exit_codes].class == Fixnum
-            exit_code = [ hash[:expect_exit_codes] ]
-          elsif hash[:expect_exit_codes].class == Array
-            exit_code = hash[:expect_exit_codes]
-          elsif hash[:expect_exit_codes].class == String
-            if hash[:expect_exit_codes].casecmp('all') == 0
-              exit_code = nil
-            end
+        unless exit_code_ok
+          Dopi.log.error("Wrong exit code in command #{name} for node #{@node.name}")
+          if expect_exit_codes.kind_of?(Array)
+            Dopi.log.error("Exit code was #{cmd_exit_code.to_s} should be one of #{expect_exit_codes.join(', ')}")
+          elsif expect_exit_codes.kind_of?(Fixnum)
+            Dopi.log.error("Exit code was #{cmd_exit_code.to_s} should be #{expect_exit_codes.to_s}")
+          else
+            Dopi.log.error("Exit code was #{cmd_exit_code.to_s} #{expect_exit_codes}")
           end
         end
-        return exit_code
+
+        exit_code_ok
       end
-
-
-      def check_exit_code(cmd_exit_code)
-        return true unless expect_exit_codes
-        if expect_exit_codes.include? cmd_exit_code
-          return true
-        else
-          Dopi.log.error("Wrong exit code in command #{name} for node #{@node.name}")
-          Dopi.log.error("Exit code was #{cmd_exit_code.to_s} should be one of #{expect_exit_codes.join(',')}")
-          return false
-        end
-      end
-
 
     end
   end
