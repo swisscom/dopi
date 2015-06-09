@@ -55,7 +55,7 @@ module Dopi
       rescue Dopi::NoRoleFoundError => e
         Dopi.log.warn(e.message) 
       rescue StandardError => e
-        Dopi.log.error(e.message)
+        Dopi.configuration.trace ? Dopi.log.error(e) : Dopi.log.error(e.message)
         Dopi.log.warn("Plan: Can't validate the command plugins because of a previous error")
       end
       validity
