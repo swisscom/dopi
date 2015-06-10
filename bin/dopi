@@ -18,11 +18,11 @@ module Wrapper
   desc 'Verbosity of the command line tool'
   default_value 'INFO'
   arg_name 'Verbosity'
-  flag [:v,:verbosity]
+  flag [:verbosity, :v]
 
   desc 'Show stacktrace on crash'
   default_value Dopi.configuration.trace
-  switch [:t,:trace]
+  switch [:trace, :t]
 
   #
   # DOPi Configuration
@@ -32,11 +32,11 @@ module Wrapper
   desc 'Specify the directory where DOPi will cache data about the plans'
   default_value Dopi.configuration.plan_cache_dir
   arg_name 'DIR'
-  flag [:p,:plan_cache_dir]
+  flag [:plan_cache_dir, :p]
 
   desc 'Use Hiera to get the role for the nodes'
   default_value Dopi.configuration.use_hiera
-  switch [:h,:use_hiera]
+  switch [:use_hiera, :h]
 
   desc 'Specify the hiera configuration file'
   default_value Dopi.configuration.hiera_yaml
