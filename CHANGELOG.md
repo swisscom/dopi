@@ -14,3 +14,5 @@ All notable changes to DOPi will be documented in this file.
 - A bug where Hiera was not correctly initialized in certain situations was fixed
 - The puppet agent plugin should now expect error code 2 (changes) as default
 - Trace should now also show a stacktrace for unexpected validation Errors
+- The initconfig command will now avoid duplicate entries
+- Boolean false values from the config file correctly overwrite the default now
