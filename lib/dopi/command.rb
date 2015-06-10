@@ -65,7 +65,7 @@ module Dopi
       rescue Timeout::Error
         state_fail
         Dopi.log.error("Command #{name} timed out on #{@node.name}")
-      rescue Exception => e
+      rescue => e
         state_fail
         raise e
       end
