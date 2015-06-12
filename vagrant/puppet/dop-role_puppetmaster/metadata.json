@@ -9,7 +9,7 @@
   "issues_url": null,
   "dependencies": [
     {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"},
-    {"name":"puppet-mcollective","version_requirement":">= 2.1.1"},
+    {"name":"camptocamp-mcollective","version_requirement":">= 3.0.5"},
     {"name":"theforeman-puppet","version_requirement":">= 3.0.0"},
     {"name":"theforeman-foreman","version_requirement":">= 3.0.2"}
   ]

@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry"
   spec.add_development_dependency "pry-debugger"
   spec.add_development_dependency "pry-doc"
+  spec.add_development_dependency "librarian-puppet"
 
   spec.add_runtime_dependency "dop_common"
   spec.add_runtime_dependency "gli"

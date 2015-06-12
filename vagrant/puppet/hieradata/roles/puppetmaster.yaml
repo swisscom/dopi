@@ -9,5 +9,5 @@ puppet::server_rttendedeports: 'store'
 puppet::server_external_nodes: ''
 puppet::hiera_config: '/vagrant/vagrant/puppet/hiera.yaml'
 
-mcollective::middleware: true
+mcollective::use_client: true
 

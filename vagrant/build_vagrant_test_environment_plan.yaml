@@ -1,0 +1,48 @@
+infrastructures:
+    vagrant: {}
+
+nodes:
+    'puppetmaster.example.com':
+        type: 'vagrant'
+    'broker.example.com':
+        type: 'vagrant'
+
+plan:
+    max_in_flight: 1
+    ssh_root_pass: 'vagrant'
+
+steps:
+    - name: "Make sure all machines are destroyed"
+      nodes:
+        - 'puppetmaster.example.com'
+      command:
+          plugin: 'custom'
+          exec: 'vagrant'
+          arguments: "destroy"
+
+    - name: "Create puppetmaster machine"
+      nodes:
+        - 'puppetmaster.example.com'
+      command:
+          plugin: 'custom'
+          plugin_timeout: 600
+          exec: 'vagrant'
+          arguments: "up puppetmaster"
+
+    - name: "Create Mcollective broker machine"
+      nodes:
+        - 'broker.example.com'
+      command:
+          plugin: 'custom'
+          exec: 'vagrant'
+          arguments: "up broker"
+
+    - name: "Provision Mcollective broker machine"
+      nodes:
+        - 'broker.example.com'
+      command:
+          plugin: 'ssh/puppet_agent_run'
+          arguments:
+            '--server':      'puppetmaster.example.com'
+            '--waitforcert': '300'
+

@@ -12,14 +12,14 @@ Vagrant.configure(2) do |config|
   config.ssh.password = 'vagrant'
   config.ssh.insert_key = 'true'
 
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.ignore_private_ip = false
+  config.hostmanager.include_offline = true
 
-  # Puppetmaster and MCollective broker
+  # Puppetmaster
   config.vm.define 'puppetmaster', primary: true do |puppetmaster|
     puppetmaster.vm.hostname = 'puppetmaster.example.com'
-
-    puppetmaster.vm.network :private_network,
-      :ip => '192.168.122.101',
-      :libvirt__network_name => 'default'
 
     puppetmaster.librarian_puppet.puppetfile_dir = 'vagrant/puppet'
     puppetmaster.puppet_install.puppet_version  = '3.8.1'
@@ -35,29 +35,21 @@ Vagrant.configure(2) do |config|
       destination: '/etc/puppet/environments/production/environment.conf'
   end
 
-  # SSH Test Machines
-  ssh_test_machines = {
-    'mysql01' => {
-      :ip => '192.168.122.103'
-    },
-    'web01' => {
-      :ip => '192.168.122.104'
-    },
-    'web02' => {
-      :ip => '192.168.122.105'
-    },
-    'haproxy01' => {
-      :ip => '192.168.122.106'
-    },
-  }
+  # Mcollective Broker
+  config.vm.define 'broker', primary: true do |puppetmaster|
+    puppetmaster.vm.hostname = 'broker.example.com'
 
-  ssh_test_machines.keys.each do |name|
+    puppetmaster.puppet_install.puppet_version  = '3.8.1'
+  end
+
+  # Other Machines
+  [ 'mysql01',
+    'web01',
+    'web02',
+    'haproxy01'
+  ].each do |name|
     config.vm.define name do |server|
       server.vm.hostname = name + '.example.com'
-
-      server.vm.network :private_network,
-        :ip => ssh_test_machines[name][:ip],
-        :libvirt__network_name => 'default'
     end
   end
 

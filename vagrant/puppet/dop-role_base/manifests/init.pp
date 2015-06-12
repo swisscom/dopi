@@ -10,10 +10,6 @@ class role_base {
   include 'puppet'
   include 'mcollective'
 
-  # FIX: directory is missing
-  file{'/usr/libexec/mcollective':
-    ensure => directory
-  }->
-  Class['mcollective::server']
-
+  file{'/usr/libexec/mcollective/':            ensure => directory}
+  file{'/usr/libexec/mcollective/mcollective': ensure => directory}
 }

@@ -10,5 +10,10 @@
 #
 class role_puppetmaster inherits role_base {
   include 'foreman'
+  include 'puppet'
+
+  file{'/etc/puppet/autosign.conf':
+    content => "*.example.com\n",
+  }
 }
 
