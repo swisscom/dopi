@@ -154,13 +154,13 @@ module Dopi
           stdout_thread= Thread.new do
             until ( line = stdout.gets ).nil? do
               cmd_stdout << line
-              Dopi.log.info(@node.name + ":" + name + " - " + line.chomp)
+              Dopi.log.info(@node.name + ":" + name + " - " + line.gsub("\n", '').gsub("\r", ''))
             end
           end
           stderr_thread = Thread.new do
             until ( line = stderr.gets ).nil? do
               cmd_stderr << line
-              Dopi.log.error(@node.name + ":" + name + " - " + line.chomp)
+              Dopi.log.error(@node.name + ":" + name + " - " + line.gsub("\n", '').gsub("\r", ''))
             end
           end
           stdout_thread.join
