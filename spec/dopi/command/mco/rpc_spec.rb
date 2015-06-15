@@ -99,7 +99,82 @@ describe Dopi::Command::Mco::Rpc do
   end
 
   describe '#arguments' do
-    pending
+    it 'should return the arguments hash if it is specified and valid' do
+      command_parser = DopCommon::Command.new({
+        :plugin    => 'mco/rpc',
+        :agent     => 'rpcutil',
+        :action    => 'get_fact',
+        :arguments => { :fact => 'osfamily' }
+      })
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect(command.arguments).to eq({ :fact => 'osfamily' })
+    end
+    it 'should return an empty hash if "arguments" is not specified and all arguments are optional' do
+      command_parser = DopCommon::Command.new({
+        :plugin    => 'mco/rpc',
+        :agent     => 'rpcutil',
+        :action    => 'inventory'
+      })
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect(command.arguments).to eq({})
+    end
+    it 'will raise an error if "arguments" is not specified and there are required arguments' do
+      command_parser = DopCommon::Command.new({
+        :plugin    => 'mco/rpc',
+        :agent     => 'rpcutil',
+        :action    => 'get_fact'
+      })
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect{command.arguments}.to raise_error Dopi::CommandParsingError
+    end
+    it 'will raise an error if an argument key is not valid' do
+      command_parser = DopCommon::Command.new({
+        :plugin    => 'mco/rpc',
+        :agent     => 'rpcutil',
+        :action    => 'get_fact',
+        :arguments => { :foo => 'osfamily' }
+      })
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect{command.arguments}.to raise_error Dopi::CommandParsingError
+    end
+    it 'will raise an error if an argument value is not valid' do
+      command_parser = DopCommon::Command.new({
+        :plugin    => 'mco/rpc',
+        :agent     => 'rpcutil',
+        :action    => 'get_fact',
+        :arguments => { :fact => 'osfamily&&' }
+      })
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect{command.arguments}.to raise_error Dopi::CommandParsingError
+    end
+    it 'will raise an error if agent is not valid' do
+      command_parser = DopCommon::Command.new({
+        :plugin => 'mco/rpc',
+        :agent  => 'nonexistingagent',
+        :action => 'get_fact'
+      })
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect{command.arguments}.to raise_error Dopi::CommandParsingError
+    end
+    it 'will raise an error if action is not valid' do
+      command_parser = DopCommon::Command.new({
+        :plugin => 'mco/rpc',
+        :agent  => 'rpcutil',
+        :action => 'nonexistingaction'
+      })
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect{command.arguments}.to raise_error Dopi::CommandParsingError
+    end
+    it 'will raise and error if arguments is not a Hash' do
+      command_parser = DopCommon::Command.new({
+        :plugin    => 'mco/rpc',
+        :agent     => 'rpcutil',
+        :action    => 'get_fact',
+        :arguments => 'foo'
+      })
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect{command.arguments}.to raise_error Dopi::CommandParsingError
+    end
   end
 
   describe '#run' do

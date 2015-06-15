@@ -64,7 +64,8 @@ module Dopi
         end
 
         def arguments
-          hash[:arguments] #TODO: implement
+          @arguments ||= arguments_valid? ?
+            hash[:arguments] : {}
         end
 
       private
@@ -125,7 +126,7 @@ module Dopi
           agent_ddl = nil
           begin
             agent_ddl = MCollective::DDL.new(agent)
-          rescue
+          rescue CommandParsingError
             raise CommandParsingError, "Agent not valid, unable to verify the action #{hash[:action]}"
           else
             agent_ddl.actions.include?(hash[:action]) or
@@ -135,7 +136,19 @@ module Dopi
         end
 
         def arguments_valid?
-          true #TODO: implement
+          hash.nil? or hash[:arguments].nil? or hash[:arguments].kind_of?(Hash) or
+            raise CommandParsingError, "The value for 'arguments' has to be a Hash" 
+          begin
+            args = hash ? ( hash[:arguments] or {} ) : {}
+            agent_ddl = MCollective::DDL.new(agent)
+            agent_ddl.validate_rpc_request(action, args)
+          rescue CommandParsingError
+            raise CommandParsingError, "Agent and/or Action not valid, unable to verify the action #{hash[:action]}"
+          rescue MCollective::DDLValidationError => e
+            raise CommandParsingError, "Error while parsing arguments for agent #{agent} and action #{action}: #{e.message}"
+          end
+          return false if hash[:arguments].nil? # is completely optional if no exception was raised so far
+          true
         end
 
       end
