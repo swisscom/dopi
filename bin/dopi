@@ -80,6 +80,15 @@ module Wrapper
   default_value Dopi.configuration.ssh_check_host_key
   switch [:ssh_check_host_key]
 
+  desc 'Set the MCollective client configuration.'
+  default_value Dopi.configuration.mco_config
+  arg_name 'FILE'
+  flag [:mco_config]
+
+  desc 'Use the DOPi logger to capture MCollective logs (this is enabled by default)'
+  default_value Dopi.configuration.mco_dopi_logger
+  switch [:mco_dopi_logger]
+
   pre do |global,command,options,args|
     Dopi.configure do |config|
       config.trace =              global[:trace]
@@ -94,6 +103,8 @@ module Wrapper
       config.ssh_key =            global[:ssh_key]
       config.ssh_pass_auth =      global[:ssh_pass_auth]
       config.ssh_check_host_key = global[:ssh_check_host_key]
+      config.mco_config         = global[:mco_config]
+      config.mco_dopi_logger    = global[:mco_dopi_logger]
     end
     ENV['GLI_DEBUG'] = 'true' if global[:trace] == true
     Dopi.logger = Logger.new(STDERR)

@@ -37,6 +37,7 @@ module Dopi
     attr_accessor :role_variable, :role_default
     attr_accessor :ssh_user, :ssh_key,
                   :ssh_pass_auth, :ssh_check_host_key
+    attr_accessor :mco_config, :mco_dopi_logger
 
     def initialize
       # Defaults
@@ -59,6 +60,10 @@ module Dopi
       @ssh_key  = File.join(ENV['HOME'], '.ssh/id_dsa')
       @ssh_pass_auth = false
       @ssh_check_host_key = false
+
+      # MCO defaults
+      @mco_config = '/etc/mcollective/client.cfg'
+      @mco_dopi_logger = true
     end
  
   end
