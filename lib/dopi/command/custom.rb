@@ -34,6 +34,7 @@ require 'open3'
 module Dopi
   class Command
     class Custom < Dopi::Command
+      include Dopi::ExitCodeParser
 
     public
 
@@ -69,11 +70,6 @@ module Dopi
       def arguments
         @arguments ||= arguments_valid? ?
           parse_arguments : ""
-      end
-
-      def expect_exit_codes
-        @expect_exit_codes ||= expect_exit_codes_valid? ?
-          hash[:expect_exit_codes] : expect_exit_codes_defaults
       end
 
     private
@@ -114,25 +110,6 @@ module Dopi
         end
       end
 
-      def expect_exit_codes_valid?
-        return false unless hash.kind_of?(Hash) # plugin may not have parameters
-        return false if hash[:expect_exit_codes].nil? # expect_exit_codes is optional
-        hash[:expect_exit_codes].kind_of?(Fixnum) or
-          hash[:expect_exit_codes].kind_of?(String) or
-          hash[:expect_exit_codes].kind_of?(Symbol) or
-          hash[:expect_exit_codes].kind_of?(Array) or
-          raise CommandParsingError, "The value for 'expect_exit_codes' hast to be a number or an array of numbers or :all"
-        if hash[:expect_exit_codes].kind_of?(String) || hash[:expect_exit_codes].kind_of?(Symbol)
-          ['all', 'All', 'ALL', :all].include? hash[:expect_exit_codes] or
-            raise CommandParsingError, "Unknown keyword for expect_exit_codes. This has to be a number, an array or :all"
-        end
-        if hash[:expect_exit_codes].kind_of?(Array)
-          hash[:expect_exit_codes].all?{|exit_code| exit_code.kind_of?(Fixnum)} or
-            raise CommandParsingError, "The array in 'expect_exit_codes' can only contain numbers"
-        end
-        true
-      end
-
       def expect_exit_codes_defaults
         0
       end
@@ -140,7 +117,6 @@ module Dopi
       def command_string
         exec + ' ' + arguments
       end
-
 
       # The command method executes the command of the step.
       # Returns an array with stdio, sterror and exit code.
@@ -170,14 +146,12 @@ module Dopi
         [ cmd_stdout, cmd_stderr, cmd_exit_code.exitstatus ]
       end
 
-
       # Return parser patterns if you want to hardcode
       # it to the command. This can be overwritten by
       # the 'parse_output' section in the plan
       def parser_patterns
         nil
       end
-
 
       # Parse the raw_output
       def parse_output(raw_output)
@@ -235,29 +209,7 @@ module Dopi
         end
         return results
       end
-
-      def check_exit_code(cmd_exit_code)
-        exit_code_ok = case expect_exit_codes
-        when 'all', 'ALL', 'All', :all then true
-        when Array then expect_exit_codes.include?(cmd_exit_code)
-        when Fixnum then expect_exit_codes == cmd_exit_code
-        else false
-        end
-
-        unless exit_code_ok
-          Dopi.log.error("Wrong exit code in command #{name} for node #{@node.name}")
-          if expect_exit_codes.kind_of?(Array)
-            Dopi.log.error("Exit code was #{cmd_exit_code.to_s} should be one of #{expect_exit_codes.join(', ')}")
-          elsif expect_exit_codes.kind_of?(Fixnum)
-            Dopi.log.error("Exit code was #{cmd_exit_code.to_s} should be #{expect_exit_codes.to_s}")
-          else
-            Dopi.log.error("Exit code was #{cmd_exit_code.to_s} #{expect_exit_codes}")
-          end
-        end
-
-        exit_code_ok
-      end
-
     end
+
   end
 end
