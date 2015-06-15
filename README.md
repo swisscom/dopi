@@ -108,7 +108,7 @@ For a general description of the DOP plan file format, please see the dop_common
 The documentation in this gem will focus on the command hashes for all the basic plugins which
 are shipped with DOPi and on how to create your own custom plugins.
 
-### Plugins
+### How to use Plugins
 
 DOPi uses plugins to run commands on the nodes. Each step in the plan has one
 command and as many verify_commands as needed. DOPi will run all the verify_commands
@@ -131,33 +131,38 @@ Some of the Plugins don't actually need parameters, so they can be called with t
       command: my_simple_plugin
 ```
 
-##### Generic parameters
+### Generic Plugin Parameters
 
 There are some generic parameters every plugin supports:
 
-###### plugin_timeout **optional**
+#### plugin_timeout (optional)
 
 `default: 300`
 
 The time in seconds after which DOPi will kill the thread and mark the step as failed.
 
-#### Command execution plugins
+### Command Execution Plugins
 
 This are the plugins generally used in steps as commands
 
 [custom](doc/plugins/custom.md)
+
 [ssh/custom](doc/plugins/ssh/custom.md)
+
 [ssh/wait_for_login](doc/plugins/ssh/wait_for_login.md)
+
 [ssh/puppet_agent_run](doc/plugins/ssh/puppet_agent_run.md)
+
 [mco/rpc](doc/plugins/mco/rpc.md)
 
-#### Verification plugins
+### Verification Plugins
 
 This are some helper plugins that check stuff on the nodes. They are
 usefull for verify_commands. However, every normal plugin can be used
 as a verify_command and vice versa.
 
 [ssh/file_contains](doc/plugins/ssh/file_contains.md)
+
 [ssh/file_exists](doc/plugins/ssh/file_exists.md)
 
 ## Contributing
