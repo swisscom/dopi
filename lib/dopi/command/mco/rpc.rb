@@ -54,7 +54,8 @@ module Dopi
         end
 
         def action
-          hash[:action] #TODO: implement
+          @action ||= action_valid? ?
+            hash[:action] : nil
         end
 
         def arguments
@@ -104,9 +105,20 @@ module Dopi
         end
 
         def action_valid?
-          # mc = MCollective::RPC::rpcclient(agent)
-          # mc.actions.include?(hash[:action]
-          true #TODO: implement
+          hash[:action] or
+           raise CommandParsingError, "No action defined"
+          hash[:action].kind_of?(String) or
+            raise CommandParsingError, "The value for 'action' has to be a String"
+          agent_ddl = nil
+          begin
+            agent_ddl = MCollective::DDL.new(agent)
+          rescue
+            raise CommandParsingError, "Agent not valid, unable to verify the action #{hash[:action]}"
+          else
+            agent_ddl.actions.include?(hash[:action]) or
+              raise CommandParsingError, "The action #{hash[:action]} for agent #{agent} does not exist"
+          end
+          true
         end
 
         def arguments_valid?
