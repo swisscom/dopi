@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [Unreleased]
+### Added
+- MCollective RPC command plugin
+
 ## [0.1.10] - 2015-06-10
 ### Added
 - The custom plugin now automatically sets the environment variable DOP_NODE_FQDN
