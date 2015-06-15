@@ -17,12 +17,13 @@ Vagrant.configure(2) do |config|
   config.hostmanager.ignore_private_ip = false
   config.hostmanager.include_offline = true
 
+  config.puppet_install.puppet_version  = '3.8.1'
+
   # Puppetmaster
   config.vm.define 'puppetmaster', primary: true do |puppetmaster|
     puppetmaster.vm.hostname = 'puppetmaster.example.com'
 
     puppetmaster.librarian_puppet.puppetfile_dir = 'vagrant/puppet'
-    puppetmaster.puppet_install.puppet_version  = '3.8.1'
 
     puppetmaster.vm.provision 'puppet' do |puppet|
       puppet.hiera_config_path = 'vagrant/puppet/hiera.yaml'
@@ -38,8 +39,6 @@ Vagrant.configure(2) do |config|
   # Mcollective Broker
   config.vm.define 'broker', primary: true do |puppetmaster|
     puppetmaster.vm.hostname = 'broker.example.com'
-
-    puppetmaster.puppet_install.puppet_version  = '3.8.1'
   end
 
   # Other Machines
