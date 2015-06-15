@@ -43,7 +43,8 @@ module Dopi
         end
 
         def agent
-          hash[:agent] #TODO: implement
+          @agent ||= agent_valid? ?
+            hash[:agent] : nil
         end
 
         def options
@@ -86,7 +87,16 @@ module Dopi
         end
 
         def agent_valid?
-          true #TODO: implement
+          hash[:agent] or
+            raise CommandParsingError, "No agent defined"
+          hash[:agent].kind_of?(String) or
+            raise CommandParsingError, "The value for 'agent' has to be a String"
+          begin
+            MCollective::DDL.new(hash[:agent])
+          rescue => e
+            raise CommandParsingError, "Unable to load the MCollective agent #{hash[:agent]}on this system: #{e.message}"
+          end
+          true
         end
 
         def options_valid?
