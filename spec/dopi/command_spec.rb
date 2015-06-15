@@ -24,6 +24,7 @@ describe Dopi::Command do
   Dir['spec/data/plan/plugins/**/*.yaml'].each do |plan_file|
     describe "plugin tests from: '#{plan_file}'" do
       Dopi.configuration.ssh_pass_auth = true
+      Dopi.configuration.mco_config = 'spec/data/mco/client.cfg'
       plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
       plan = Dopi::Plan.new(plan_parser, 'fakeid')
       plan.steps.each do |step|

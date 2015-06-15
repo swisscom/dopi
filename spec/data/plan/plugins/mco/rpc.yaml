@@ -1,0 +1,49 @@
+infrastructures:
+  bla: {}
+
+nodes:
+  mysql01.example.com: {}
+  web01.example.com: {}
+  web02.example.com: {}
+  haproxy01.example.com: {}
+  haproxy02.example.com: {}
+
+configuration:
+  nodes:
+    mysql01.example.com:
+      my_role: mysql
+    web01.example.com:
+      my_role: httpd
+    web02.example.com:
+      my_role: httpd
+    haproxy01.example.com:
+      my_role: haproxy
+
+plan:
+  max_in_flight: 1
+  ssh_root_pass: 'vagrant'
+
+steps:
+
+  - name: 'Make sure MCollective on web01 is configured'
+    nodes:
+      - 'web01.example.com'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/etc/mcollective/server.cfg'
+      plugin: 'ssh/puppet_agent_run'
+      arguments:
+        '--server': 'puppetmaster.example.com'
+
+  - name: 'Mcollective'
+    nodes:
+      - web01.example.com
+    command:
+      plugin: 'mco/rpc'
+      options: {}
+      agent: 'rpcutil'
+      action: 'inventory'
+      arguments: {}
+
+
