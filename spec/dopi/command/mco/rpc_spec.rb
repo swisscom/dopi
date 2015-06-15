@@ -34,7 +34,21 @@ describe Dopi::Command::Mco::Rpc do
   end
 
   describe '#options' do
-    pending
+    it 'should return the merged options hash if the hash is valid' do
+      command_parser = DopCommon::Command.new({:plugin => 'mco/rpc', :options => {:ttl => 300}})
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect(command.options[:ttl]).to eq(300)
+    end
+    it 'should return the default options hash if the hash is not defined' do
+      command_parser = DopCommon::Command.new({:plugin => 'mco/rpc'})
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect(command.options).to eq(command.send(:options_defaults))
+    end
+    it 'will raise and error if options is not a hash' do
+      command_parser = DopCommon::Command.new({:plugin => 'mco/rpc', :options => 2})
+      command = Dopi::Command.create_plugin_instance(command_parser.plugin, @node, command_parser)
+      expect{command.options}.to raise_error Dopi::CommandParsingError
+    end
   end
 
   describe '#action' do

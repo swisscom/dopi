@@ -54,8 +54,8 @@ module Dopi
 
         def options
           @options ||= options_valid? ?
-            MCollective::Util.default_options.merge(hash[:options]) :
-            MCollective::Util.default_options
+            options_defaults.merge(hash[:options]) :
+            options_defaults
         end
 
         def action
@@ -71,6 +71,12 @@ module Dopi
 
         def expect_exit_codes_defaults
           0
+        end
+
+        def options_defaults
+          MCollective::Util.default_options.merge({
+            :config => Dopi.configuration.mco_config
+          })
         end
 
         def parse_mco_result(result)
@@ -106,7 +112,9 @@ module Dopi
         end
 
         def options_valid?
-          true #TODO: implement
+          return false if hash[:options].nil? # is optional
+          hash[:options].kind_of?(Hash) or
+            raise CommandParsingError, "The value for 'options' has to be a Hash"
         end
 
         def action_valid?
