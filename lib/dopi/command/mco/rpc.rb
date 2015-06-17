@@ -1,11 +1,6 @@
 #
 # DOPi Plugin: MCO RPC
 #
-# This DOPi Plugin will call an action on an mco agent
-#
-# Plugin Settings:
-#
-#
 require 'mcollective'
 
 module Dopi

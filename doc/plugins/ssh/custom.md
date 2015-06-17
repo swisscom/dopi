@@ -43,7 +43,9 @@ man page for more information about this.
 
 ### Simple Example
 
-    - name "My new Step"
+    - name "Say Hello World on a node"
+      nodes:
+        - 'web01.example.com'
       command:
         plugin: 'ssh/custom'
         exec: 'echo'
@@ -51,7 +53,9 @@ man page for more information about this.
 
 ### Complete Example
 
-    - name "My new Step"
+    - name "Install an RPM on the node"
+      nodes:
+        - 'web01.example.com'
       command:
         plugin: 'ssh/custom'
         exec: 'yum'

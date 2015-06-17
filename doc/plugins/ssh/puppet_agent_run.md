@@ -32,13 +32,16 @@ The ssh/puppet_agent_run plugin has no additional parameters.
 
 ### Simple Example
 
-    - name "My new Step"
+    - name "Run puppet on a node"
+      nodes:
+        - 'web01.example.com'
       command: 'ssh/puppet_agent_run'
-
 
 ### Complete Example
 
-    - name "My new Step"
+    - name "Run puppet with parameters on a node"
+      nodes:
+        - 'web01.example.com'
       command:
         plugin: 'ssh/puppet_agent_run'
         plugin_timeout: 300

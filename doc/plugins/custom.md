@@ -40,7 +40,9 @@ codes. Will replace the current default.
 ### Simple Example
 
 ```YAML
-    - name "My new Step"
+    - name "Say Hello World on the machine DOPi is running on"
+      nodes:
+        - 'web01.example.com'
       command:
         plugin: 'custom'
         exec: 'echo'
@@ -50,7 +52,9 @@ codes. Will replace the current default.
 ### Complete Example
 
 ```YAML
-    - name "My new Step"
+    - name "Install an RPM on the machine DOPi is running on"
+      nodes:
+        - 'web01.example.com'
       command:
         plugin: 'custom'
         exec: 'yum'

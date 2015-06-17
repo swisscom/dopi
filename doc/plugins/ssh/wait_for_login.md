@@ -33,7 +33,9 @@ Amount of seconds to wait between login attempts.
 
 ### Simple Example
 
-    - name "My new Step"
+    - name "Wait until we can successfully login to the node"
+      nodes:
+        - 'web01.example.com'
       command:
         plugin: 'ssh/wait_for_login'
         plugin_timeout: 300
@@ -41,7 +43,9 @@ Amount of seconds to wait between login attempts.
 
 ### Complete Example
 
-    - name "My new Step"
+    - name "Wait until we can successfully login to the node"
+      nodes:
+        - 'web01.example.com'
       command:
         plugin: 'ssh/wait_for_login'
         plugin_timeout: 300
