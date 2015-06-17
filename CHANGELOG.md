@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [Unreleased]
+## [0.1.11] - 2015-06-17
 ### Added
 - MCollective RPC command plugin
 - File replace command plugin (replace a string in a file)
