@@ -1,0 +1,32 @@
+infrastructures:
+  baremetal: {}
+
+nodes:
+  'linux01.example.com':
+    type: 'baremetal'
+
+plan:
+  max_in_flight: 1
+  ssh_root_pass: 'vagrant'
+
+steps:
+
+  - name: 'Mcollective retrieve node inventory'
+    nodes: 'all'
+    command:
+      plugin: 'mco/rpc'
+      agent: 'rpcutil'
+      action: 'inventory'
+
+  - name: 'Mcollective retrieve a fact'
+    nodes: 'all'
+    command:
+      plugin: 'mco/rpc'
+      agent: 'rpcutil'
+      action: 'get_fact'
+      arguments:
+        :fact: 'osfamily'
+      options:
+        :timeout: 30
+        :ttl: 60
+
