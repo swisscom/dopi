@@ -36,14 +36,25 @@ steps:
       arguments:
         '--server': 'puppetmaster.example.com'
 
-  - name: 'Mcollective'
+  - name: 'Mcollective retrieve node inventory'
     nodes:
       - web01.example.com
     command:
       plugin: 'mco/rpc'
-      options: {}
       agent: 'rpcutil'
       action: 'inventory'
-      arguments: {}
+
+  - name: 'Mcollective retrieve a fact'
+    nodes:
+      - web01.example.com
+    command:
+      plugin: 'mco/rpc'
+      agent: 'rpcutil'
+      action: 'get_fact'
+      arguments:
+        :fact: 'osfamily'
+      options:
+        :timeout: 30
+        :ttl: 60
 
 

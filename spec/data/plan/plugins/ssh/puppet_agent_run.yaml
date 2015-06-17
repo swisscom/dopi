@@ -1,0 +1,32 @@
+infrastructures:
+  bla: {}
+
+nodes:
+  mysql01.example.com: {}
+  web01.example.com: {}
+  web02.example.com: {}
+  haproxy01.example.com: {}
+  haproxy02.example.com: {}
+
+configuration:
+  nodes:
+    mysql01.example.com:
+      my_role: mysql
+    web01.example.com:
+      my_role: httpd
+    web02.example.com:
+      my_role: httpd
+    haproxy01.example.com:
+      my_role: haproxy
+
+plan:
+  max_in_flight: 1
+  ssh_root_pass: 'vagrant'
+
+steps:
+
+  - name: 'Simple puppet agent run without parameters'
+    nodes:
+      - web01.example.com
+    command: ssh/puppet_agent_run
+
