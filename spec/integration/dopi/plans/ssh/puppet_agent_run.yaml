@@ -1,0 +1,33 @@
+infrastructures:
+  baremetal: {}
+
+nodes:
+  'linux01.example.com':
+    type: 'baremetal'
+
+plan:
+  max_in_flight: 1
+  ssh_root_pass: 'vagrant'
+
+steps:
+
+  - name: 'Change MCollective config'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/file_replace'
+      file: '/etc/mcollective/server.cfg'
+      pattern: 'broker.example.com'
+      replacement: 'wrong.example.com'
+      
+  - name: 'Puppet Agent run, expect changes'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/puppet_agent_run'
+      expect_exit_codes: 2
+
+  - name: 'Puppet Agent run, expect no changes'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/puppet_agent_run'
+      expect_exit_codes: 0
+
