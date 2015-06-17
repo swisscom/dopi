@@ -1,19 +1,6 @@
 #
 # DOPi Plugin: File Contains
 #
-# This DOPi Plugin will check if the specified file on
-# the node contains a specific pattern
-#
-# Plugin Settings:
-#
-# file
-# The file to check
-# default: nil
-#
-# pattern
-# The Regexp to check against
-# default: nil
-#
 require 'pathname'
 
 module Dopi

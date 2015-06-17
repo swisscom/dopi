@@ -1,14 +1,5 @@
 #
-# DOPi Plugin: Wait For Login
-#
-# This DOPi Plugin will check if the specified file on
-# the node exists
-#
-# Plugin Settings:
-#
-# file
-# The file to check
-# default: nil
+# DOPi Plugin: File Exists
 #
 require 'pathname'
 
