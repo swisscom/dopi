@@ -113,8 +113,9 @@ require 'dopi/command/custom'
 require 'dopi/command/ssh/custom'
 require 'dopi/command/ssh/puppet_agent_run'
 require 'dopi/command/ssh/wait_for_login'
-require 'dopi/command/ssh/file_exists'
 require 'dopi/command/ssh/file_contains'
+require 'dopi/command/ssh/file_exists'
+require 'dopi/command/ssh/file_replace'
 require 'dopi/command/mco/rpc'
 
 # TODO: load plugins from the plugin paths
