@@ -1,3 +1,6 @@
+require 'simplecov'
+SimpleCov.start
+
 require 'dopi'
 
 Dopi.log.level = ::Logger::ERROR
