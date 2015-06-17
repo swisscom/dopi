@@ -153,6 +153,8 @@ This are the plugins generally used in steps as commands
 
 [ssh/puppet_agent_run](doc/plugins/ssh/puppet_agent_run.md)
 
+[ssh/file_replace](doc/plugins/ssh/file_replace.md)
+
 [mco/rpc](doc/plugins/mco/rpc.md)
 
 ### Verification Plugins

@@ -1,0 +1,43 @@
+infrastructures:
+  baremetal: {}
+
+nodes:
+  'linux01.example.com':
+    type: 'baremetal'
+
+plan:
+  max_in_flight: 1
+  ssh_root_pass: 'vagrant'
+
+steps:
+
+  - name: 'Replace the server string in puppet.conf'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/file_replace'
+      file: '/etc/puppet/puppet.conf'
+      pattern: 'puppetmaster.example.com'
+      replacement: 'wrong.example.com'
+
+  - name: 'Check if the String is replaced'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/file_contains'
+      file: '/etc/puppet/puppet.conf'
+      pattern: 'wrong.example.com'
+
+  - name: 'Change the String back'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/file_replace'
+      file: '/etc/puppet/puppet.conf'
+      pattern: 'wrong.example.com'
+      replacement: 'puppetmaster.example.com'
+
+  - name: 'Check if the String is ok again'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/file_contains'
+      file: '/etc/puppet/puppet.conf'
+      pattern: 'puppetmaster.example.com'
+
