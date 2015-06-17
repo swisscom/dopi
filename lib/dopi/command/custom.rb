@@ -1,34 +1,9 @@
 # DOPi Plugin: Custom Command
 #
-# This DOPi Plugin will execute a customized command on the
-# node DOPi is running on. It will run the command once per
-# node in the step and export the node fqdn in the
-# environment variable DOP_NODE_FQDN
+# TODO: Refactor and document
+#  - fail_on_warning
+#  - parsing
 #
-# Plugin Settings:
-#
-# exec
-# The command the plugin should execute for every node.
-#
-# arguments (optional)
-# The arguments for the command. This can be set by a string
-# as an array or as a hash. All the elements of the hash and
-# the array will be flattened and joined with a space.
-# default: ""
-#
-# env (optional)
-# The environment variables that should be set
-# default: { DOP_NODE_FQDN => fqdn_of_node }
-#
-# expect_exit_codes (optional)
-# The exit codes DOPi should expect if the program terminates.
-# It the program exits with an exit code not listed here, DOPi
-# will mark the run as failed. The values can be a number, an
-# array of numbers or :all for all possible exit codes.
-# default: 0
-#
-#
-# TODO: Refactor
 require 'open3'
 
 module Dopi

@@ -24,7 +24,7 @@ and joined with a space.
 
 `default: { DOP_NODE_FQDN => fqdn_of_node }`
 
-The environment variables that should be set
+The environment variables that should be set. Will be merged with the defalut hash
 
 ### expect_exit_codes (optional)
 
@@ -33,7 +33,7 @@ The environment variables that should be set
 The exit codes DOPi should expect if the program terminates. It the program
 exits with an exit code not listed here, DOPi will mark the run as failed.
 The values can be a number, an array of numbers or :all for all possible exit
-codes.
+codes. Will replace the current default.
 
 ## Examples:
 
