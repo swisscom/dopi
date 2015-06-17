@@ -1,23 +1,6 @@
 #
 # DOPi Plugin: Wait For Login
 #
-# This DOPi Plugin will try to connect to the node until a successful login
-# is possible or until a timeout is reached.
-#
-# Plugin Settings:
-#
-# plugin_timeout
-# Amount of seconds the plugin should try to login to the node.
-# default: 300
-#
-# connect_timeout
-# Amount of seconds to wait while connecting until giving up.
-# default: 0
-#
-# interval
-# Amount of seconds to wait between login attempts.
-# default: 10
-#
 
 module Dopi
   class Command

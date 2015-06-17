@@ -5,7 +5,7 @@ is possible or until a timeout is reached.
 
 ## Plugin Settings:
 
-The wait_for_login command plugin is based on the
+The ssh/wait_for_login command plugin is based on the
 [ssh custom command plugin](doc/plugins/ssh/custom.md) and the
 [custom command plugin](doc/plugins/custom.md) and inherits all their
 parameters.
