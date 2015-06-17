@@ -1,0 +1,44 @@
+infrastructures:
+  baremetal: {}
+
+nodes:
+  'linux01.example.com':
+    type: 'baremetal'
+
+plan:
+  max_in_flight: 1
+  ssh_root_pass: 'vagrant'
+
+steps:
+
+  - name: 'Test correct escaping of command'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'echo'
+      arguments: '"${MYVAR}" > /tmp/test1'
+      env:
+        'MYVAR': 'MYVALUE'
+
+  - name: 'Test correct escaping of command 2'
+    nodes: 'all'
+    command:
+      plugin: ssh/custom
+      exec: 'echo'
+      arguments: '\"${MYVAR}\" > /tmp/test2'
+      env:
+        'MYVAR': 'MYVALUE'
+
+  - name: 'Fail if contents of the files are wrong'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_contains'
+          file: '/tmp/test1'
+          pattern: '^MYVALUE$'
+        - plugin: 'ssh/file_contains'
+          file: '/tmp/test2'
+          pattern: '^\"MYVALUE\"$'
+      plugin: 'ssh/custom'
+      exec: 'fail'
+

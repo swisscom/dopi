@@ -20,7 +20,7 @@ Vagrant.configure(2) do |config|
   config.puppet_install.puppet_version  = '3.8.1'
 
   # Puppetmaster
-  config.vm.define 'puppetmaster', primary: true do |puppetmaster|
+  config.vm.define 'puppetmaster' do |puppetmaster|
     puppetmaster.vm.hostname = 'puppetmaster.example.com'
 
     puppetmaster.librarian_puppet.puppetfile_dir = 'vagrant/puppet'
@@ -37,19 +37,18 @@ Vagrant.configure(2) do |config|
   end
 
   # Mcollective Broker
-  config.vm.define 'broker', primary: true do |puppetmaster|
-    puppetmaster.vm.hostname = 'broker.example.com'
+  config.vm.define 'broker' do |broker|
+    broker.vm.hostname = 'broker.example.com'
   end
 
-  # Other Machines
-  [ 'mysql01',
-    'web01',
-    'web02',
-    'haproxy01'
-  ].each do |name|
-    config.vm.define name do |server|
-      server.vm.hostname = name + '.example.com'
-    end
+  # Linux test machines
+  config.vm.define 'linux01' do |node|
+    node.vm.hostname = 'linux01.example.com'
   end
+
+  # windows test box
+  #config.vm.define 'windows' do |server|
+  #  server.vm.box = 'mwrock/Windows2012R2'
+  #end
 
 end
