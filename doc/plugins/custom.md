@@ -39,7 +39,7 @@ codes. Will replace the current default.
 
 ### Simple Example
 
-```yaml
+```YAML
     - name "My new Step"
       command:
         plugin: 'custom'
@@ -49,7 +49,7 @@ codes. Will replace the current default.
 
 ### Complete Example
 
-```yaml
+```YAML
     - name "My new Step"
       command:
         plugin: 'custom'
