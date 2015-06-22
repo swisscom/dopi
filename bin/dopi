@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'gli'
+require 'logger/colors'
 require 'dopi'
 require 'yaml'
 require 'fileutils'

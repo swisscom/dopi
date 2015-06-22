@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "dop_common"
   spec.add_runtime_dependency "gli"
+  spec.add_runtime_dependency "logger-colors"
   spec.add_runtime_dependency "hiera"
   spec.add_runtime_dependency "deep_merge"
   spec.add_runtime_dependency "puppet", "~> 3.7"
