@@ -1,0 +1,56 @@
+infrastructures:
+  baremetal: {}
+
+nodes:
+  'linux01.example.com':
+    type: 'baremetal'
+
+plan:
+  max_in_flight: 1
+  ssh_root_pass: 'vagrant'
+
+steps:
+
+  #
+  # Check if skipping works if the file exists
+  #
+
+  - name: 'Check if the command is skipped if the file does exist'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/etc/puppet/puppet.conf'
+      plugin: 'custom'
+      exec: 'fail'
+
+  #
+  # Check if the command is run if the file does not exists
+  #
+
+  - name: 'Make sure the test file is absent'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'rm'
+      arguments: '-f /tmp/file_exists_test'
+
+  - name: 'Check if the file is absent an write it again'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/tmp/file_exists_test'
+      plugin: 'ssh/custom'
+      exec: 'echo'
+      arguments: '"file_exists test" > /tmp/file_exists_test'
+
+  - name: 'Check if the file is there and fail if the command is run anyway'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/tmp/file_exists_test'
+      plugin: 'custom'
+      exec: 'fail'
+
