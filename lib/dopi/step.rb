@@ -21,10 +21,11 @@ module Dopi
 
     def run(max_in_flight)
       if state_done?
-        Dopi.log.info("Step #{name} is in state 'done'. Skipping")
+        Dopi.log.info("Step '#{name}' is in state 'done'. Skipping")
         return
       end
       state_run
+      Dopi.log.info("Starting to run step '#{name}'")
       commands_copy = commands.dup
       if canary_host
         pick = rand(commands_copy.length - 1)
@@ -36,13 +37,15 @@ module Dopi
           command.meta_run
         end
       end
+      Dopi.log.info("Step '#{name}' successfully finished.") if state_done?
+      Dopi.log.error("Step '#{name}' failed! Stopping execution.") if state_failed?
     end
 
     def command_plugin_valid?
       begin
         commands.first.meta_valid?(name)
       rescue PluginLoaderError => e
-        Dopi.log.error("Step #{name}: Can't load plugin #{@step_parser.command.plugin}: #{e.message}")
+        Dopi.log.error("Step '#{name}': Can't load plugin '#{@step_parser.command.plugin}': #{e.message}")
         false
       end
     end
