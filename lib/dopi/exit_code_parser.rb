@@ -45,13 +45,13 @@ module Dopi
       end
 
       unless exit_code_ok
-        Dopi.log.error("Wrong exit code in command #{name} for node #{@node.name}")
+        log(:error, "Wrong exit code in command #{name}")
         if expect_exit_codes.kind_of?(Array)
-          Dopi.log.error("Exit code was #{cmd_exit_code.to_s} should be one of #{expect_exit_codes.join(', ')}")
+          log(:error, "Exit code was #{cmd_exit_code.to_s} should be one of #{expect_exit_codes.join(', ')}")
         elsif expect_exit_codes.kind_of?(Fixnum)
-          Dopi.log.error("Exit code was #{cmd_exit_code.to_s} should be #{expect_exit_codes.to_s}")
+          log(:error, "Exit code was #{cmd_exit_code.to_s} should be #{expect_exit_codes.to_s}")
         else
-          Dopi.log.error("Exit code was #{cmd_exit_code.to_s} #{expect_exit_codes}")
+          log(:error, "Exit code was #{cmd_exit_code.to_s} #{expect_exit_codes}")
         end
       end
 

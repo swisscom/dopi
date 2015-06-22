@@ -43,7 +43,7 @@ module Dopi
 
     def command_plugin_valid?
       begin
-        commands.first.meta_valid?(name)
+        commands.first.meta_valid?
       rescue PluginLoaderError => e
         Dopi.log.error("Step '#{name}': Can't load plugin '#{@step_parser.command.plugin}': #{e.message}")
         false

@@ -13,9 +13,9 @@ module Dopi
       end
 
       def run
-        Dopi.log.info("running dummy command for node: #{node.name}")
+        log(:info, "Running dummy command")
         if @command_hash.class == Hash
-          Dopi.log.info("command hash was: #{hash.inspect}")
+          log(:info, "Command hash was: #{hash.inspect}")
         end
       end
 

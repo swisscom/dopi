@@ -7,7 +7,7 @@ module Dopi
       class PuppetAgentRun < Dopi::Command::Ssh::Custom
 
         def exec
-          'puppet agent --test'
+          'puppet agent --test --color false'
         end
 
         def expect_exit_codes_defaults

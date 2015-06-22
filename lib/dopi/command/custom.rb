@@ -98,20 +98,20 @@ module Dopi
       def run_command
         cmd_stdout = ''
         cmd_stderr = ''
-        Dopi.log.debug("Executing #{command_string} for command #{name}")
-        Dopi.log.debug("Environment: #{env.to_s}")
+        log(:debug, "Executing #{command_string} for command #{name}")
+        log(:debug, "Environment: #{env.to_s}")
         cmd_exit_code = Open3.popen3(env, command_string) do |stdin, stdout, stderr, wait_thr|
           stdin.close
           stdout_thread= Thread.new do
             until ( line = stdout.gets ).nil? do
               cmd_stdout << line
-              Dopi.log.info(@node.name + ":" + name + " - " + line.gsub("\n", '').gsub("\r", ''))
+              log(:debug, line.gsub("\n", '').gsub("\r", ''))
             end
           end
           stderr_thread = Thread.new do
             until ( line = stderr.gets ).nil? do
               cmd_stderr << line
-              Dopi.log.error(@node.name + ":" + name + " - " + line.gsub("\n", '').gsub("\r", ''))
+              log(:error, line.gsub("\n", '').gsub("\r", ''))
             end
           end
           stdout_thread.join
@@ -141,21 +141,21 @@ module Dopi
           patterns = hash[:parse_output]
         end
         if patterns.nil?
-          Dopi.log.debug("No patterns defined to parse the output of command #{name}")
+          log(:debug, "No patterns defined to parse the output of command #{name}")
           return true
         else
           if patterns[:error].class == Array
             errors = match_patterns(raw_output, patterns[:error])
             errors.each do |error|
-              Dopi.log.error("ERROR detected in output of command #{name}:")
-              Dopi.log.error(error)
+              log(:error, "ERROR detected in output")
+              log(:error, error)
             end
           end
           if patterns[:warning].class == Array
             warnings = match_patterns(raw_output, patterns[:warning])
             warnings.each do |warning|
-              Dopi.log.warn("Warning detected in output of command #{name}:")
-              Dopi.log.warn(warning)
+              log(:warn, "Warning detected in output")
+              log(:warn, warning)
             end
           end
         end

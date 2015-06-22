@@ -42,7 +42,7 @@ module Dopi
 
     def meta_run
       if state_done?
-        Dopi.log.info("Command #{name} on node #{@node.name} is in state 'done'. Skipping")
+        log(:info, "Command '#{name}' is in state 'done'. Skipping")
         return
       end
       state_run
@@ -50,7 +50,6 @@ module Dopi
         verify_command.state_reset if verify_command.state_failed?
         # TODO: Reset done state as well. We should always rerun validation commands
       end
-      Dopi.log.debug("Running command #{name} on #{@node.name}")
       begin
         Timeout::timeout(plugin_timeout) do
           if state_running? && verify_commands.any?
@@ -60,27 +59,29 @@ module Dopi
             end
           end
           if state_running?
+            log(:info, "Running command")
             run ? state_finish : state_fail
           else
-            Dopi.log.info("Nothing to do for command #{name} on #{@node.name}")
+            log(:info, "Nothing to do for command")
           end
         end
       rescue Timeout::Error
         state_fail
-        Dopi.log.error("Command #{name} timed out on #{@node.name}")
+        log(:error, "Command timed out (plugin_timeout is set to #{plugin_timeout})")
       rescue => e
         state_fail
+        log(:error, "Command failed")
         raise e
       end
     end
 
-    def meta_valid?(step_name)
+    def meta_valid?
       validity = valid?
       validity = false unless verify_commands.all? do |verify_command|
         begin
-          verify_command.meta_valid?(step_name)
+          verify_command.meta_valid?
         rescue PluginLoaderError => e
-          Dopi.log.error("Step #{step_name}: Can't load plugin #{verify_command.plugin}: #{e.message}")
+          Dopi.log.error("Step '#{@step.name}': Can't load plugin #{verify_command.plugin}: #{e.message}")
         end
       end
       validity
@@ -104,6 +105,17 @@ module Dopi
       @verify_commands ||= parsed_verify_commands.map do |command|
         Dopi::Command.create_plugin_instance(command, @step, @node, true)
       end
+    end
+
+    def log(severity, message)
+      # Ignore verify command errors, because they are expected
+      if @is_verify_command
+        severity = :debug
+      end
+      # TODO: implement Node specific logging
+      # for now we simply forward to the global DOPi logger
+      enriched_message = "  Step '#{@step.name}', Node '#{@node.name}', Plugin '#{name}' : " + message
+      Dopi.log.log(Logger.const_get(severity.upcase), enriched_message)
     end
 
   end

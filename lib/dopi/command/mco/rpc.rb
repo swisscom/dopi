@@ -33,7 +33,7 @@ module Dopi
           mc = rpcclient(agent, flags)
           results = mc.custom_request(action, arguments, [@node.name], {'identity' => @node.name})
           if results.empty?
-            Dopi.log.error(@node.name + ":" + name + " - No answer from node recieved")
+            log(:error, "No answer from node recieved")
             result_ok = false
           else
             result_ok = false unless parse_mco_result(results.first)
@@ -78,7 +78,7 @@ module Dopi
         def parse_mco_result(result)
           result_ok = true
           unless check_exit_code(result[:statuscode])
-            Dopi.log.error(@node.name + ":" + name + " - " + result[:statusmsg])
+            log(:error, result[:statusmsg])
             result_ok = false
           end
           result_ok = false unless parse_mco_result_data(result[:data])
@@ -89,8 +89,8 @@ module Dopi
           warning  = "You are using the RPC plugin to run the #{agent} MCollective agent."
           warning += " DOPi will not know what to expect in the resulting data as this is plugin specific."
           warning += " Not all errors may be detected."
-          Dopi.log.warn(warning)
-          Dopi.log.info(data.inspect)
+          log(:warn, warning)
+          log(:debug, 'Receieved data: ' + data.inspect)
           return true
         end
 
