@@ -22,17 +22,20 @@ module Dopi
       PluginManager << klass
     end
 
-    def self.create_plugin_instance(plugin_name, node, command_parser)
+    def self.create_plugin_instance(command_parser, step, node, is_verify_command = false)
       plugin_type = PluginManager.get_plugin_name(self) + '/'
-      Dopi.log.debug("Creating instance of plugin #{plugin_type + plugin_name}")
-      PluginManager.create_instance(plugin_type + plugin_name, node, command_parser)
+      plugin_full_name = plugin_type + command_parser.plugin
+      Dopi.log.debug("Creating instance of plugin #{plugin_full_name}")
+      PluginManager.create_instance(plugin_full_name, command_parser, step, node, is_verify_command)
     end
 
-    attr_reader :node
+    attr_reader :node, :is_verify_command
 
-    def initialize(node, command_parser)
-      @node           = node
-      @command_parser = command_parser
+    def initialize(command_parser, step, node, is_verify_command)
+      @command_parser    = command_parser
+      @step              = step
+      @node              = node
+      @is_verify_command = is_verify_command
     end
 
     def_delegator :@command_parser, :plugin, :name
@@ -99,7 +102,7 @@ module Dopi
 
     def verify_commands
       @verify_commands ||= parsed_verify_commands.map do |command|
-        Dopi::Command.create_plugin_instance(command.plugin, @node, command)
+        Dopi::Command.create_plugin_instance(command, @step, @node, true)
       end
     end
 

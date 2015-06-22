@@ -49,7 +49,7 @@ module Dopi
 
     def commands
       @commands ||= @nodes.map do |node|
-        Dopi::Command.create_plugin_instance(@step_parser.command.plugin, node, @step_parser.command)
+        Dopi::Command.create_plugin_instance(@step_parser.command, self, node)
       end
     end
 
