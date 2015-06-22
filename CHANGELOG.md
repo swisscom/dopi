@@ -2,8 +2,9 @@
 All notable changes to DOPi will be documented in this file.
 
 ## [Unreleased]
-### Added
-- Colorized CLI output based on log message severity
+### Changed
+- Colorized CLI output based on log message severity.
+- A lot of CLI output improvements
 
 ### Fixed
 - A bug where the state was not printed if a command failed on runonce mode
