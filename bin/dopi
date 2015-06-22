@@ -236,8 +236,8 @@ module Wrapper
       begin
         plan = Dopi.load_plan(id)
         plan.run
-        print_state(plan)
       ensure
+        print_state(plan)
         @plan_cache.remove(id)
       end
     end

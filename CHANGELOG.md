@@ -5,6 +5,9 @@ All notable changes to DOPi will be documented in this file.
 ### Added
 - Colorized CLI output based on log message severity
 
+### Fixed
+- A bug where the state was not printed if a command failed on runonce mode
+
 ## [0.1.11] - 2015-06-17
 ### Added
 - MCollective RPC command plugin
