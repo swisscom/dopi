@@ -10,6 +10,7 @@ module Dopi
   class Command
     class Custom < Dopi::Command
       include Dopi::ExitCodeParser
+      include Dopi::OutputParser
 
     public
 
@@ -21,14 +22,18 @@ module Dopi
         unless Dopi::Command::Custom > self.class && self.method(:exec).owner == self.class
           log_validation_method('exec_valid?', CommandParsingError)
         end
+        validate_output_parser
       end
 
       def run
         result = []
         cmd_stdout, cmd_stderr, cmd_exit_code = run_command
-        result << parse_output(cmd_stdout)
-        result << parse_output(cmd_stderr)
+        # Output Parser
+        result << check_output(cmd_stdout)
+        result << check_output(cmd_stderr)
+        # Exit Code Parser
         result << check_exit_code(cmd_exit_code)
+
         result.all?
       end
 
@@ -89,6 +94,10 @@ module Dopi
         0
       end
 
+      def parse_output_defaults
+        nil
+      end
+
       def command_string
         exec + ' ' + arguments
       end
@@ -121,70 +130,6 @@ module Dopi
         [ cmd_stdout, cmd_stderr, cmd_exit_code.exitstatus ]
       end
 
-      # Return parser patterns if you want to hardcode
-      # it to the command. This can be overwritten by
-      # the 'parse_output' section in the plan
-      def parser_patterns
-        nil
-      end
-
-      # Parse the raw_output
-      def parse_output(raw_output)
-        errors = []
-        warnings = []
-        patterns = nil
-
-        if parser_patterns.class == Hash
-          patterns = parser_patterns
-        end
-        if hash.class == Hash && hash[:parse_output].class == Hash
-          patterns = hash[:parse_output]
-        end
-        if patterns.nil?
-          log(:debug, "No patterns defined to parse the output of command #{name}")
-          return true
-        else
-          if patterns[:error].class == Array
-            errors = match_patterns(raw_output, patterns[:error])
-            errors.each do |error|
-              log(:error, "ERROR detected in output")
-              log(:error, error)
-            end
-          end
-          if patterns[:warning].class == Array
-            warnings = match_patterns(raw_output, patterns[:warning])
-            warnings.each do |warning|
-              log(:warn, "Warning detected in output")
-              log(:warn, warning)
-            end
-          end
-        end
-        if hash[:fail_on_warning]
-          return false unless warnings.empty?
-        end
-        return false unless errors.empty?
-        return true
-      end
-
-
-      # takes an array of patterns and a string to match
-      # returns every line with a match
-      def match_patterns(raw_output, patterns)
-        results = []
-        patterns.each do |pattern|
-          begin
-            regexp = Regexp.new(pattern)
-            raw_output.each_line do |line|
-              results << line unless line.scan(regexp).empty?
-            end
-          rescue RegexpError => e
-            # TODO: Throw proper exception class
-            raise "Error while parsing regular expression #{pattern} for command #{name}"
-          end
-        end
-        return results
-      end
     end
-
   end
 end

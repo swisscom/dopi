@@ -1,0 +1,40 @@
+infrastructures:
+  baremetal: {}
+
+nodes:
+  'linux01.example.com':
+    type: 'baremetal'
+
+plan:
+  max_in_flight: 1
+  ssh_root_pass: 'vagrant'
+
+steps:
+
+  #
+  # Check if the parser is working as intended
+  #
+
+  - name: 'Check if the output parser can catch an error'
+    nodes: 'all'
+    command:
+      plugin: 'custom'
+      exec: 'echo'
+      arguments: '"Error: this is a simulated error"'
+      parse_output:
+        error:
+          - '^Error:'
+
+  - name: 'Check if the output parser can catch a warning'
+    nodes: 'all'
+    command:
+      plugin: 'custom'
+      exec: 'echo'
+      arguments: '"Warning: This is a simulated warning"'
+      fail_on_warning: true
+      parse_output:
+        warning:
+          - '^Warning:'
+
+
+
