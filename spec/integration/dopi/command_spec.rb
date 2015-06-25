@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe 'Basic integration test built from plan files' do
-  #Dopi.log.level = ::Logger::INFO
 
   before :all do
     Dopi.configuration.ssh_pass_auth = true
