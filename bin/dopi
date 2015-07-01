@@ -126,10 +126,39 @@ module Wrapper
 
   def plan_valid?(plan_file)
     plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
-    plan = Dopi::Plan.new(plan_parser, 'fakeid')
+    plan = Dopi::Plan.new(plan_parser)
     plan.valid?
   end
 
+  def add_plan(plan_file)
+    begin
+      if plan_valid?(plan_file)
+        id = @plan_cache.add(plan_file)
+        plan = Dopi.load_plan(id)
+      else
+        exit_now!("An error occured while parsing the plan. Plan was not added.")
+      end
+    end
+    plan
+  end
+
+  def run_plan(plan)
+    run_thread    = Thread.new do
+      plan.run
+    end
+    update_thread = Thread.new do
+      until plan.state_done? or plan.state_failed? do
+        if plan.state_changed?
+          puts "Update plan"
+          Dopi.save_plan(plan)
+        end
+        sleep(1)
+      end
+    end
+    run_thread.join
+    update_thread.join
+    Dopi.save_plan(plan)
+  end
 
   desc 'Validate a plan file'
   arg_name 'plan_file'
@@ -152,13 +181,7 @@ module Wrapper
     c.action do |global_options,options,args|
       help_now!('Specify a plan file to add') if args.empty?
       help_now!('You can only add one plan') if args.length > 1
-      if plan_valid?(args[0])
-        id = @plan_cache.add(args[0])
-        Dopi.load_plan(id)
-        puts id
-      else
-        exit_now!("An error occured while parsing the plan. Plan was not added.")
-      end
+      puts add_plan(args[0])
     end
   end
 
@@ -201,12 +224,12 @@ module Wrapper
       help_now!('You can only run one plan') if args.length > 1
       begin
         plan = Dopi.load_plan(args[0])
-        plan.run
-        Dopi.save_plan(plan)
-        print_state(plan)
+        run_plan(plan)
       rescue Dopi::StateTransitionError => e
         Dopi.log.error(e.message)
         exit_now!("Some steps are in a state where they can't be started again. Try to reset the plan.")
+      ensure
+        print_state(plan)
       end
     end
   end
@@ -232,21 +255,12 @@ module Wrapper
     c.action do |global_options,options,args|
       help_now!('Specify a plan file to add') if args.empty?
       help_now!('You can only add one plan') if args.length > 1
-      id = nil
-      plan = nil
+      plan = add_plan(args[0])
       begin
-        if plan_valid?(args[0])
-          id = @plan_cache.add(args[0])
-          plan = Dopi.load_plan(id)
-        else
-          exit_now!("An error occured while parsing the plan. Plan was not added.")
-        end
-      end
-      begin
-        plan.run
+        run_plan(plan)
       ensure
         print_state(plan)
-        @plan_cache.remove(id)
+        @plan_cache.remove(plan.name)
       end
     end
   end
