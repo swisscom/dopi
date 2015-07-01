@@ -61,6 +61,7 @@ module Dopi
           if state_running?
             log(:info, "Running command")
             run ? state_finish : state_fail
+            log(:info, "Done") if state_done?
           else
             log(:info, "Nothing to do for command")
           end
