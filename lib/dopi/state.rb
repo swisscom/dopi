@@ -77,22 +77,44 @@ module Dopi
     def state_run
       raise Dopi::StateTransitionError, "Can't switch to running from #{state.to_s}" unless state == :ready || state == :running
       @state = :running
+      state_changed
     end
 
     def state_finish
       raise Dopi::StateTransitionError, "Can't switch to done from #{state.to_s}" unless state == :running || state == :done
       @state = :done
+      state_changed
     end
 
     def state_fail
       raise Dopi::StateTransitionError, "Can't switch to done from #{state.to_s}" unless state == :running || state == :failed
       @state = :failed
+      state_changed
     end
 
     def state_reset
       raise Dopi::StateTransitionError, "Can't switch to ready from #{state.to_s}" unless state == :failed || state == :ready
       state_children.each {|child| child.state_reset unless child.state_done?}
       @state = :ready
+      state_changed
+    end
+
+    # returns true if the global state has changes since
+    # you last called this method
+    def state_changed?
+      if state_children.empty?
+        !(@changed ? @changed = false : true)
+      else
+        !state_children.all? {|child| child.state_unchanged?}
+      end
+    end
+
+    def state_unchanged?
+      !(state_changed?)
+    end
+
+    def state_changed
+      @changed = true
     end
 
   end
