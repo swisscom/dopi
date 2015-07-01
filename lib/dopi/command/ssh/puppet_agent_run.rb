@@ -14,6 +14,16 @@ module Dopi
           [ 0, 2 ]
         end
 
+        def parse_output_defaults
+          { :error => [
+              '^Error:'
+            ],
+            :warning => [
+              '^Warning:'
+            ]
+          }
+        end
+
       end
     end
   end
