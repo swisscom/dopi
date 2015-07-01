@@ -114,7 +114,6 @@ module Wrapper
     true
   end
 
-
   def print_state(plan)
     plan.steps.each do |step|
       puts "[#{step.state.to_s}] #{step.name}"
@@ -124,49 +123,13 @@ module Wrapper
     end
   end
 
-  def plan_valid?(plan_file)
-    plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
-    plan = Dopi::Plan.new(plan_parser)
-    plan.valid?
-  end
-
-  def add_plan(plan_file)
-    begin
-      if plan_valid?(plan_file)
-        id = @plan_cache.add(plan_file)
-        plan = Dopi.load_plan(id)
-      else
-        exit_now!("An error occured while parsing the plan. Plan was not added.")
-      end
-    end
-    plan
-  end
-
-  def run_plan(plan)
-    run_thread    = Thread.new do
-      plan.run
-    end
-    update_thread = Thread.new do
-      until plan.state_done? or plan.state_failed? do
-        if plan.state_changed?
-          puts "Update plan"
-          Dopi.save_plan(plan)
-        end
-        sleep(1)
-      end
-    end
-    run_thread.join
-    update_thread.join
-    Dopi.save_plan(plan)
-  end
-
   desc 'Validate a plan file'
   arg_name 'plan_file'
   command :validate do |c|
     c.action do |global_options,options,args|
       help_now!('Specify a plan file to add') if args.empty?
       help_now!('You can only add one plan') if args.length > 1
-      if plan_valid?(args[0])
+      if Dopi.plan_valid?(args[0])
         puts "Plan is valid"
       else
         exit_now!("Plan is NOT valid")
@@ -174,17 +137,16 @@ module Wrapper
     end
   end
 
-
   desc 'Add a new plan file to the plan cache'
   arg_name 'plan_file'
   command :add do |c|
     c.action do |global_options,options,args|
       help_now!('Specify a plan file to add') if args.empty?
       help_now!('You can only add one plan') if args.length > 1
-      puts add_plan(args[0])
+      plan = Dopi.add_plan(args[0])
+      puts plan.name
     end
   end
-
 
   desc 'Show the list of plans in the dopi plan cache'
   command :list do |c|
@@ -193,38 +155,35 @@ module Wrapper
     end
   end
 
-
   desc 'Remove an existing plan from the plan cache'
-  arg_name 'id'
+  arg_name 'name'
   command :remove do |c|
     c.action do |global_options,options,args|
       help_now!('Specify a plan id to remove') if args.empty?
       help_now!('You can only remove one plan') if args.length > 1
-      puts @plan_cache.remove(args[0])
+      @plan_cache.remove(args[0])
     end
   end
 
-
   desc 'Show plan details and state'
-  arg_name 'id'
+  arg_name 'name'
   command :show do |c|
     c.action do |global_options,options,args|
-      help_now!('Specify a plan id to show') if args.empty?
+      help_now!('Specify a plan name to show') if args.empty?
       help_now!('You can only show one plan') if args.length > 1
       print_state(Dopi.load_plan(args[0]))
     end
   end
 
-
   desc 'Run the plan'
   arg_name 'id'
   command :run do |c|
     c.action do |global_options,options,args|
-      help_now!('Specify a plan id to run') if args.empty?
+      help_now!('Specify a plan name to run') if args.empty?
       help_now!('You can only run one plan') if args.length > 1
       begin
         plan = Dopi.load_plan(args[0])
-        run_plan(plan)
+        Dopi.run_plan(plan)
       rescue Dopi::StateTransitionError => e
         Dopi.log.error(e.message)
         exit_now!("Some steps are in a state where they can't be started again. Try to reset the plan.")
@@ -234,12 +193,11 @@ module Wrapper
     end
   end
 
-
   desc 'Reset a failed plan'
-  arg_name 'id'
+  arg_name 'name'
   command :reset do |c|
     c.action do |global_options,options,args|
-      help_now!('Specify a plan id to run') if args.empty?
+      help_now!('Specify a plan name to run') if args.empty?
       help_now!('You can only run one plan') if args.length > 1
       plan = Dopi.load_plan(args[0])
       plan.reset
@@ -248,19 +206,18 @@ module Wrapper
     end
   end
 
-
   desc 'Add a plan, run it and then remove it again (This is mainly for testing)'
   arg_name 'plan_file'
   command :oneshot do |c|
     c.action do |global_options,options,args|
       help_now!('Specify a plan file to add') if args.empty?
       help_now!('You can only add one plan') if args.length > 1
-      plan = add_plan(args[0])
       begin
-        run_plan(plan)
-      ensure
-        print_state(plan)
-        @plan_cache.remove(plan.name)
+        plan = Dopi.add_plan(args[0])
+        begin Dopi.run_plan(plan)
+        ensure print_state(plan)
+        end
+      ensure @plan_cache.remove(plan.name)
       end
     end
   end
