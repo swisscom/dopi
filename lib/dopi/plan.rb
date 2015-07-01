@@ -70,7 +70,7 @@ module Dopi
     def steps
       @steps ||= parsed_steps.map do |parsed_step|
         nodes = (nodes_by_names(parsed_step.nodes) + nodes_by_roles(parsed_step.roles)).uniq
-        ::Dopi::Step.new(parsed_step, nodes)
+        ::Dopi::Step.new(parsed_step, self, nodes)
       end
     end
 

@@ -15,7 +15,7 @@ describe Dopi::Step do
         :arguments => 'Hello World'
       }
     }
-    @step = Dopi::Step.new(DopCommon::Step.new(hash), @plan.nodes)
+    @step = Dopi::Step.new(DopCommon::Step.new(hash), @plan, @plan.nodes)
   end
 
   describe '#new' do
@@ -24,7 +24,7 @@ describe Dopi::Step do
     end
 
     it 'takes a name, a plugin name, a list of nodes and returns a Dopi::Step object' do
-      step = Dopi::Step.new(DopCommon::Step.new({:name => 'dummy', :command => 'dummy'}), @plan.nodes)
+      step = Dopi::Step.new(DopCommon::Step.new({:name => 'dummy', :command => 'dummy'}), @plan, @plan.nodes)
       expect(step).to be_an_instance_of Dopi::Step
     end
   end

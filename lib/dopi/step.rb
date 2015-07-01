@@ -9,9 +9,10 @@ module Dopi
     extend Forwardable
     include Dopi::State
 
-    def initialize(step_parser, nodes = [])
+    def initialize(step_parser, plan, nodes = [])
       @step_parser = step_parser
-      @nodes = nodes
+      @plan        = plan
+      @nodes       = nodes
 
       commands.each{|command| state_add_child(command)}
       raise "nodes list for step #{name} is empty" if @nodes.empty?
