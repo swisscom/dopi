@@ -99,18 +99,13 @@ module Dopi
       state_changed
     end
 
-    # returns true if the global state has changes since
-    # you last called this method
+    # returns if the state was changed since the last call of this function
     def state_changed?
       if state_children.empty?
         !(@changed ? @changed = false : true)
       else
-        !state_children.all? {|child| child.state_unchanged?}
+        (state_children.count{|child| child.state_changed?} > 0)
       end
-    end
-
-    def state_unchanged?
-      !(state_changed?)
     end
 
     def state_changed
