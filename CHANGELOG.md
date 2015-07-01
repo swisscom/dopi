@@ -4,6 +4,7 @@ All notable changes to DOPi will be documented in this file.
 ## [Unreleased]
 ### Added
 - It is now possible to specify a name for a plan
+- 'dopi show' now shows the correct state of a running plan
 
 ### Changed
 - Colorized CLI output based on log message severity.
