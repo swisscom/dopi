@@ -13,12 +13,12 @@ require "dopi/version"
 module Dopi
   class << self
 
-    def load_plan(plan_id)
-      plan_exists?(plan_id) ? YAML::load(File.read(dump_file(plan_id))) : create(plan_id)
+    def load_plan(plan_name)
+      plan_exists?(plan_name) ? YAML::load(File.read(dump_file(plan_name))) : create(plan_name)
     end
 
     def save_plan(plan)
-      File.open(dump_file(plan.id), 'w') { |file| file.write(YAML::dump(plan)) }
+      File.open(dump_file(plan.name), 'w') { |file| file.write(YAML::dump(plan)) }
     end
 
   private
@@ -27,20 +27,20 @@ module Dopi
       @plan_cache ||= DopCommon::PlanCache.new(Dopi.configuration.plan_cache_dir)
     end
 
-    def plan_exists?(plan_id)
-      File.exists?(dump_file(plan_id))
+    def plan_exists?(plan_name)
+      File.exists?(dump_file(plan_name))
     end
 
-    def create(plan_id)
-      plan_parser = plan_cache.get(plan_id)
-      plan = Dopi::Plan.new(plan_parser, plan_id)
+    def create(plan_name)
+      plan_parser = plan_cache.get(plan_name)
+      plan = Dopi::Plan.new(plan_parser)
       raise StandardError, 'Plan not valid; did not add' unless plan.valid?
       save_plan(plan)
       plan
     end
 
-    def dump_file(plan_id)
-      File.join(Dopi.configuration.plan_cache_dir, plan_id + '_dopi.yaml')
+    def dump_file(plan_name)
+      File.join(Dopi.configuration.plan_cache_dir, plan_name + '_dopi.yaml')
     end
 
   end

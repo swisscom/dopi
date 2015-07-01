@@ -14,7 +14,7 @@ describe Dopi::Node do
   before :each do
     plan_file = 'spec/data/plan/plan_simple.yaml'
     plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
-    @plan = Dopi::Plan.new(plan_parser, 'fakeid')
+    @plan = Dopi::Plan.new(plan_parser)
     @node = @plan.nodes.find {|node| node.name == 'web01.example.com'}
   end
 

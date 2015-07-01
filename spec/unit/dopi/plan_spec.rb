@@ -12,7 +12,7 @@ describe Dopi::Plan do
   before :each do
     plan_file = 'spec/data/plan/plan_simple.yaml'
     plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
-    @plan = Dopi::Plan.new(plan_parser, 'fakeid')
+    @plan = Dopi::Plan.new(plan_parser)
   end
 
   describe '#new' do
