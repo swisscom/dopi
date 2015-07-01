@@ -35,6 +35,23 @@ exits with an exit code not listed here, DOPi will mark the run as failed.
 The values can be a number, an array of numbers or :all for all possible exit
 codes. Will replace the current default.
 
+### parse_output (optional)
+
+`default: {}`
+
+Here you can define patterns that match against the output of the command plugin
+and flag certain lines as errors or warnings. The parse_output key should contain
+a hash with two keys, 'error' and 'warning' which each can contain an array of
+patterns.
+
+### fail_on_warning
+
+`default: false`
+
+Set this to true if you want to threat warnings in the output as errors. This is
+useful if the plugin already specifies the parsing patterns but your need to stop
+the run on warnings.
+
 ## Examples:
 
 ### Simple Example
@@ -64,5 +81,8 @@ codes. Will replace the current default.
         parse_output:
           error:
             - '^No package puppet available'
+            - 'Some other Error pattern'
+          warning:
+            - '^Warning:'
 ```
 
