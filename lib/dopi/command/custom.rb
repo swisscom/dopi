@@ -1,8 +1,5 @@
-# DOPi Plugin: Custom Command
 #
-# TODO: Refactor and document
-#  - fail_on_warning
-#  - parsing
+# DOPi Plugin: Custom Command
 #
 require 'open3'
 
@@ -98,6 +95,7 @@ module Dopi
         nil
       end
 
+      # assemble the command to execute
       def command_string
         exec + ' ' + arguments
       end
