@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [Unreleased]
+## [0.2.0] - 2015-07-01
 ### Added
 - It is now possible to specify a name for a plan
 - 'dopi show' now shows the correct state of a running plan
