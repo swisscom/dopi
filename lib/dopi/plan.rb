@@ -29,7 +29,7 @@ module Dopi
       end
       state_run
       steps.each do |step|
-        step.run(max_in_flight)
+        step.run
         break if abort? || state_failed?
       end
     end

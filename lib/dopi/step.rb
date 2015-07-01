@@ -20,7 +20,7 @@ module Dopi
 
     def_delegators :@step_parser, :name, :canary_host
 
-    def run(max_in_flight)
+    def run
       if state_done?
         Dopi.log.info("Step '#{name}' is in state 'done'. Skipping")
         return
@@ -33,7 +33,7 @@ module Dopi
         commands_copy.delete_at(pick).meta_run
       end
       unless state_failed?
-        Parallel.each(commands_copy, :in_threads => max_in_flight) do |command|
+        Parallel.each(commands_copy, :in_threads => @plan.max_in_flight) do |command|
           raise Parallel::Break if state_failed?
           command.meta_run
         end
