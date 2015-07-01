@@ -29,7 +29,7 @@ And then execute:
     end
 
     plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
-    plan = Dopi::Plan.new(plan_parser, 'fakeid')
+    plan = Dopi::Plan.new(plan_parser)
     plan.run
 
     puts "Plan status: #{plan.state.to_s}"
@@ -40,6 +40,28 @@ And then execute:
       end
     end
 
+#### With DOP plan cache
+
+This will persist the plan in the DOP plan cache.
+
+    require 'dopi'
+
+    Dopi.configure do |config|
+      config.role_variable = 'my_role'
+      config.role_default  = 'base'
+    end
+
+    plan = Dopi.add_plan(plan_file)
+    Dopi.run_plan(plan)
+
+    puts "Plan status: #{plan.state.to_s}"
+    plan.steps.each do |step|
+      puts "[#{step.state.to_s}] #{step.name}"
+      step.commands.each do |command|
+        puts "  [#{command.state.to_s}] #{command.node.fqdn}"
+      end
+    end
+    
 ### DOPi as a CLI
 
 ### Install
@@ -57,19 +79,19 @@ Help on all available options
 First you have to add a plan to the plan cache:
 
     $ dopi add spec/data/plan/example_deploment_plan_test.yaml 
-    3addf8efff12351fa87c901cfacfe1f8edeb9557589b3bde544630dcb7eedc49 
+    example_deploment_plan_test 
 
-This will return a plan identifier which can be used to run other
+This will return the plan name which can be used to run other
 commands on that plan. You can get a list of all the plans in the
 cache by running:
 
     $ dopi list
-    3addf8efff12351fa87c901cfacfe1f8edeb9557589b3bde544630dcb7eedc49
+    example_deploment_plan_test
 
 You can get information about the state of a plan with the show command
-and the id of the plan:
+and the name of the plan:
 
-    $ dopi show 3addf8efff12351fa87c901cfacfe1f8edeb9557589b3bde544630dcb7eedc49
+    $ dopi show example_deploment_plan_test
     [ready] test_run
       [ready] mysql01.example.com
       [ready] web01.example.com
@@ -97,9 +119,9 @@ and the id of the plan:
       [ready] haproxy01.example.com
       [ready] haproxy02.example.com
 
-You can run the plan with the run command and the id:
+You can run the plan with the run command and the name:
 
-    $ dopi run 3addf8efff12351fa87c901cfacfe1f8edeb9557589b3bde544630dcb7eedc49
+    $ dopi run example_deploment_plan_test
 
 
 ## Plan File Format
