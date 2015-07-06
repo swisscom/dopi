@@ -9,6 +9,8 @@ module Dopi
     extend Forwardable
     include Dopi::State
 
+    DEFAULT_MAX_IN_FLIGHT = 3
+
     def initialize(step_parser, plan, nodes = [])
       @step_parser = step_parser
       @plan        = plan
@@ -18,7 +20,7 @@ module Dopi
       raise "nodes list for step #{name} is empty" if @nodes.empty?
     end
 
-    def_delegators :@step_parser, :name, :canary_host
+    def_delegators :@step_parser, :name
 
     def run
       if state_done?
@@ -44,7 +46,11 @@ module Dopi
     end
 
     def max_in_flight
-      @max_in_flight ||= @plan.max_in_flight
+      @max_in_flight ||= @step_parser.max_in_flight || @plan.max_in_flight || DEFAULT_MAX_IN_FLIGHT
+    end
+
+    def canary_host
+      @canary_host ||= @step_parser.canary_host || @plan.canary_host
     end
 
     def command_plugin_valid?

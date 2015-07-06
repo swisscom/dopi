@@ -23,7 +23,8 @@ module Dopi
       :name,
       :configuration,
       :ssh_root_pass,
-      :max_in_flight
+      :max_in_flight,
+      :canary_host
 
     def run
       if state_done?
