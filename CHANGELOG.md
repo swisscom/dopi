@@ -7,6 +7,9 @@ All notable changes to DOPi will be documented in this file.
 - max_in_flight now supports the values 0 and -1. More info about this is in the Documentation of the DOP plan format.
 - Make it possible to set max_in_flight and canary_host globaly and per step
 
+### Fixed
+- Plan validation will now detect nodes which do not exist in steps and roles without nodes
+
 ## [0.2.0] - 2015-07-01
 ### Added
 - It is now possible to specify a name for a plan

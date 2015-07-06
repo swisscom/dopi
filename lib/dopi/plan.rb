@@ -56,6 +56,8 @@ module Dopi
       validity = @plan_parser.valid?
       begin
         validity = false unless steps.all?{|step| step.command_plugin_valid? }
+        validity = false unless nodes_valid?
+        validity = false unless roles_valid?
       rescue Dopi::NoRoleFoundError => e
         Dopi.log.warn(e.message) 
       rescue StandardError => e
@@ -82,6 +84,33 @@ module Dopi
 
     def_delegator  :@plan_parser, :nodes, :parsed_nodes
     def_delegator  :@plan_parser, :steps, :parsed_steps
+
+    def nodes_valid?
+      valid = true
+      parsed_steps.each do |step|
+        step.nodes.each do |node|
+          unless nodes.any?{|real_node| real_node.name == node}
+            Dopi.log.error("Node #{node} in step #{step.name} does not exist")
+            valid = false
+          end
+        end
+      end
+      valid
+    end
+
+    def roles_valid?
+      valid = true
+      parsed_steps.each do |step|
+        step.roles.each do |role|
+          unless nodes.any?{|real_node| real_node.role == role}
+            Dopi.log.error("Role #{role} in step #{step.name} does not contain any nodes")
+            valid = false
+          end
+        end
+      end
+      valid
+    end
+
 
     def nodes_by_names(names)
       case names

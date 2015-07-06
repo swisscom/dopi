@@ -1,0 +1,21 @@
+name: 'test_plan_with_invalid_node'
+
+infrastructures:
+  baremetal: {}
+
+nodes:
+  'linux01.example.com':
+    type: 'baremetal'
+
+steps:
+
+  - name: 'Wait 1'
+    nodes:
+      - 'linux01.example.com'
+      - 'linux02.example.com'
+    max_in_flight: 2
+    command:
+      plugin: 'custom'
+      exec: 'echo'
+      arguments: 'Hello World'
+
