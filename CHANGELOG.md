@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [Unreleased]
+### Changed
+- max_in_flight and ssh_root_pass are now global keys and no longer under 'plan'. The old location will still work, but DOPi will show a deprecation warning.
+- max_in_flight now supports the values 0 and -1. More info about this is in the Documentation of the DOP plan format.
+
 ## [0.2.0] - 2015-07-01
 ### Added
 - It is now possible to specify a name for a plan
