@@ -217,7 +217,7 @@ module Wrapper
         begin Dopi.run_plan(plan)
         ensure print_state(plan)
         end
-      ensure @plan_cache.remove(plan.name)
+      ensure @plan_cache.remove(plan.name) unless plan.nil?
       end
     end
   end
