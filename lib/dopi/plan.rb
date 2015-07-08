@@ -75,8 +75,7 @@ module Dopi
 
     def steps
       @steps ||= parsed_steps.map do |parsed_step|
-        nodes = (nodes_by_names(parsed_step.nodes) + nodes_by_roles(parsed_step.roles)).uniq
-        ::Dopi::Step.new(parsed_step, self, nodes)
+        ::Dopi::Step.new(parsed_step, self, create_node_list(parsed_step))
       end
     end
 
@@ -84,6 +83,15 @@ module Dopi
 
     def_delegator  :@plan_parser, :nodes, :parsed_nodes
     def_delegator  :@plan_parser, :steps, :parsed_steps
+
+    def create_node_list(parsed_step)
+      list = []
+      list += nodes_by_names(parsed_step.nodes)
+      list += nodes_by_roles(parsed_step.roles)
+      list -= nodes_by_names(parsed_step.nodes_exclude)
+      list -= nodes_by_roles(parsed_step.roles_exclude)
+      list.uniq
+    end
 
     def nodes_valid?
       valid = true
