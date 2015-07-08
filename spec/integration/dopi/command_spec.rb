@@ -17,7 +17,7 @@ describe 'Basic integration test built from plan files' do
   # Create plugin tests from plugin test yaml files
   # and check if they run successfully
   Dir['spec/integration/dopi/plans/**/*.yaml'].each do |plan_file|
-    describe "plugin tests from: '#{plan_file}'" do
+    describe plan_file do
       plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
       plan = Dopi::Plan.new(plan_parser)
       it "is a valid plan file" do
@@ -35,7 +35,7 @@ describe 'Basic integration test built from plan files' do
   # Create plugin tests from plugin test yaml files
   # and check if they fail
   Dir['spec/integration/dopi/fail_check_plans/**/*.yaml'].each do |plan_file|
-    describe "plugin tests from: '#{plan_file}'" do
+    describe plan_file do
       plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
       plan = Dopi::Plan.new(plan_parser)
       it "is a valid plan file" do
@@ -53,7 +53,7 @@ describe 'Basic integration test built from plan files' do
   # Create plugin tests from plugin test yaml files
   # and check if they are not valid
   Dir['spec/integration/dopi/invalid_plans/**/*.yaml'].each do |plan_file|
-    describe "plugin tests from: '#{plan_file}'" do
+    describe plan_file do
       plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
       plan = Dopi::Plan.new(plan_parser)
       it "is not a valid plan file" do
