@@ -5,10 +5,11 @@ All notable changes to DOPi will be documented in this file.
 ### Changed
 - max_in_flight and ssh_root_pass are now global keys and no longer under 'plan'. The old location will still work, but DOPi will show a deprecation warning.
 - max_in_flight now supports the values 0 and -1. More info about this is in the Documentation of the DOP plan format.
-- Make it possible to set max_in_flight and canary_host globaly and per step
+- Make it possible to set max_in_flight and canary_host globaly and per step.
 
 ### Fixed
-- Plan validation will now detect nodes which do not exist in steps and roles without nodes
+- Plan validation will now detect nodes which do not exist in steps and roles without nodes.
+- Fixed a bug where the role could not be resolved if the plan is not already in the plan cache.
 
 ## [0.2.0] - 2015-07-01
 ### Added
