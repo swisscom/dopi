@@ -1,0 +1,23 @@
+name: 'resolve_roles_on_validate'
+max_in_flight: 1
+ssh_root_pass: 'vagrant'
+
+infrastructures:
+  baremetal: {}
+
+nodes:
+  'linux01.example.com':
+    type: 'baremetal'
+
+configuration:
+  hosts:
+    'linux01.example.com':
+      role: 'testrole'
+
+steps:
+
+  - name: 'Step which includes only one role'
+    roles:
+      - 'testrole'
+    command:
+      plugin: 'dummy'
