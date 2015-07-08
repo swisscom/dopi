@@ -89,17 +89,32 @@ module Dopi
       end
     end
 
-    # This should also resolve over hiera and there should be no need to resolve
-    # it internaly. There is currently a problem with the Plan cache which parses
-    # the plan and needs to resolve the role before Hiera can access the plan
+    # This will try to resolve the role from the plan configuration hash.
+    # This is needed in case the plan is not yet added to the plan cache
+    # (in case of validation) and hiera can't resolve it over the plugin,
+    # but we still need the information about the node role.
     def role_from_config
       begin
-        @plan.configuration.lookup("nodes/#{name}", Dopi.configuration.role_variable, scope)
-      rescue DopCommon::ConfigurationValueNotFound
-        nil
+        hiera # make sure hiera is initialized
+        answer = nil
+        Hiera::Backend.datasources(scope) do |source|
+          Dopi.log.debug("Hiera: Looking for data source #{source}")
+          data = nil
+          begin
+            data = @plan.configuration.lookup(source, Dopi.configuration.role_variable, scope)
+          rescue DopCommon::ConfigurationValueNotFound
+            next
+          else
+            break if answer = Hiera::Backend.parse_answer(data, scope)
+          end
+        end
+      rescue StandardError => e
+        Dopi.log.debug(e.message)
       end
+      return answer
     end
 
+    # this will try to resolve the role over hiera dirctly
     def role_from_hiera
       return nil unless Dopi.configuration.use_hiera
       hiera.lookup(Dopi.configuration.role_variable, nil, scope)
