@@ -17,6 +17,7 @@ module Dopi
         if @command_hash.class == Hash
           log(:info, "Command hash was: #{hash.inspect}")
         end
+        true
       end
 
     end
