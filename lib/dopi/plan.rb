@@ -88,7 +88,9 @@ module Dopi
     def nodes_valid?
       valid = true
       parsed_steps.each do |step|
+        return true if step.nodes == :all
         step.nodes.each do |node|
+          next if node.kind_of?(Regexp)
           unless nodes.any?{|real_node| real_node.name == node}
             Dopi.log.error("Node '#{node}' in step '#{step.name}' does not exist")
             valid = false
@@ -101,7 +103,9 @@ module Dopi
     def roles_valid?
       valid = true
       parsed_steps.each do |step|
+        return true if step.roles == :all
         step.roles.each do |role|
+          next if role.kind_of?(Regexp )
           unless nodes.any?{|real_node| real_node.role == role}
             Dopi.log.error("Role '#{role}' in step '#{step.name}' does not contain any nodes")
             valid = false
@@ -111,19 +115,32 @@ module Dopi
       valid
     end
 
-
     def nodes_by_names(names)
       case names
-        when 'all' then nodes
-        when Array then nodes.select {|node| names.include? node.name}
+        when :all then nodes
+        when Array then nodes.select do |node|
+          names.any? do |name|
+            case name
+            when Regexp then node.name =~ name
+            else node.name == name
+            end
+          end
+        end
         else []
       end
     end
 
     def nodes_by_roles(roles)
       case roles
-        when 'all' then nodes
-        when Array then nodes.select {|node| roles.include? node.role}
+        when :all then nodes
+        when Array then nodes.select do |node|
+          roles.any? do |role|
+            case role
+            when Regexp then node.role =~ role
+            else node.role == role
+            end
+          end
+        end
         else []
       end
     end
