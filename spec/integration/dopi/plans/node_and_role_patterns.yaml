@@ -1,0 +1,54 @@
+name: 'node_and_role_patterns'
+max_in_flight: 1
+ssh_root_pass: 'vagrant'
+
+infrastructures:
+  baremetal: {}
+
+nodes:
+  'linux01.example.com':
+    type: 'baremetal'
+  'nonexisting01.example.com':
+    type: 'baremetal'
+  'nonexisting02.example.com':
+    type: 'baremetal'
+  'nonexisting03.example.com':
+    type: 'baremetal'
+
+configuration:
+  hosts:
+    'linux01.example.com':
+      role: 'isreal'
+    'nonexisting01.example.com':
+      role: 'unreal'
+    'nonexisting02.example.com':
+      role: 'unreal'
+    'nonexisting03.example.com':
+      role: 'unreal'
+
+steps:
+
+  - name: 'Step which includes and excludes nodes with a regexp'
+    nodes:
+      - '/.*\.example\.com$/'
+    nodes_exclude:
+      - '/^nonexisting.*/'
+    exclude_by_filter:
+    exclude_by_hiera:
+    command:
+      plugin: 'ssh/custom'
+      exec: 'echo'
+      arguments: '"Hello World"'
+
+  - name: 'Step which includes and excludes roles with a regexp'
+    roles:
+      - '/.*real$/'
+    roles_exclude:
+      - '/^un.*/'
+    exclude_by_filter:
+    exclude_by_hiera:
+    command:
+      plugin: 'ssh/custom'
+      exec: 'echo'
+      arguments: '"Hello World"'
+
