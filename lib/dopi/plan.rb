@@ -55,7 +55,7 @@ module Dopi
     def valid?
       validity = @plan_parser.valid?
       begin
-        validity = false unless steps.all?{|step| step.command_plugin_valid? }
+        validity = false unless steps.all?{|step| step.valid? }
         validity = false unless nodes_valid?
         validity = false unless roles_valid?
       rescue Dopi::NoRoleFoundError => e
@@ -90,7 +90,7 @@ module Dopi
       parsed_steps.each do |step|
         step.nodes.each do |node|
           unless nodes.any?{|real_node| real_node.name == node}
-            Dopi.log.error("Node #{node} in step #{step.name} does not exist")
+            Dopi.log.error("Node '#{node}' in step '#{step.name}' does not exist")
             valid = false
           end
         end
@@ -103,7 +103,7 @@ module Dopi
       parsed_steps.each do |step|
         step.roles.each do |role|
           unless nodes.any?{|real_node| real_node.role == role}
-            Dopi.log.error("Role #{role} in step #{step.name} does not contain any nodes")
+            Dopi.log.error("Role '#{role}' in step '#{step.name}' does not contain any nodes")
             valid = false
           end
         end

@@ -17,7 +17,6 @@ module Dopi
       @nodes       = nodes
 
       commands.each{|command| state_add_child(command)}
-      raise "nodes list for step #{name} is empty" if @nodes.empty?
     end
 
     def_delegators :@step_parser, :name
@@ -51,6 +50,14 @@ module Dopi
 
     def canary_host
       @canary_host ||= @step_parser.canary_host || @plan.canary_host
+    end
+
+    def valid?
+      if @nodes.empty?
+        Dopi.log.error("Step '#{name}': Nodes list is empty")
+        return false
+      end
+      command_plugin_valid?
     end
 
     def command_plugin_valid?
