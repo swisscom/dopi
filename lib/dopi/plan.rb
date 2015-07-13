@@ -88,8 +88,8 @@ module Dopi
       list = []
       list += nodes_by_names(parsed_step.nodes)
       list += nodes_by_roles(parsed_step.roles)
-      list -= nodes_by_names(parsed_step.nodes_exclude)
-      list -= nodes_by_roles(parsed_step.roles_exclude)
+      list -= nodes_by_names(parsed_step.exclude_nodes)
+      list -= nodes_by_roles(parsed_step.exclude_roles)
       list.uniq
     end
 

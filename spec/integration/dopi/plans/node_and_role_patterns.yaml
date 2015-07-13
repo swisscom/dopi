@@ -31,10 +31,8 @@ steps:
   - name: 'Step which includes and excludes nodes with a regexp'
     nodes:
       - '/.*\.example\.com$/'
-    nodes_exclude:
+    exclude_nodes:
       - '/^nonexisting.*/'
-    exclude_by_filter:
-    exclude_by_hiera:
     command:
       plugin: 'ssh/custom'
       exec: 'echo'
@@ -43,10 +41,8 @@ steps:
   - name: 'Step which includes and excludes roles with a regexp'
     roles:
       - '/.*real$/'
-    roles_exclude:
+    exclude_roles:
       - '/^un.*/'
-    exclude_by_filter:
-    exclude_by_hiera:
     command:
       plugin: 'ssh/custom'
       exec: 'echo'
