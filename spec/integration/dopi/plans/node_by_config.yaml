@@ -1,0 +1,104 @@
+name: 'nodes_by_config'
+max_in_flight: 1
+ssh_root_pass: 'vagrant'
+
+infrastructures:
+  baremetal: {}
+
+nodes:
+  'linux01.example.com':
+    type: 'baremetal'
+  'nonexisting01.example.com':
+    type: 'baremetal'
+  'nonexisting02.example.com':
+    type: 'baremetal'
+
+configuration:
+  hosts:
+    'linux01.example.com':
+      my_alias3:  'realnode'
+      my_alias2: 'include_this'
+      my_alias3: 'dont_exclude_this'
+      my_alias4: 'only_include_this'
+      my_alias5:
+        - 'include_this'
+        - 'dont_exclude_this'
+    'nonexisting01.example.com':
+      my_alias: 'fakenode'
+      my_alias2: 'include_this'
+      my_alias3: 'exclude_this'
+      my_alias5:
+        - 'include_this'
+        - 'exclude_this'
+      my_alias6: 'exclude_this'
+      my_alias8: 'exclude_this'
+    'nonexisting02.example.com':
+      my_alias: 'fakenode'
+      my_alias2: 'include_this'
+      my_alias3: 'exclude_this'
+      my_alias5:
+        - 'include_this'
+        - 'exclude_this'
+      my_alias7: 'exclude_this'
+      my_alias8: 'exclude_this_too'
+
+steps:
+  - name: 'Include and exclude with regexp pattern'
+    nodes_by_config:
+      my_alias: '/node$/'
+    exclude_nodes_by_config:
+      my_alias: '/^fake/'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'echo'
+      arguments: 'Hello World'
+
+  - name: 'Include and exclude with string compare'
+    nodes_by_config:
+      my_alias2: 'include_this'
+    exclude_nodes_by_config:
+      my_alias3: 'exclude_this'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'echo'
+      arguments: 'Hello World'
+
+  - name: 'Check if it works if my_alias4 is only set for some nodes'
+    nodes_by_config:
+      my_alias4: 'only_include_this'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'echo'
+      arguments: 'Hello World'
+
+  - name: 'Check if it works if my_alias5 is an array of aliases'
+    nodes_by_config:
+      my_alias5: 'include_this'
+    exclude_nodes_by_config:
+      my_alias5: 'exclude_this'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'echo'
+      arguments: 'Hello World'
+
+  - name: 'exclude an array of aliases'
+    nodes: 'all'
+    exclude_nodes_by_config:
+      my_alias6: 'exclude_this'
+      my_alias7: 'exclude_this'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'echo'
+      arguments: 'Hello World'
+
+  - name: 'exclude an array of aliases'
+    nodes: 'all'
+    exclude_nodes_by_config:
+      my_alias8:
+        - 'exclude_this'
+        - 'exclude_this_too'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'echo'
+      arguments: 'Hello World'
+
