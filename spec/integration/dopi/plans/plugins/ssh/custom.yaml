@@ -11,6 +11,13 @@ plan:
 
 steps:
 
+  - name: 'Remove the test files'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'rm'
+      arguments: '-rf /tmp/test1 /tmp/test2'
+
   - name: 'Test correct escaping of command'
     nodes: 'all'
     command:
