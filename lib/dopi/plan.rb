@@ -88,8 +88,14 @@ module Dopi
       list = []
       list += nodes_by_names(parsed_step.nodes)
       list += nodes_by_roles(parsed_step.roles)
+      parsed_step.nodes_by_config.each do |variable, pattern|
+        list += nodes_by_config(variable, pattern)
+      end
       list -= nodes_by_names(parsed_step.exclude_nodes)
       list -= nodes_by_roles(parsed_step.exclude_roles)
+      parsed_step.exclude_nodes_by_config.each do |variable, pattern|
+        list -= nodes_by_config(variable, pattern)
+      end
       list.uniq
     end
 
@@ -141,11 +147,27 @@ module Dopi
     def nodes_by_roles(roles)
       case roles
         when :all then nodes
-        when Array then nodes.select do |node|
+         when Array then nodes.select do |node|
           roles.any? do |role|
             case role
             when Regexp then node.role =~ role
             else node.role == role
+            end
+           end
+         end
+        else []
+      end
+    end
+
+    def nodes_by_config(variable, patterns)
+      case patterns
+        when Array then nodes.select do |node|
+          [node.config(variable)].flatten.any? do |config_value|
+            patterns.any? do |pattern|
+              case pattern
+              when Regexp then config_value =~ pattern
+              else config_value == pattern
+              end
             end
           end
         end

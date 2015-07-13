@@ -4,7 +4,8 @@ All notable changes to DOPi will be documented in this file.
 ## [Unreleased]
 ### Added
 - It is now possible to specify nodes and roles as Regex pattern instead of just names.
-- It is now possible to filter nodes with nodes_exclude and roles_exclude in a step.
+- It is now possible to filter nodes with exclude_nodes and exclude_roles in a step.
+- It is now possible to add or exclude nodes based on configuration values (hiera) with nodes_by_config and exclude_nodes_by_config.
 
 ### Changed
 - max_in_flight and ssh_root_pass are now global keys and no longer under 'plan'. The old location will still work, but DOPi will show a deprecation warning.

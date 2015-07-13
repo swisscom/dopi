@@ -16,7 +16,7 @@ nodes:
 configuration:
   hosts:
     'linux01.example.com':
-      my_alias3:  'realnode'
+      my_alias:  'realnode'
       my_alias2: 'include_this'
       my_alias3: 'dont_exclude_this'
       my_alias4: 'only_include_this'

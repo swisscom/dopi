@@ -20,8 +20,12 @@ module Dopi
 
     def_delegators :@node_parser, :name
 
+    def config(variable)
+      resolve_external(variable) || resolve_internal(variable)
+    end
+
     def role
-      @role ||= role_from_hiera || role_from_config || role_default
+      @role ||= config(Dopi.configuration.role_variable) || role_default
     end
 
     def ssh_root_pass
@@ -89,19 +93,19 @@ module Dopi
       end
     end
 
-    # This will try to resolve the role from the plan configuration hash.
+    # This will try to resolve the config variable from the plan configuration hash.
     # This is needed in case the plan is not yet added to the plan cache
     # (in case of validation) and hiera can't resolve it over the plugin,
-    # but we still need the information about the node role.
-    def role_from_config
+    # but we still need the information about the node config.
+    def resolve_internal(variable)
       begin
         hiera # make sure hiera is initialized
         answer = nil
         Hiera::Backend.datasources(scope) do |source|
-          Dopi.log.debug("Hiera: Looking for data source #{source}")
+          Dopi.log.debug("Hiera internal: Looking for data source #{source}")
           data = nil
           begin
-            data = @plan.configuration.lookup(source, Dopi.configuration.role_variable, scope)
+            data = @plan.configuration.lookup(source, variable, scope)
           rescue DopCommon::ConfigurationValueNotFound
             next
           else
@@ -111,13 +115,14 @@ module Dopi
       rescue StandardError => e
         Dopi.log.debug(e.message)
       end
+      Dopi.log.debug("Hiera internal: answer for variable #{variable} : #{answer}")
       return answer
     end
 
-    # this will try to resolve the role over hiera dirctly
-    def role_from_hiera
+    # this will try to resolve the variable over hiera directly
+    def resolve_external(variable)
       return nil unless Dopi.configuration.use_hiera
-      hiera.lookup(Dopi.configuration.role_variable, nil, scope)
+      hiera.lookup(variable, nil, scope)
     end
 
     def ssh_root_pass_from_hiera
