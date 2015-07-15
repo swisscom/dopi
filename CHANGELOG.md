@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [Unreleased]
+## [0.3.0] - 2015-07-15
 ### Added
 - It is now possible to specify nodes and roles as Regex pattern instead of just names.
 - It is now possible to filter nodes with exclude_nodes and exclude_roles in a step.
