@@ -60,8 +60,10 @@ Vagrant.configure(2) do |config|
 
 
   # windows test box
-  #config.vm.define 'windows' do |server|
-  #  server.vm.box = 'mwrock/Windows2012R2'
-  #end
+  config.vm.define 'windows01' do |server|
+    server.vm.hostname = 'windows01.example.com'
+    server.vm.box = 'opentable/win-2012r2-standard-amd64-nocm'
+    server.vm.communicator = "winrm"
+  end
 
 end
