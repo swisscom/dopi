@@ -22,6 +22,7 @@ module Dopi
     def_delegators :@plan_parser,
       :name,
       :configuration,
+      :credentials,
       :ssh_root_pass,
       :max_in_flight,
       :canary_host

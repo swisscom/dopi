@@ -11,6 +11,8 @@ module Dopi
 
     DEFAULT_MAX_IN_FLIGHT = 3
 
+    attr_accessor :plan
+
     def initialize(step_parser, plan, nodes = [])
       @step_parser = step_parser
       @plan        = plan
