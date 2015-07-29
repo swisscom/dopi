@@ -133,6 +133,7 @@ require 'dopi/command/ssh/file_contains'
 require 'dopi/command/ssh/file_exists'
 require 'dopi/command/ssh/file_replace'
 require 'dopi/command/mco/rpc'
+require 'dopi/command/winrm'
 require 'dopi/command/winrm/cmd'
 
 # TODO: load plugins from the plugin paths
