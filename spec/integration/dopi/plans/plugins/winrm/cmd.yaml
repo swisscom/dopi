@@ -1,0 +1,31 @@
+name:          'simple_test_for_winrm_cmd'
+max_in_flight: -1
+canary_host:   true
+
+infrastructures:
+  baremetal: {}
+
+nodes:
+  'windows01.example.com':
+    type: 'baremetal'
+
+credentials:
+  'windows_kerberos':
+    type: 'kerberos'
+    realm: 'EXAMPLE.COM'
+  'windows_login':
+    type: 'username_password'
+    username: 'Administrator'
+    password: 'vagrant'
+
+steps:
+  - name: 'execute a simple winrm command'
+    nodes: 'all'
+    command:
+      plugin: 'winrm/cmd'
+      credentials:
+        - 'windows_kerberos'
+        - 'windows_login'
+      exec: 'ipconfig'
+      arguments: '/all'
+
