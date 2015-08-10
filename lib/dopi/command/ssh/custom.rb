@@ -45,7 +45,7 @@ module Dopi
         end
 
         def env_string
-          node_env = env.reject{|variable,value| variable = 'SSHPASS'}
+          node_env = env.reject{|variable,value| variable == 'SSHPASS'}
           escape_string(node_env.collect{|k,v| "#{k}=#{v}"}.join(' '))
         end
 

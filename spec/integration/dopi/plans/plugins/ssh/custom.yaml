@@ -1,3 +1,7 @@
+name: 'ssh_customs_plugin_test'
+max_in_flight: 1
+ssh_root_pass: 'vagrant'
+
 infrastructures:
   baremetal: {}
 
@@ -5,9 +9,6 @@ nodes:
   'linux01.example.com':
     type: 'baremetal'
 
-plan:
-  max_in_flight: 1
-  ssh_root_pass: 'vagrant'
 
 steps:
 
