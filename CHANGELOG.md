@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [Unreleased]
+### Added
+- Possibility to set/change/delete/overwrite plugin defaults in steps 
+- New credentials infrastructure to manage login secrets for the plugins
+- Basic WinRM plugin to execute steps
+
 ## [0.3.1] - 2015-08-17
 ### Fixed
 - Fixed a bug in the ssh/customs plugin where the environment was not set correctly on the node
