@@ -1,0 +1,42 @@
+name: 'plugin_defaults_tests'
+max_in_flight: 1
+
+infrastructures:
+  baremetal: {}
+
+nodes:
+  'windows01.example.com':
+    type: 'baremetal'
+
+credentials:
+  'windows_kerberos':
+    type: 'kerberos'
+    realm: 'EXAMPLE.COM'
+  'windows_login':
+    type: 'username_password'
+    username: 'Administrator'
+    password: 'vagrant'
+
+steps:
+  - name: 'execute a simple winrm command'
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugin: '/winrm/'
+        credentials: 'windows_login'
+    command:
+      plugin: 'winrm/cmd'
+      exec: 'ipconfig'
+      arguments: '/all'
+
+  - name: 'execute a simple winrm command'
+    nodes: 'all'
+    delete_plugin_defaults: 'all'
+    set_plugin_defaults:
+      - plugin: 'winrm/cmd'
+        credentials:
+          - 'windows_login'
+    command:
+      plugin: 'winrm/cmd'
+      exec: 'ipconfig'
+      arguments: '/all'
+
