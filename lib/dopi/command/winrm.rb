@@ -40,7 +40,7 @@ module Dopi
           end
         end
         winrm_service or
-          raise CommandExecutionError, "Unable to login with any of the given credentials"
+          raise CommandExecutionError, "Unable to login with any of the given credentials: #{credentials.inspect}"
       end
 
       def endpoint
