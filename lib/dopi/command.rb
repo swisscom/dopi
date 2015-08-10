@@ -29,13 +29,48 @@ module Dopi
       PluginManager.create_instance(plugin_full_name, command_parser, step, node, is_verify_command)
     end
 
-    attr_reader :node, :is_verify_command
+    def self.set_plugin_defaults(node_name, hash)
+      @plugin_defaults ||= {}
+      @plugin_defaults[node_name] ||= {}
+      @plugin_defaults[node_name].merge!(hash)
+    end
+
+    def self.plugin_defaults(node_name)
+      @plugin_defaults ||= {}
+      @plugin_defaults[node_name] ||= {}
+    end
+
+    # delete all the defaults on this plugin for the node
+    def self.wipe_plugin_defaults(node_name)
+      @plugin_defaults ||= {}
+      @plugin_defaults[node_name] = {}
+    end
+
+    # delete a specific default for the node
+    def self.delete_plugin_default(node_name, key)
+      @plugin_defaults ||= {}
+      @plugin_defaults[node_name] ||= {}
+      @plugin_defaults[node_name].delete(key)
+    end
+
+
+    attr_reader :node, :hash, :is_verify_command
 
     def initialize(command_parser, step, node, is_verify_command)
       @command_parser    = command_parser
       @step              = step
       @node              = node
       @is_verify_command = is_verify_command
+      @hash              = merged_hash
+      log(:debug, "Plugin created with merged command hash: #{hash.inspect}")
+    end
+
+    def merged_hash
+      if @command_parser.hash.kind_of?(Hash)
+        self.class.plugin_defaults(@node.name).merge(@command_parser.hash)
+      else
+        self.class.plugin_defaults(@node.name)
+      end
     end
 
     def_delegator :@command_parser, :plugin, :name
@@ -91,7 +126,7 @@ module Dopi
   private
 
     def_delegator  :@command_parser, :verify_commands, :parsed_verify_commands
-    def_delegators :@command_parser, :hash, :plugin_timeout
+    def_delegators :@command_parser, :plugin_timeout
 
     def run
       raise Dopi::CommandExecutionError, "No run method implemented in plugin #{name}"

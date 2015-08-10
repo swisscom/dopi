@@ -36,6 +36,30 @@ module Dopi
         tr("-", "_").
         downcase
     end
+
+    # Expects a regular expression as a plugin filter
+    def self.plugin_list(filter = nil)
+      if filter
+        regexp = Regexp.new(filter)
+        @plugins.select{|p| p =~ regexp}
+      else
+        @plugins
+      end
+    end
+
+    # Expects a regular expression as a plugin filter
+    def self.plugin_name_list(filter = nil)
+      plugin_list(filter).keys
+    end
+
+    # Expects a regular expression as a plugin filter
+    def self.plugin_klass_list(filter = nil)
+      plugin_list(filter).values
+    end
+
+    def self.plugin_klass(plugin_name)
+      @plugins[plugin_name]
+    end
     
   end
 end

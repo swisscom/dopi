@@ -30,6 +30,58 @@ module Dopi
       end
       state_run
       Dopi.log.info("Starting to run step '#{name}'")
+      run_commands
+      Dopi.log.info("Step '#{name}' successfully finished.") if state_done?
+      Dopi.log.error("Step '#{name}' failed! Stopping execution.") if state_failed?
+    end
+
+    def delete_plugin_defaults
+      if @step_parser.delete_plugin_defaults == :all
+        # Wipe all the defaults
+        PluginManager.plugin_klass_list('^dopi/command/').each do |plugin_klass|
+          @nodes.each{|node| plugin_klass.wipe_plugin_defaults(node.name)}
+        end
+      else
+        @step_parser.delete_plugin_defaults.each do |entry|
+          plugin_list(entry[:plugins]).each do |plugin_klass|
+            if entry[:delete_keys] == :all
+              @nodes.each{|node| plugin_klass.wipe_plugin_defaults(node.name)}
+            else
+              entry[:delete_keys].each do |key|
+                @nodes.each{|node| plugin_klass.delete_plugin_default(node.name, key)}
+              end
+            end
+          end
+        end
+      end
+    end
+
+    def set_plugin_defaults
+      @step_parser.set_plugin_defaults.each do |entry|
+        defaults_hash = entry.dup
+        defaults_hash.delete(:plugins)
+        plugin_list(entry[:plugins]).each do |plugin_klass|
+          @nodes.each{|node| plugin_klass.set_plugin_defaults(node.name, defaults_hash)}
+        end
+      end
+    end
+
+    def plugin_list(plugin_filter_list)
+      if plugin_filter_list == :all
+        PluginManager.plugin_klass_list('^dopi/command/')
+      else
+        all_plugin_names = PluginManager.plugin_name_list('^dopi/command/').map{|p| p.sub('dopi/command/', '')}
+        selected_plugin_names = plugin_filter_list.map do |filter|
+          case filter
+          when Regexp then all_plugin_names.select{|p| p =~ filter}
+          else all_plugin_names.select{|p| p == filter}
+          end
+        end
+        selected_plugin_names.flatten.uniq.map{|p| PluginManager.plugin_klass('dopi/command/' + p)}
+      end
+    end
+
+    def run_commands
       commands_copy = commands.dup
       if canary_host
         pick = rand(commands_copy.length - 1)
@@ -42,8 +94,6 @@ module Dopi
           command.meta_run
         end
       end
-      Dopi.log.info("Step '#{name}' successfully finished.") if state_done?
-      Dopi.log.error("Step '#{name}' failed! Stopping execution.") if state_failed?
     end
 
     def max_in_flight
@@ -73,6 +123,8 @@ module Dopi
 
     def commands
       @commands ||= @nodes.map do |node|
+        delete_plugin_defaults
+        set_plugin_defaults
         Dopi::Command.create_plugin_instance(@step_parser.command, self, node)
       end
     end
