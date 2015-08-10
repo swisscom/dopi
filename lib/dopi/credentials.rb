@@ -13,6 +13,7 @@
 module Dopi
   module Credentials
     include DopCommon::Validator
+    include DopCommon::HashParser
 
   public
 
@@ -28,6 +29,7 @@ module Dopi
 
     def credentials_valid?
       return false unless hash.kind_of?(Hash) # plugin may not have parameters
+      key_aliases(hash, :credentials, ['credentials', :credential, 'credential'])
       return false if hash[:credentials].nil? # credentials is optional
       hash[:credentials].kind_of?(String) or hash[:credentials].kind_of?(Array) or
         raise CommandParsingError, "the value for 'credentials' has to be a string or an array of strings"
