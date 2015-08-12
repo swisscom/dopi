@@ -48,7 +48,7 @@ module Dopi
       end
 
       def port
-        port_valid? ? hash[:port] : '5985'
+        port_valid? ? hash[:port] : 5985
       end
 
       def ssl
@@ -60,7 +60,7 @@ module Dopi
       end
 
       def disable_sspi
-        disable_sspi_valid? ? hash[:disable_sspi_valid] : nil
+        disable_sspi_valid? ? hash[:disable_sspi] : nil
       end
 
       def basic_auth_only
@@ -81,28 +81,35 @@ module Dopi
       end
 
       def port_valid?
-        #TODO: implement proper validation
-        hash[:port]
+        return false if hash[:port].nil?
+        hash[:port].kind_of?(Fixnum) and (hash[:port] > 0) and (hash[:port] < 65536) or
+          raise CommandParsingError, "The value for 'port' has to be a number in the range of 1-65535"
       end
 
       def ssl_valid?
-        #TODO: implement proper validation
-        hash[:ssl_valid]
+        return false if hash[:ssl].nil?
+        hash[:ssl].kind_of?(TrueClass) or hash[:ssl].kind_of?(FalseClass) or
+          raise CommandParsingError, "The value for 'ssl_valid' has to be true or false"
       end
 
       def ca_trust_path_valid?
-        #TODO: implement proper validation
-        hash[:ca_trust_path]
+        return false if hash[:ca_trust_path].nil?
+        hash[:ca_trust_path].kind_of?(String) or
+          raise CommandParsingError, "The value for ca_trust_path has to be a string"
+        File.directory?(hash[:ca_trust_path]) or
+          raise CommandParsingError, "The directory in 'ca_trust_path' does not exist"
       end
 
       def disable_sspi_valid?
-        #TODO: implement proper validation
-        hash[:disable_sspi]
+        return false if hash[:disable_sspi].nil?
+        hash[:disable_sspi].kind_of?(TrueClass) or hash[:disable_sspi].kind_of?(FalseClass) or
+          raise CommandParsingError, "The value for 'disable_sspi' has to be true or false"
       end
 
       def basic_auth_only_valid?
-        #TODO: implement proper validation
-        hash[:basic_auth_only]
+        return false if hash[:basic_auth_only].nil?
+        hash[:basic_auth_only].kind_of?(TrueClass) or hash[:basic_auth_only].kind_of?(FalseClass) or
+          raise CommandParsingError, "The value for 'basic_auth_only' has to be true or false"
       end
 
     end
