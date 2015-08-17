@@ -126,12 +126,15 @@ module Dopi
     # this will try to resolve the variable over hiera directly
     def resolve_external(variable)
       return nil unless Dopi.configuration.use_hiera
-      hiera.lookup(variable, nil, scope)
+      begin hiera.lookup(variable, nil, scope)
+      rescue Psych::SyntaxError => e
+        Dopi.log.error("YAML parsing error in hiera data. Make sure you hiera yaml files are valid")
+        nil
+      end
     end
 
     def ssh_root_pass_from_hiera
-      return nil unless Dopi.configuration.use_hiera
-      hiera.lookup('ssh_root_pass', nil, scope)
+      resolve_external('ssh_root_pass')
     end
 
   end

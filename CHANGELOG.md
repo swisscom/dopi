@@ -5,6 +5,7 @@ All notable changes to DOPi will be documented in this file.
 ### Fixed
 - Fixed a bug in the ssh/customs plugin where the environment was not set correctly on the node
 - Fixed a bug where parallel execution of commands over ssh caused errors
+- Show correct errors if the parsing of a hiera yaml file fails
 
 ## [0.3.0] - 2015-07-15
 ### Added
