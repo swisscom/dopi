@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [0.3.1]
+## [0.3.1] - 2015-08-17
 ### Fixed
 - Fixed a bug in the ssh/customs plugin where the environment was not set correctly on the node
 - Fixed a bug where parallel execution of commands over ssh caused errors
