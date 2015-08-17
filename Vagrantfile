@@ -45,6 +45,19 @@ Vagrant.configure(2) do |config|
   config.vm.define 'linux01' do |node|
     node.vm.hostname = 'linux01.example.com'
   end
+  config.vm.define 'linux02' do |node|
+    node.vm.hostname = 'linux02.example.com'
+  end
+  config.vm.define 'linux03' do |node|
+    node.vm.hostname = 'linux03.example.com'
+  end
+  config.vm.define 'linux04' do |node|
+    node.vm.hostname = 'linux04.example.com'
+  end
+  config.vm.define 'linux05' do |node|
+    node.vm.hostname = 'linux05.example.com'
+  end
+
 
   # windows test box
   #config.vm.define 'windows' do |server|

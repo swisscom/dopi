@@ -16,6 +16,9 @@ module Dopi
     def initialize(node_parser, plan)
       @node_parser = node_parser
       @plan = plan
+      @@mutex ||= Mutex.new
+      @@hiera ||= nil
+      @@hiera_config ||= nil
     end
 
     def_delegators :@node_parser, :name
@@ -72,14 +75,15 @@ module Dopi
     end
 
     def hiera
-      @@hiera ||= nil
-      @@hiera_config ||= nil
-      # Create a new Hiera object if the config has changed
-      unless Dopi.configuration.hiera_yaml == @@hiera_config
-        @@hiera_config = Dopi.configuration.hiera_yaml
-        config = YAML.load_file(@@hiera_config)
-        config[:logger] = 'dopi'
-        @@hiera = Hiera.new(:config => config)
+      @@mutex.synchronize do
+        # Create a new Hiera object if the config has changed
+        unless Dopi.configuration.hiera_yaml == @@hiera_config
+          Dopi.log.debug("Hiera config location changed from #{@@hiera_config.to_s} to #{Dopi.configuration.hiera_yaml.to_s}")
+          @@hiera_config = Dopi.configuration.hiera_yaml
+          config = YAML.load_file(@@hiera_config)
+          config[:logger] = 'dopi'
+          @@hiera = Hiera.new(:config => config)
+        end
       end
       @@hiera
     end

@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.3.1]
+### Fixed
+- Fixed a bug in the ssh/customs plugin where the environment was not set correctly on the node
+- Fixed a bug where parallel execution of commands over ssh caused errors
+
 ## [0.3.0] - 2015-07-15
 ### Added
 - It is now possible to specify nodes and roles as Regex pattern instead of just names.
