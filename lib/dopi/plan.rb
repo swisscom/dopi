@@ -75,6 +75,11 @@ module Dopi
     end
 
     def steps
+      # Before all the new commands get parsed we have to make sure we
+      # Reset all the plugin defaults
+      PluginManager.plugin_klass_list('^dopi/command/').each do |plugin_klass|
+        plugin_klass.wipe_plugin_defaults
+      end
       @steps ||= parsed_steps.map do |parsed_step|
         ::Dopi::Step.new(parsed_step, self, create_node_list(parsed_step))
       end

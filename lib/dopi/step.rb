@@ -39,13 +39,13 @@ module Dopi
       if @step_parser.delete_plugin_defaults == :all
         # Wipe all the defaults
         PluginManager.plugin_klass_list('^dopi/command/').each do |plugin_klass|
-          @nodes.each{|node| plugin_klass.wipe_plugin_defaults(node.name)}
+          @nodes.each{|node| plugin_klass.delete_plugin_defaults(node.name)}
         end
       else
         @step_parser.delete_plugin_defaults.each do |entry|
           plugin_list(entry[:plugins]).each do |plugin_klass|
             if entry[:delete_keys] == :all
-              @nodes.each{|node| plugin_klass.wipe_plugin_defaults(node.name)}
+              @nodes.each{|node| plugin_klass.delete_plugin_defaults(node.name)}
             else
               entry[:delete_keys].each do |key|
                 @nodes.each{|node| plugin_klass.delete_plugin_default(node.name, key)}

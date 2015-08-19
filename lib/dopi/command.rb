@@ -40,8 +40,13 @@ module Dopi
       @plugin_defaults[node_name] ||= {}
     end
 
+    # wipe all the defaults for this plugin
+    def self.wipe_plugin_defaults
+      @plugin_defaults = {}
+    end
+
     # delete all the defaults on this plugin for the node
-    def self.wipe_plugin_defaults(node_name)
+    def self.delete_plugin_defaults(node_name)
       @plugin_defaults ||= {}
       @plugin_defaults[node_name] = {}
     end
