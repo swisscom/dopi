@@ -5,38 +5,80 @@ infrastructures:
   baremetal: {}
 
 nodes:
-  'windows01.example.com':
+  'linux01.example.com':
     type: 'baremetal'
 
-credentials:
-  'windows_kerberos':
-    type: 'kerberos'
-    realm: 'EXAMPLE.COM'
-  'windows_login':
-    type: 'username_password'
-    username: 'Administrator'
-    password: 'vagrant'
-
 steps:
-  - name: 'execute a simple winrm command'
+  - name: 'Check if the default settings work'
     nodes: 'all'
     set_plugin_defaults:
-      - plugin: '/winrm/'
-        credentials: 'windows_login'
+      - plugin: 'custom'
+        :env:
+          FOO: 'foo'
     command:
-      plugin: 'winrm/cmd'
-      exec: 'ipconfig'
-      arguments: '/all'
+      plugin: 'custom'
+      exec: 'test'
+      arguments: '${FOO} = foo'
 
-  - name: 'execute a simple winrm command'
+  - name: 'Check if the default settings are persistant'
+    nodes: 'all'
+    command:
+      plugin: 'custom'
+      exec: 'test'
+      arguments: '${FOO} = foo'
+
+  - name: 'Check if the deletion of all settings works'
     nodes: 'all'
     delete_plugin_defaults: 'all'
-    set_plugin_defaults:
-      - plugin: 'winrm/cmd'
-        credentials:
-          - 'windows_login'
     command:
-      plugin: 'winrm/cmd'
-      exec: 'ipconfig'
-      arguments: '/all'
+      plugin: 'custom'
+      exec: 'test'
+      arguments: '${FOO} = foo'
+      expect_exit_codes: 2
+
+  - name: 'Check if setting it with a Regexp who does not match still not sets it for this plugin'
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugin: '/notthisplugin/'
+        :env:
+          FOO: 'foo'
+    command:
+      plugin: 'custom'
+      exec: 'test'
+      arguments: '${FOO} = foo'
+      expect_exit_codes: 2
+
+  - name: 'Check if setting it with a Regexp works'
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugin: '/cust/'
+        :env:
+          FOO: 'foo'
+    command:
+      plugin: 'custom'
+      exec: 'test'
+      arguments: '${FOO} = foo'
+
+  - name: 'Check if deletion of other settings does not remove our settings'
+    nodes: 'all'
+    delete_plugin_defaults:
+      - plugins: '/ssh/'
+        delete_keys:
+          - :env
+    command:
+      plugin: 'custom'
+      exec: 'test'
+      arguments: '${FOO} = foo'
+
+  - name: 'Check if deletion of specific keys works'
+    nodes: 'all'
+    delete_plugin_defaults:
+      - plugins: 'custom'
+        delete_keys:
+          - :env
+    command:
+      plugin: 'custom'
+      exec: 'test'
+      arguments: '${FOO} = foo'
+      expect_exit_codes: 2
 
