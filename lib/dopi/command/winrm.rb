@@ -2,6 +2,7 @@
 # DOPi Plugin: WinRM Command
 #
 require 'winrm'
+require 'gssapi'
 
 module Dopi
   class Command
@@ -36,11 +37,15 @@ module Dopi
             wr.cmd('ipconfig') # test connection (TODO: maybe there is a better way)
           rescue WinRM::WinRMAuthorizationError, GSSAPI::GssApiError => e
             log(:warn, "Unable to login with credential #{credential.name} : #{e.message}")
+          rescue SocketError => e
+            raise CommandExecutionError,
+              "A problem occurred while trying to connect to node #{@node.name} : #{e.message}"
           else winrm_service = wr
           end
         end
         winrm_service or
-          raise CommandExecutionError, "Unable to login with any of the given credentials: #{credentials.inspect}"
+          raise CommandExecutionError,
+            "Unable to login with any of the given credentials: #{credentials.keys.join(', ')}"
       end
 
       def endpoint
