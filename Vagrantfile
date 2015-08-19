@@ -64,6 +64,7 @@ Vagrant.configure(2) do |config|
     server.vm.hostname = 'windows01.example.com'
     server.vm.box = 'opentable/win-2012r2-standard-amd64-nocm'
     server.vm.communicator = "winrm"
+    server.hostmanager.manage_host = true
   end
 
 end
