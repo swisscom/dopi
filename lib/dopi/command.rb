@@ -71,6 +71,8 @@ module Dopi
       @is_verify_command = is_verify_command
       @hash              = merged_hash
       log(:debug, "Plugin created with merged command hash: #{hash.inspect}")
+      # make sure verify commands are initialized as well
+      verify_commands
     end
 
     def merged_hash
