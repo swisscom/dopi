@@ -56,7 +56,15 @@ module Dopi
           [:username_password, :ssh_key]
         end
 
+        def reset_ssh_command_string
+          @ssh_command_string = nil
+        end
+
         def ssh_command_string
+          @ssh_command_string ||= working_ssh_command_string
+        end
+
+        def working_ssh_command_string
           # TODO: Replace this with the normal credentials hash once we can retire the ssh_root_pass method
           credentials_with_deprications.each do |credential|
             if credential.type == :username_password && !sshpass_bin
@@ -64,7 +72,7 @@ module Dopi
               next
             end
             # check connection and return command string if it is working
-            c = create_command(credential)
+            c = create_ssh_command_string(credential)
             return c if run_command(c[:env], c[:command] + ' exit')
             log(:warn, "Unable to login with credential #{credential.name}")
           end
@@ -73,7 +81,7 @@ module Dopi
             "Can't establish connection with node #{@node.name} with any of the given credentials #{cred_names}"
         end
 
-        def create_command(credential)
+        def create_ssh_command_string(credential)
           test_command_string = case credential.type
           when :username_password then
             {
@@ -104,6 +112,11 @@ module Dopi
 
         def command_string
           ssh_command_string[:command] + " \"#{env_string} #{escape_string(super)}\""
+        end
+
+        def run
+          reset_ssh_command_string
+          super
         end
 
         def quiet
