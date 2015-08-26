@@ -13,6 +13,9 @@ module Dopi
   class CommandExecutionError < StandardError
   end
 
+  class CommandConnectionError < StandardError
+  end
+
   class Command
     extend Forwardable
     include Dopi::State

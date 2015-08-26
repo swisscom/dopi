@@ -38,7 +38,7 @@ module Dopi
           rescue WinRM::WinRMAuthorizationError, GSSAPI::GssApiError => e
             log(:warn, "Unable to login with credential #{credential.name} : #{e.message}")
           rescue SocketError => e
-            raise CommandExecutionError,
+            raise CommandConnectionError,
               "A problem occurred while trying to connect to node #{@node.name} : #{e.message}"
           else winrm_service = wr
           end

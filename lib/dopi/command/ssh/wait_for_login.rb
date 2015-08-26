@@ -19,7 +19,10 @@ module Dopi
         end
 
         def run
-          until check_exit_code(run_command[2])
+          until connected
+            begin connected = check_exit_code(run_command[2])
+            rescue CommandConnectionError
+            end
             sleep interval
           end
           true

@@ -30,8 +30,10 @@ module Dopi
         result << check_output(cmd_stderr)
         # Exit Code Parser
         result << check_exit_code(cmd_exit_code)
-
         result.all?
+      rescue CommandConnectionError => e
+        log(:error, e.message)
+        false
       end
 
       def exec
@@ -102,7 +104,7 @@ module Dopi
 
       # The command method executes the command of the step.
       # Returns an array with stdio, sterror and exit code.
-      def run_command
+      def run_command(env = env, command_string = command_string)
         cmd_stdout = ''
         cmd_stderr = ''
         log(:debug, "Executing #{command_string} for command #{name}")
