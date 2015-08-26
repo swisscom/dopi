@@ -51,20 +51,16 @@ Vagrant.configure(2) do |config|
   config.vm.define 'linux03' do |node|
     node.vm.hostname = 'linux03.example.com'
   end
-  config.vm.define 'linux04' do |node|
-    node.vm.hostname = 'linux04.example.com'
-  end
-  config.vm.define 'linux05' do |node|
-    node.vm.hostname = 'linux05.example.com'
-  end
-
 
   # windows test box
-  config.vm.define 'windows01' do |server|
-    server.vm.hostname = 'windows01.example.com'
-    server.vm.box = 'opentable/win-2012r2-standard-amd64-nocm'
-    server.vm.communicator = "winrm"
-    server.hostmanager.manage_host = true
+  config.vm.define 'windows01' do |node|
+    node.vm.hostname = 'windows01.example.com'
+    node.vm.box = 'opentable/win-2012r2-standard-amd64-nocm'
+    node.vm.communicator = "winrm"
+    node.hostmanager.manage_host = true
+    node.vm.provider :libvirt do |domain|
+      domain.nic_model_type = 'e1000'
+    end
   end
 
 end
