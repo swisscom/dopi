@@ -1,5 +1,6 @@
-name: 'ssh_customs_plugin_test'
+name: 'ssh_customs_plugin_test_depricated'
 max_in_flight: 1
+ssh_root_pass: 'vagrant'
 
 infrastructures:
   baremetal: {}
@@ -8,19 +9,11 @@ nodes:
   'linux01.example.com':
     type: 'baremetal'
 
-credentials:
-  'vagrant_login':
-    type: 'username_password'
-    username: 'root'
-    password: 'vagrant'
 
 steps:
 
   - name: 'Remove the test files'
     nodes: 'all'
-    set_plugin_defaults:
-      - plugins: '/^ssh/'
-        credential: 'vagrant_login'
     command:
       plugin: 'ssh/custom'
       exec: 'rm'
@@ -38,7 +31,7 @@ steps:
   - name: 'Test correct escaping of command 2'
     nodes: 'all'
     command:
-      plugin: 'ssh/custom'
+      plugin: ssh/custom
       exec: 'echo'
       arguments: '\"${MYVAR}\" > /tmp/test2'
       env:
