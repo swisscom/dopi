@@ -31,9 +31,6 @@ module Dopi
         # Exit Code Parser
         result << check_exit_code(cmd_exit_code)
         result.all?
-      rescue CommandConnectionError => e
-        log(:error, e.message)
-        false
       end
 
       def exec

@@ -112,6 +112,10 @@ module Dopi
       rescue Timeout::Error
         state_fail
         log(:error, "Command timed out (plugin_timeout is set to #{plugin_timeout})")
+      rescue CommandConnectionError => e
+        state_fail
+        Dopi.log.error(log_prefix + e.message)
+        raise CommandExecutionError, "Plugin connection error"
       rescue => e
         state_fail
         log(:error, "Command failed")
@@ -151,6 +155,10 @@ module Dopi
       end
     end
 
+    def log_prefix
+      "  Step '#{@step.name}', Node '#{@node.name}', Plugin '#{name}' : "
+    end
+
     def log(severity, message)
       # Ignore verify command errors, because they are expected
       if @is_verify_command
@@ -158,8 +166,7 @@ module Dopi
       end
       # TODO: implement Node specific logging
       # for now we simply forward to the global DOPi logger
-      enriched_message = "  Step '#{@step.name}', Node '#{@node.name}', Plugin '#{name}' : " + message
-      Dopi.log.log(Logger.const_get(severity.upcase), enriched_message)
+      Dopi.log.log(Logger.const_get(severity.upcase), log_prefix + message)
     end
 
   end
