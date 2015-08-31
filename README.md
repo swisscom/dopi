@@ -179,6 +179,8 @@ This are the plugins generally used in steps as commands
 
 [mco/rpc](doc/plugins/mco/rpc.md)
 
+[winrm/cmd](doc/plugins/winrm/cmd.md)
+
 ### Verification Plugins
 
 This are some helper plugins that check stuff on the nodes. They are
