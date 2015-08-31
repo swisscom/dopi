@@ -1,11 +1,15 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [Unreleased]
+## [0.4.0] - 2015-08-31
 ### Added
-- Possibility to set/change/delete/overwrite plugin defaults in steps 
-- New credentials infrastructure to manage login secrets for the plugins
-- Basic WinRM plugin to execute steps
+- Possibility to set/change/delete/overwrite plugin defaults in steps
+- New credentials hash to manage login secrets for the plugins
+- Basic WinRM plugin to execute commands
+
+### Changed
+- SSH plugin now supports the credentals hash for login
+- ssh_root_pass will still work, but will display a deprecation warning
 
 ## [0.3.1] - 2015-08-17
 ### Fixed
