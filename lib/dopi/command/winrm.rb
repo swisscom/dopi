@@ -49,7 +49,7 @@ module Dopi
       end
 
       def endpoint
-        "http://#{@node.name}:#{port}/wsman"
+        "http://#{@node.address(port)}:#{port}/wsman"
       end
 
       def port

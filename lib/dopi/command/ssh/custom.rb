@@ -85,7 +85,7 @@ module Dopi
           test_command_string = case credential.type
           when :username_password then
             {
-              :command => "#{sshpass_cmd}ssh #{global_options.join(' ')} #{credential.username}@#{@node.name}",
+              :command => "#{sshpass_cmd}ssh #{global_options.join(' ')} #{credential.username}@#{@node.address(22)}",
               :env     => {'SSHPASS' => credential.password}
             }
           when :ssh_key then
@@ -93,7 +93,7 @@ module Dopi
             options << ' -o ChallengeResponseAuthentication=no'
             options << ' -o PasswordAuthentication=no'
             options << " -i #{credential.public_key}"
-            { :command => "ssh #{options.join(' ')} #{credential.username}@#{@node.name}", :env => {}}
+            { :command => "ssh #{options.join(' ')} #{credential.username}@#{@node.address(22)}", :env => {}}
           end
         end
 

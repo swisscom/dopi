@@ -35,6 +35,7 @@ module Dopi
     attr_accessor :trace, :config_file, :plan_cache_dir
     attr_accessor :use_hiera, :hiera_yaml, :load_facts, :facts_dir
     attr_accessor :role_variable, :role_default
+    attr_accessor :connection_check_timeout
     attr_accessor :ssh_user, :ssh_key,
                   :ssh_pass_auth, :ssh_check_host_key
     attr_accessor :mco_config, :mco_dopi_logger
@@ -50,6 +51,9 @@ module Dopi
       @hiera_yaml = '/etc/puppet/hiera.yaml'
       @load_facts = false
       @facts_dir  = '/var/lib/puppet/yaml/facts/'
+
+      # Connection
+      @connection_check_timeout = 5
 
       # Role defaults
       @role_variable = 'role'

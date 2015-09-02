@@ -5,6 +5,8 @@ require 'forwardable'
 require 'puppet'
 require 'hiera'
 require 'yaml'
+require 'socket'
+require 'timeout'
 
 module Dopi
   class NoRoleFoundError < StandardError
@@ -20,6 +22,7 @@ module Dopi
     def initialize(node_parser, plan)
       @node_parser = node_parser
       @plan = plan
+      @addresses = {}
     end
 
     def_delegators :@node_parser, :name
@@ -36,7 +39,28 @@ module Dopi
       @sshpass ||= ssh_root_pass_from_hiera || @plan.ssh_root_pass
     end
 
+    def address(port)
+      addresses = [ name, ip_addresses ].flatten
+      @addresses[port] ||= addresses.find {|addr| connection_possible?(addr,port)} or
+        raise StandardError, "Unable to establish a connection for node #{name} on port #{port} over #{addresses.join(', ')}"
+    end
+
   private
+
+    def ip_addresses
+      @node_parser.interfaces.map{|i| i.ip == :dhcp ? nil : i.ip}.compact
+    end
+
+    def connection_possible?(address, port)
+      Timeout::timeout(Dopi.configuration.connection_check_timeout) do
+        TCPSocket.new(address, port).close
+      end
+      Dopi.log.debug("Connection test with #{address}:#{port} for node #{name} ok")
+      true
+    rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Timeout::Error, SocketError
+      Dopi.log.debug("Connection test with #{address}:#{port} for node #{name} failed")
+      false
+    end
 
     def hostname
       @hostname ||= name.split('.', 2)[0]

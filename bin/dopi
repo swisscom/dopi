@@ -91,6 +91,11 @@ module Wrapper
   default_value Dopi.configuration.mco_dopi_logger
   switch [:mco_dopi_logger]
 
+  desc 'Time until a connection check is marked as failure'
+  default_value Dopi.configuration.connection_check_timeout
+  arg_name 'SECONDS'
+  flag [:connection_check_timeout]
+
   pre do |global,command,options,args|
     Dopi.configure do |config|
       config.trace =              global[:trace]
@@ -107,6 +112,7 @@ module Wrapper
       config.ssh_check_host_key = global[:ssh_check_host_key]
       config.mco_config         = global[:mco_config]
       config.mco_dopi_logger    = global[:mco_dopi_logger]
+      config.connection_check_timeout = global[:connection_check_timeout]
     end
     ENV['GLI_DEBUG'] = 'true' if global[:trace] == true
     Dopi.logger = Logger.new(STDERR)
