@@ -47,10 +47,6 @@ module Dopi
       @mutex.synchronize { @abort = true }
     end
 
-    def reset
-      state_reset_with_children
-    end
-
     # The main validation work is done in the dop_common
     # parser. We just add the command plugin parsers
     def valid?

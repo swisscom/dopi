@@ -33,10 +33,6 @@ describe Dopi::Plan do
     end
   end
 
-  describe '#reset' do
-    pending
-  end
-
   describe '#run' do
     it 'successfuly run some simple steps' do
       expect(@plan.state_ready?).to be true

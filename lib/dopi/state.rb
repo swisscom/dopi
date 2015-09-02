@@ -47,10 +47,10 @@ module Dopi
       end
     end
 
-    def state_reset_with_children
-      state_reset if state_failed?
-      if state_children_failed?
-        state_children.each {|child| child.state_reset_with_children }
+    def state_reset_with_children(force = false)
+      state_reset(force) if state_failed? or force
+      if state_children_failed? or force
+        state_children.each {|child| child.state_reset_with_children(force) }
       end
     end
 
@@ -92,9 +92,13 @@ module Dopi
       state_changed
     end
 
-    def state_reset
-      raise Dopi::StateTransitionError, "Can't switch to ready from #{state.to_s}" unless state == :failed || state == :ready
-      state_children.each {|child| child.state_reset unless child.state_done?}
+    def state_reset(force = false)
+      if force
+        state_children.each {|child| child.state_reset(force)}
+      else
+        raise Dopi::StateTransitionError, "Can't switch to ready from #{state.to_s}" unless state == :failed || state == :ready
+        state_children.each {|child| child.state_reset unless child.state_done?}
+      end
       @state = :ready
       state_changed
     end
