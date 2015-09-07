@@ -61,7 +61,6 @@ module Dopi
       @plugin_defaults[node_name].delete(key)
     end
 
-
     attr_reader :node, :hash, :is_verify_command
 
     def initialize(command_parser, step, node, is_verify_command)
@@ -86,42 +85,25 @@ module Dopi
     def_delegator :@command_parser, :plugin, :name
 
     def meta_run
-      if state_done?
-        log(:info, "Command '#{name}' is in state 'done'. Skipping")
-        return
-      end
+      return if skip_run?
       state_run
-      verify_commands.each do |verify_command|
-        verify_command.state_reset(true)
-      end
-      begin
-        Timeout::timeout(plugin_timeout) do
-          if state_running? && verify_commands.any?
-            state_finish if verify_commands.all? do |command| 
-              command.meta_run
-              command.state_done?
-            end
-          end
-          if state_running?
-            log(:info, "Running command")
-            run ? state_finish : state_fail
-            log(:info, "Done") if state_done?
-          else
-            log(:info, "Nothing to do for command")
-          end
+      Timeout::timeout(plugin_timeout) do
+        log(:info, "Running command #{name}") unless @is_verify_command
+        if run
+          state_finish
+          log(:info, "#{name} [OK]") if state_done?
+        else
+          state_fail
+          log(:info, "#{name} [FAILED]")
         end
-      rescue Timeout::Error
-        state_fail
-        log(:error, "Command timed out (plugin_timeout is set to #{plugin_timeout})")
-      rescue CommandConnectionError => e
-        state_fail
-        Dopi.log.error(log_prefix + e.message)
-        raise CommandExecutionError, "Plugin connection error"
-      rescue => e
-        state_fail
-        log(:error, "Command failed")
-        raise e
       end
+    rescue Timeout::Error
+      state_fail
+      log(:error, "Command timed out (plugin_timeout is set to #{plugin_timeout})")
+    rescue => e
+      state_fail
+      log(:error, "Command failed: #{e.message}", false)
+      raise e
     end
 
     def meta_valid?
@@ -150,20 +132,46 @@ module Dopi
       true
     end
 
+    def skip_run?
+      if state_done?
+        log(:info, "Is already in state 'done'. Skipping")
+        true
+      elsif verify_commands.any? && verify_commands_ok?
+        log(:info, "All verify commands ok. Skipping and marked as 'done'")
+        state_run
+        state_finish
+        true
+      else
+        false
+      end
+    end
+
     def verify_commands
       @verify_commands ||= parsed_verify_commands.map do |command|
         Dopi::Command.create_plugin_instance(command, @step, @node, true)
       end
     end
 
-    def log_prefix
-      "  Step '#{@step.name}', Node '#{@node.name}', Plugin '#{name}' : "
+    def verify_commands_ok?
+      verify_commands.all? do |command|
+        command.state_reset(true)
+        command.meta_run
+        command.state_done?
+      end
     end
 
-    def log(severity, message)
-      # Ignore verify command errors, because they are expected
+    def log_prefix
       if @is_verify_command
-        severity = :debug
+        "  [Verify] #{@node.name} : "
+      else
+        "  [Command] #{@node.name} : "
+      end
+    end
+
+    def log(severity, message, overwrite = true)
+      # Ignore verify command errors, because they are expected
+      if @is_verify_command && overwrite
+        severity = :debug if severity == :error || severity == :warn
       end
       # TODO: implement Node specific logging
       # for now we simply forward to the global DOPi logger
