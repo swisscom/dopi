@@ -13,12 +13,13 @@ module Dopi
   class Node
     extend Forwardable
 
+    @@mutex = Mutex.new
+    @@hiera = nil
+    @@hiera_config = nil
+    
     def initialize(node_parser, plan)
       @node_parser = node_parser
       @plan = plan
-      @@mutex ||= Mutex.new
-      @@hiera ||= nil
-      @@hiera_config ||= nil
     end
 
     def_delegators :@node_parser, :name
