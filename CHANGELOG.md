@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.4.1] - 2015-09-07
+### Fixed
+- Fixed a bug with the winrm/cmd output stream
+- Fixed a bug where dopi crashed because of an uninitialized class variable
+
 ## [0.4.0] - 2015-08-31
 ### Added
 - Possibility to set/change/delete/overwrite plugin defaults in steps
