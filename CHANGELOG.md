@@ -4,6 +4,7 @@ All notable changes to DOPi will be documented in this file.
 ### [Unreleased]
 ### Added
 - Dopi will now test the connection and if not successful automatically try to connect with the configured IPs of the node
+- New winrm/wait_for_login command plugin
 
 ### Changed
 - Plan names can now use dashes
