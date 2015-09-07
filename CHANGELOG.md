@@ -5,9 +5,11 @@ All notable changes to DOPi will be documented in this file.
 ### Added
 - Dopi will now test the connection and if not successful automatically try to connect with the configured IPs of the node
 - New winrm/wait_for_login command plugin
+- The reset command in the executable now supports the '--force' switch to reset from any state
 
 ### Changed
 - Plan names can now use dashes
+- Verify commands are now always executed, even if they where successful in the past
 
 ## [0.4.2] - 2015-09-09
 ### Fixed
