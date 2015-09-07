@@ -180,6 +180,7 @@ This are the plugins generally used in steps as commands
 [mco/rpc](doc/plugins/mco/rpc.md)
 
 [winrm/cmd](doc/plugins/winrm/cmd.md)
+[winrm/wait_for_login](doc/plugins/winrm/wait_for_login)
 
 ### Verification Plugins
 
