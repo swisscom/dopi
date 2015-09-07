@@ -32,6 +32,7 @@ module Dopi
 
         def run_command
           cmd_stdout = ""
+          cmd_stderr = ""
           result = winrm.cmd(exec) do |stdout, stderr|
             unless stdout.nil? or stdout.empty?
               cmd_stdout << stdout
