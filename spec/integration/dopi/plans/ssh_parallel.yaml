@@ -1,0 +1,39 @@
+name:          'test_ssh_in_parallel'
+max_in_flight: -1
+
+infrastructures:
+  baremetal: {}
+
+credentials:
+  'ssh_vagrant_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'vagrant'
+
+nodes:
+  'linux01.example.com':
+    type: 'baremetal'
+  'linux02.example.com':
+    type: 'baremetal'
+  'linux03.example.com':
+    type: 'baremetal'
+    interfaces:
+      'eth0':
+        ip: '192.168.121.41'
+
+steps:
+
+  - name: 'Wait until you are able to connect'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/wait_for_login'
+      credentials: 'ssh_vagrant_login'
+
+  - name: 'Execute a command on multiple nodes'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/custom'
+      credentials: 'ssh_vagrant_login'
+      exec: 'sleep'
+      arguments: '5'
+
