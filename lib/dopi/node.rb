@@ -12,6 +12,9 @@ module Dopi
   class NoRoleFoundError < StandardError
   end
 
+  class NodeConnectionError < StandardError
+  end
+
   class Node
     extend Forwardable
 
@@ -42,7 +45,7 @@ module Dopi
     def address(port)
       addresses = [ name, ip_addresses ].flatten
       @addresses[port] ||= addresses.find {|addr| connection_possible?(addr,port)} or
-        raise StandardError, "Unable to establish a connection for node #{name} on port #{port} over #{addresses.join(', ')}"
+        raise NodeConnectionError, "Unable to establish a connection for node #{name} on port #{port} over #{addresses.join(', ')}"
     end
 
   private

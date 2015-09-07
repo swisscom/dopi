@@ -22,7 +22,7 @@ module Dopi
           connected = false
           until connected
             begin connected = check_exit_code(run_command[2])
-            rescue CommandConnectionError
+            rescue Dopi::NodeConnectionError, Dopi::CommandConnectionError
             end
             sleep interval unless connected
           end
