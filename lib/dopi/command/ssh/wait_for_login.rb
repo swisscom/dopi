@@ -11,7 +11,7 @@ module Dopi
         DEFAULT_INTERVAL = 10
 
         def ssh_command_string
-          super + " -o ConnectTimeout=#{connection_timeout} -q "
+          super.merge({:command => super[:command] + " -o ConnectTimeout=#{connection_timeout} -q "})
         end
 
         def exec
@@ -19,11 +19,12 @@ module Dopi
         end
 
         def run
+          connected = false
           until connected
             begin connected = check_exit_code(run_command[2])
             rescue CommandConnectionError
             end
-            sleep interval
+            sleep interval unless connected
           end
           true
         end
