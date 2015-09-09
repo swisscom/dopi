@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.4.2] - 2015-09-09
+### Fixed
+- Prevent the ssh/wait_for_login from crashing
+
 ## [0.4.1] - 2015-09-07
 ### Fixed
 - Fixed a bug with the winrm/cmd output stream
