@@ -51,7 +51,7 @@ module Dopi
   private
 
     def ip_addresses
-      @node_parser.interfaces.map{|i| i.ip == :dhcp ? nil : i.ip}.compact
+      @node_parser.interfaces.map{|i| [:dhcp, :none].include? i.ip ? nil : i.ip}.compact
     end
 
     def connection_possible?(address, port)
