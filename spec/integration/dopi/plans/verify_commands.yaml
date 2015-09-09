@@ -1,0 +1,48 @@
+name: 'verify_command_tests'
+max_in_flight: 1
+
+infrastructures:
+  baremetal: {}
+
+nodes:
+  'linux01.example.com':
+    type: 'baremetal'
+
+credentials:
+  'vagrant_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'vagrant'
+
+steps:
+
+  - name: 'Remove the test file'
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugins: '/^ssh/'
+        credential: 'vagrant_login'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'rm'
+      arguments: '-rf /tmp/verify_command_test'
+
+  - name: 'write the test file'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/tmp/verify_command_test'
+      plugin: 'ssh/custom'
+      exec: 'echo'
+      arguments: '"Verify command test" > /tmp/verify_command_test'
+
+  - name: 'Fail if contents of the file is wrong'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_contains'
+          file: '/tmp/verify_command_test'
+          pattern: '^Verify command test$'
+      plugin: 'ssh/custom'
+      exec: 'fail'
+
