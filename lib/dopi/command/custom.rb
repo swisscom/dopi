@@ -14,11 +14,11 @@ module Dopi
       def validate
         log_validation_method('env_valid?', CommandParsingError)
         log_validation_method('arguments_valid?', CommandParsingError)
-        log_validation_method('expect_exit_codes_valid?', CommandParsingError)
         # Skip validation in subclasses that overwrite the non optional methods
         unless Dopi::Command::Custom > self.class && self.method(:exec).owner == self.class
           log_validation_method('exec_valid?', CommandParsingError)
         end
+        validate_exit_code_parser
         validate_output_parser
       end
 

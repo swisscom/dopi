@@ -17,7 +17,7 @@ module Dopi
           unless Dopi::Command::Winrm::Cmd > self.class && self.method(:exec).owner == self.class
             log_validation_method('exec_valid?', CommandParsingError)
           end
-          log_validation_method('expect_exit_codes_valid?', CommandParsingError)
+          validate_exit_code_parser
           validate_output_parser
         end
 

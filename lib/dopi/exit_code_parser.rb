@@ -9,6 +9,10 @@ module Dopi
 
   public
 
+    def validate_exit_code_parser
+      log_validation_method('expect_exit_codes_valid?', CommandParsingError)
+    end
+
     def expect_exit_codes
       @expect_exit_codes ||= expect_exit_codes_valid? ?
         hash[:expect_exit_codes] : expect_exit_codes_defaults
