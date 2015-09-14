@@ -189,6 +189,7 @@ require 'dopi/command/ssh/file_replace'
 require 'dopi/command/mco/rpc'
 require 'dopi/command/winrm'
 require 'dopi/command/winrm/cmd'
+require 'dopi/command/winrm/powershell'
 require 'dopi/command/winrm/wait_for_login'
 
 # TODO: load plugins from the plugin paths

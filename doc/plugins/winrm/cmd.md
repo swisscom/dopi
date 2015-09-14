@@ -144,7 +144,7 @@ patterns.
         password: 'vagrant'
 
     steps:
-      - name: 'execute a simple winrm command'
+      - name: 'execute a simple cmd command'
         nodes: 'all'
         command:
           plugin: 'winrm/cmd'

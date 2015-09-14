@@ -29,3 +29,10 @@ steps:
       exec: 'ipconfig'
       arguments: '/all'
 
+  - name: 'test powershell code'
+    nodes: 'all'
+    command:
+      plugin: 'winrm/powershell'
+      credentials: 'windows_login'
+      exec: 'Get-NetAdapter'
+

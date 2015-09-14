@@ -7,6 +7,7 @@ All notable changes to DOPi will be documented in this file.
 - New winrm/wait_for_login command plugin
 - The reset command in the executable now supports the '--force' switch to reset from any state
 - Verify commands can now be rerun after the command execution with the 'verify_after_run' flag in a plugin.
+- New plugin to execute powershell commands on windows over winrm 'winrm/powershell'.
 
 ### Changed
 - Plan names can now use dashes
