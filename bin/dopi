@@ -64,17 +64,17 @@ module Wrapper
   arg_name 'ROLE'
   flag [:role_default]
 
-  desc 'Set the default ssh user'
+  desc 'Set the default ssh user (DEPRECATED: Use the credentials hash method)'
   default_value Dopi.configuration.ssh_user
   arg_name 'USERNAME'
   flag [:ssh_user]
 
-  desc 'Set the default ssh key'
+  desc 'Set the default ssh key (DEPRECATED: Use the credentials hash method)'
   default_value Dopi.configuration.ssh_key
   arg_name 'SSHKEY'
   flag [:ssh_key]
 
-  desc 'Allow ssh logins with password (this is disabled by default. This will need the sshpass tool to be installed)'
+  desc 'Allow ssh logins with password (DEPRECATED: Use the credentials hash method)'
   default_value Dopi.configuration.ssh_pass_auth
   switch [:ssh_pass_auth]
 
