@@ -75,7 +75,7 @@ The login via password will need the program sshpass to be installed on the
 machine DOPi is running on. DOPi will display a warning if you specify a
 username password credential but sshpass is not installed.
 
-## ssh_root_pass auth (DEPRICATED >=0.4)
+## ssh_root_pass auth (DEPRECATED >=0.4)
 
 DOPi will connect to the node via ssh and execute the specified command.
 It will use the configured ssh key **(ssh_key)** with the configured user

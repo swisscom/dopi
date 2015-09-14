@@ -1,4 +1,4 @@
-name: 'ssh_customs_plugin_test_depricated'
+name: 'ssh_customs_plugin_test_deprecated'
 max_in_flight: 1
 ssh_root_pass: 'vagrant'
 
