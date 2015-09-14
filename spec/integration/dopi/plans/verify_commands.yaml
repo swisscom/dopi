@@ -32,6 +32,7 @@ steps:
       verify_commands:
         - plugin: 'ssh/file_exists'
           file: '/tmp/verify_command_test'
+      verify_after_run: true
       plugin: 'ssh/custom'
       exec: 'echo'
       arguments: '"Verify command test" > /tmp/verify_command_test'
