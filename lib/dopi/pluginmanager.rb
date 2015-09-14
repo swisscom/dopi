@@ -4,9 +4,6 @@
 #
 
 module Dopi
-  class PluginLoaderError < StandardError
-  end
-
   module PluginManager
 
     @plugins = {}

@@ -3,9 +3,6 @@
 # track of it's state based on it's children
 #
 module Dopi
-  class StateTransitionError < StandardError
-  end
-
   module State
 
     def state

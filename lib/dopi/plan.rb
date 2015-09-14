@@ -57,7 +57,7 @@ module Dopi
         validity = false unless roles_valid?
       rescue Dopi::NoRoleFoundError => e
         Dopi.log.warn(e.message) 
-      rescue StandardError => e
+      rescue => e
         Dopi.configuration.trace ? Dopi.log.error(e) : Dopi.log.error(e.message)
         Dopi.log.warn("Plan: Can't validate the command plugins because of a previous error")
       end
@@ -121,7 +121,7 @@ module Dopi
       parsed_steps.each do |step|
         return true if step.roles == :all
         step.roles.each do |role|
-          next if role.kind_of?(Regexp )
+          next if role.kind_of?(Regexp)
           unless nodes.any?{|real_node| real_node.role == role}
             Dopi.log.error("Role '#{role}' in step '#{step.name}' does not contain any nodes")
             valid = false

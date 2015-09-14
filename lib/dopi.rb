@@ -1,3 +1,4 @@
+require "dopi/error"
 require "dopi/configure"
 require "dopi/log"
 require "dopi/pluginmanager"

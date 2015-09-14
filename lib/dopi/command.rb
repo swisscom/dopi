@@ -7,15 +7,6 @@ require 'timeout'
 
 
 module Dopi
-  class CommandParsingError < StandardError
-  end
-
-  class CommandExecutionError < StandardError
-  end
-
-  class CommandConnectionError < StandardError
-  end
-
   class Command
     extend Forwardable
     include Dopi::State
@@ -90,6 +81,10 @@ module Dopi
       Timeout::timeout(plugin_timeout) do
         log(:info, "Running command #{name}") unless @is_verify_command
         if run
+          if verify_after_run
+            verify_commands_ok? or
+              raise CommandExecutionError, "Verify commands failed to confirm a successful run"
+          end
           state_finish
           log(:info, "#{name} [OK]") if state_done?
         else
@@ -99,11 +94,11 @@ module Dopi
       end
     rescue Timeout::Error
       state_fail
-      log(:error, "Command timed out (plugin_timeout is set to #{plugin_timeout})")
+      log(:error, "Command timed out (plugin_timeout is set to #{plugin_timeout})", false)
     rescue => e
       state_fail
       log(:error, "Command failed: #{e.message}", false)
-      raise e
+      Dopi.log.error(e) if Dopi.configuration.trace
     end
 
     def meta_valid?
@@ -121,7 +116,7 @@ module Dopi
   private
 
     def_delegator  :@command_parser, :verify_commands, :parsed_verify_commands
-    def_delegators :@command_parser, :plugin_timeout
+    def_delegators :@command_parser, :plugin_timeout, :verify_after_run
 
     def run
       raise Dopi::CommandExecutionError, "No run method implemented in plugin #{name}"

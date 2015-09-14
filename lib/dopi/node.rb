@@ -9,12 +9,6 @@ require 'socket'
 require 'timeout'
 
 module Dopi
-  class NoRoleFoundError < StandardError
-  end
-
-  class NodeConnectionError < StandardError
-  end
-
   class Node
     extend Forwardable
 
