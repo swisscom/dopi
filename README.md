@@ -163,6 +163,13 @@ There are some generic parameters every plugin supports:
 
 The time in seconds after which DOPi will kill the thread and mark the step as failed.
 
+#### verify_after_run (optional)
+
+`default: false`
+
+The verify commands will be executed again after the command run and the step will
+only succeed if the verify commands all successful.
+
 ### Command Execution Plugins
 
 This are the plugins generally used in steps as commands
