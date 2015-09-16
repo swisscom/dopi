@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- Display a proper error mesage if 'dopi run' is executed with a wrong plan name
+
 ## [0.5.0] - 2015-09-16
 ### Added
 - Dopi will now test the connection and if not successful automatically try to connect with the configured IPs of the node

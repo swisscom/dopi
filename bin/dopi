@@ -220,8 +220,8 @@ module Wrapper
     c.action do |global_options,options,args|
       help_now!('Specify a plan name to run') if args.empty?
       help_now!('You can only run one plan') if args.length > 1
+      plan = Dopi.load_plan(args[0])
       begin
-        plan = Dopi.load_plan(args[0])
         Dopi.run_plan(plan)
       rescue Dopi::StateTransitionError => e
         Dopi.log.error(e.message)
