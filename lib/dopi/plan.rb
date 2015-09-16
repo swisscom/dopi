@@ -10,9 +10,10 @@ module Dopi
     extend Forwardable
     include Dopi::State
 
-    attr_reader :plan_parser
+    attr_reader :plan_parser, :version
  
     def initialize(plan_parser)
+      @version = Dopi::VERSION
       @mutex = Mutex.new
       @plan_parser = plan_parser
 

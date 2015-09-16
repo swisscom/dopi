@@ -28,7 +28,18 @@ module Dopi
     end
 
     def load_plan(plan_name)
-      plan_exists?(plan_name) ? YAML::load(File.read(dump_file(plan_name))) : create(plan_name)
+      if plan_exists?(plan_name)
+        plan_dump = YAML::load(File.read(dump_file(plan_name)))
+        if plan_dump.version == Dopi::VERSION
+          return plan_dump
+        else
+          version = plan_dump.version || '< 0.5.1'
+          raise StandardError,
+            "Plan object version is #{version} while DOPi is version #{Dopi::VERSION}. Please run update."
+        end
+      else
+        create(plan_name)
+      end
     end
 
     def run_plan(plan)
@@ -62,6 +73,7 @@ module Dopi
     end
 
     def create(plan_name)
+      plan_cache.update(plan_name) unless plan_cache.version(plan_name) == DopCommon::VERSION
       plan_parser = plan_cache.get(plan_name)
       plan = Dopi::Plan.new(plan_parser)
       raise StandardError, 'Plan not valid; did not add' unless plan.valid?
