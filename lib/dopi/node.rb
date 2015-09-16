@@ -49,7 +49,7 @@ module Dopi
     end
 
     def connection_possible?(address, port)
-      Timeout::timeout(Dopi.configuration.connection_check_timeout) do
+      Timeout::timeout(Dopi.configuration.connection_check_timeout.to_i) do
         TCPSocket.new(address, port).close
       end
       Dopi.log.debug("Connection test with #{address}:#{port} for node #{name} ok")
