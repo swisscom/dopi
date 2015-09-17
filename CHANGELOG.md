@@ -2,6 +2,9 @@
 All notable changes to DOPi will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Add version control to DOPi plan dumps and the possibility to update a plan
+
 ### Fixed
 - Display a proper error mesage if 'dopi run' is executed with a wrong plan name
 
