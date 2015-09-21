@@ -28,8 +28,12 @@ module Dopi
       :max_in_flight,
       :canary_host
 
-    def run(node_pattern_list)
-      run_for_nodes = create_node_list(node_pattern_list)
+    def run(node_pattern_list = :all)
+      run_for_nodes = if node_pattern_list == :all
+        nodes
+      else
+        create_node_list(node_pattern_list)
+      end
       if state_done?
         Dopi.log.info("Plan is in state 'done'. Nothing to do")
         return

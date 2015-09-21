@@ -25,7 +25,7 @@ describe 'Basic integration test built from plan files' do
       end
       plan.steps.each do |step|
         it "successfully runs the step: '#{step.name}'" do
-          step.run
+          step.run(plan.nodes)
           expect(step.state_done?).to be true
         end
       end
@@ -43,7 +43,7 @@ describe 'Basic integration test built from plan files' do
       end
       plan.steps.each do |step|
         it "successfully runs the step: '#{step.name}'" do
-          step.run
+          step.run(plan.nodes)
           expect(step.state_failed?).to be true
         end
       end
