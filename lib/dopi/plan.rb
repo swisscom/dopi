@@ -33,7 +33,6 @@ module Dopi
         Dopi.log.info("Plan is in state 'done'. Nothing to do")
         return
       end
-      state_run
       steps.each do |step|
         step.run
         break if abort? || state_failed?

@@ -69,6 +69,20 @@ describe Dopi::State do
       expect(@state.state_ready?).to eq true
     end
 
+    it 'can run a task in noop and go back to ready again' do
+      @state.state_auto_evaluate_children = false
+
+      # First state transition to running
+      expect{@state.state_fail}.to      raise_error Dopi::StateTransitionError
+      expect{@state.state_finish}.to    raise_error Dopi::StateTransitionError
+      expect{@state.state_run_noop}.to_not raise_error
+      expect(@state.state_running_noop?).to eq true
+      expect{@state.state_fail}.to      raise_error Dopi::StateTransitionError
+      expect{@state.state_finish}.to    raise_error Dopi::StateTransitionError
+      expect{@state.state_ready}.to_not raise_error
+      expect(@state.state_ready?).to eq true
+    end
+
   end
 
   describe "state changes evaluated from children" do
@@ -88,7 +102,6 @@ describe Dopi::State do
       @child_state2.state_finish
       expect(@state.state_done?).to eq true
     end
-
 
   end
 

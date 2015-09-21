@@ -28,7 +28,6 @@ module Dopi
         Dopi.log.info("Step '#{name}' is in state 'done'. Skipping")
         return
       end
-      state_run
       Dopi.log.info("Starting to run step '#{name}'")
       run_commands
       Dopi.log.info("Step '#{name}' successfully finished.") if state_done?
