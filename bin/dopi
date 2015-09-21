@@ -136,6 +136,59 @@ module Wrapper
     puts state(plan)
   end
 
+  def node_select_options(c)
+    c.desc 'Run plans for this nodes only'
+    c.default_value ""
+    c.arg_name 'node01.example.com,node02.example.com,/example\.com$/'
+    c.flag [:nodes]
+
+    c.desc 'Run plans for this roles only'
+    c.default_value ""
+    c.arg_name 'role01,role01,/^rolepattern/'
+    c.flag [:roles]
+
+    c.desc 'Exclude this nodes from the run'
+    c.default_value ""
+    c.arg_name 'node01.example.com,node02.example.com,/example\.com$/'
+    c.flag [:exclude_nodes]
+
+    c.desc 'Exclude this roles from the run'
+    c.default_value ""
+    c.arg_name 'role01,role01,/^rolepattern/'
+    c.flag [:exclude_roles]
+
+    c.desc 'Run plans for this nodes with this config only (You have to specify a JSON hash here)'
+    c.default_value "{}"
+    c.arg_name '\'{"var1": ["val1", "/val2/"], "var2": "val2"}\''
+    c.flag [:nodes_by_config]
+
+    c.desc 'Exclude nodes with this config from the run (You have to specify a JSON hash here)'
+    c.default_value "{}"
+    c.arg_name '\'{"var1": ["val1", "/val2/"], "var2": "val2"}\''
+    c.flag [:exclude_nodes_by_config]
+  end
+
+  def parse_node_select_options(options)
+    pattern_hash = {}
+    [:nodes, :roles, :exclude_nodes, :exclude_roles].each do |key|
+      hash = { key => options[key].split(',')}
+      pattern_hash[key] = DopCommon::HashParser.pattern_list_valid?(hash, key) ?
+        DopCommon::HashParser.parse_pattern_list(hash, key) : []
+    end
+    [:nodes_by_config, :exclude_nodes_by_config].each do |key|
+      hash = {key => JSON.parse(options[key])}
+      pattern_hash[key] = DopCommon::HashParser.hash_of_pattern_lists_valid?(hash, key) ?
+        DopCommon::HashParser.parse_hash_of_pattern_lists(hash, key) : {}
+    end
+    # Select all nodes if nothing is included
+    if [:nodes, :roles, :nodes_by_config].all?{|k| pattern_hash[k].empty?}
+      pattern_hash[:nodes] = :all
+    end
+    OpenStruct.new(pattern_hash)
+  rescue DopCommon::PlanParsingError => e
+    raise StandardError, "Error while parsing the node selection options: #{e.message}"
+  end
+
   desc 'Validate a plan file'
   arg_name 'plan_file'
   command :validate do |c|
@@ -231,12 +284,15 @@ module Wrapper
   desc 'Run the plan'
   arg_name 'id'
   command :run do |c|
+    node_select_options(c)
+
     c.action do |global_options,options,args|
       help_now!('Specify a plan name to run') if args.empty?
       help_now!('You can only run one plan') if args.length > 1
+      pattern_list = parse_node_select_options(options)
       plan = Dopi.load_plan(args[0])
       begin
-        Dopi.run_plan(plan)
+        Dopi.run_plan(plan, pattern_list)
       rescue Dopi::StateTransitionError => e
         Dopi.log.error(e.message)
         exit_now!("Some steps are in a state where they can't be started again. Try to reset the plan.")
@@ -266,13 +322,15 @@ module Wrapper
   desc 'Add a plan, run it and then remove it again (This is mainly for testing)'
   arg_name 'plan_file'
   command :oneshot do |c|
+    node_select_options(c)
     c.action do |global_options,options,args|
       help_now!('Specify a plan file to add') if args.empty?
       help_now!('You can only add one plan') if args.length > 1
+      pattern_list = parse_node_select_options(options)
       begin
         plan = Dopi.add_plan(args[0])
         begin
-          Dopi.run_plan(plan)
+          Dopi.run_plan(plan, pattern_list)
           sleep(2) # allow the show command to catch up
         ensure print_state(plan)
         end

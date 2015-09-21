@@ -23,13 +23,13 @@ module Dopi
 
     def_delegators :@step_parser, :name
 
-    def run
+    def run(run_for_nodes)
       if state_done?
         Dopi.log.info("Step '#{name}' is in state 'done'. Skipping")
         return
       end
       Dopi.log.info("Starting to run step '#{name}'")
-      run_commands
+      run_commands(run_for_nodes)
       Dopi.log.info("Step '#{name}' successfully finished.") if state_done?
       Dopi.log.error("Step '#{name}' failed! Stopping execution.") if state_failed?
     end
@@ -80,8 +80,8 @@ module Dopi
       end
     end
 
-    def run_commands
-      commands_copy = commands.dup
+    def run_commands(run_for_nodes)
+      commands_copy = commands.select{|n| run_for_nodes.include?(n.node)}
       if canary_host
         pick = rand(commands_copy.length - 1)
         commands_copy.delete_at(pick).meta_run

@@ -42,11 +42,11 @@ module Dopi
       end
     end
 
-    def run_plan(plan)
+    def run_plan(plan, pattern_list)
       begin
-        run_thread    = Thread.new { plan.run }
+        run_thread    = Thread.new { plan.run(pattern_list) }
         update_thread = Thread.new do
-          until plan.state_done? or plan.state_failed? do
+          while run_thread.alive? do
             Dopi.save_plan(plan) if plan.state_changed?
           end
           sleep(1)

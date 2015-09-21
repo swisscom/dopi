@@ -28,13 +28,14 @@ module Dopi
       :max_in_flight,
       :canary_host
 
-    def run
+    def run(node_pattern_list)
+      run_for_nodes = create_node_list(node_pattern_list)
       if state_done?
         Dopi.log.info("Plan is in state 'done'. Nothing to do")
         return
       end
       steps.each do |step|
-        step.run
+        step.run(run_for_nodes)
         break if abort? || state_failed?
       end
     end
