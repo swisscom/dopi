@@ -99,10 +99,14 @@ module Dopi
     rescue Timeout::Error
       log(:error, "Command timed out (plugin_timeout is set to #{plugin_timeout})", false)
       state_fail unless noop
-    rescue => e
+    rescue CommandExecutionError => e
       log(:error, "Command failed: #{e.message}", false)
       Dopi.log.error(e) if Dopi.configuration.trace
       state_fail unless noop
+    rescue => e
+      log(:error, "Unexpected error!!! This is a Bug", false)
+      state_fail unless noop
+      raise e
     end
 
     def meta_valid?
