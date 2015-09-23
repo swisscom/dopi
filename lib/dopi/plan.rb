@@ -29,17 +29,17 @@ module Dopi
       :canary_host
 
     def run(node_pattern_list = :all, noop = false)
+      if state_done?
+        Dopi.log.info("Plan is in state 'done'. Nothing to do")
+        return
+      end
       unless state_ready?
-        raise CommandExecutionError, "Plan is not in state 'ready'. Try to reset the plan"
+        raise StandardError, "Plan is not in state 'ready'. Try to reset the plan"
       end
       run_for_nodes = if node_pattern_list == :all
         nodes
       else
         create_node_list(node_pattern_list)
-      end
-      if state_done?
-        Dopi.log.info("Plan is in state 'done'. Nothing to do")
-        return
       end
       steps.each do |step|
         step.run(run_for_nodes, noop)
