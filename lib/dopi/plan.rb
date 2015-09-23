@@ -28,7 +28,7 @@ module Dopi
       :max_in_flight,
       :canary_host
 
-    def run(node_pattern_list = :all)
+    def run(node_pattern_list = :all, noop = false)
       run_for_nodes = if node_pattern_list == :all
         nodes
       else
@@ -39,7 +39,7 @@ module Dopi
         return
       end
       steps.each do |step|
-        step.run(run_for_nodes)
+        step.run(run_for_nodes, noop)
         break if abort? || state_failed?
       end
     end

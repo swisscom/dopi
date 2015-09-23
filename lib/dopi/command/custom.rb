@@ -33,6 +33,11 @@ module Dopi
         result.all?
       end
 
+      def run_noop
+        log(:info, "(NOOP) Executing '#{command_string}' for command #{name}")
+        log(:info, "(NOOP) Environment: #{env.to_s}")
+      end
+
       def exec
         @exec ||= exec_valid? ?
           hash[:exec] : nil

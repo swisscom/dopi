@@ -36,8 +36,11 @@ module Dopi
       @sshpass ||= ssh_root_pass_from_hiera || @plan.ssh_root_pass
     end
 
+    def addresses
+      [ name, ip_addresses ].flatten
+    end
+
     def address(port)
-      addresses = [ name, ip_addresses ].flatten
       @addresses[port] ||= addresses.find {|addr| connection_possible?(addr,port)} or
         raise NodeConnectionError, "Unable to establish a connection for node #{name} on port #{port} over #{addresses.join(', ')}"
     end

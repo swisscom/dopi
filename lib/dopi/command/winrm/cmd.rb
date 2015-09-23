@@ -30,10 +30,15 @@ module Dopi
           result.all?
         end
 
+        def run_noop
+          log(:info, "(NOOP) Executing '#{command_string}' for command #{name}")
+        end
+
         def run_command
           cmd_stdout = ""
           cmd_stderr = ""
-          result = winrm.cmd(exec) do |stdout, stderr|
+          log(:debug, "Executing '#{command_string}' for command #{name}")
+          result = winrm.cmd(command_string) do |stdout, stderr|
             unless stdout.nil? or stdout.empty?
               cmd_stdout << stdout
               log(:debug, stdout)
@@ -55,6 +60,11 @@ module Dopi
         end
 
       private
+
+        # assemble the command to execute
+        def command_string
+          exec + ' ' + arguments
+        end
 
         def exec_valid?
           hash[:exec] or

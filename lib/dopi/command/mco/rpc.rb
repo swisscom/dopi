@@ -42,6 +42,12 @@ module Dopi
           result_ok
         end
 
+        def run_noop
+          log(:info, "(NOOP) command #{name}: agent: #{agent}")
+          log(:info, "(NOOP) command #{name}: options: #{options}")
+          log(:info, "(NOOP) command #{name}: arguments: #{arguments}")
+        end
+
         def agent
           @agent ||= agent_valid? ?
             hash[:agent] : nil

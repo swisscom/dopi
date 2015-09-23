@@ -82,7 +82,7 @@ module Dopi
         end
 
         def create_ssh_command_string(credential)
-          test_command_string = case credential.type
+          case credential.type
           when :username_password then
             {
               :command => "#{sshpass_cmd}ssh #{global_options.join(' ')} #{credential.username}@#{@node.address(22)}",
@@ -117,6 +117,14 @@ module Dopi
         def run
           reset_ssh_command_string
           super
+        end
+
+        def run_noop
+          log(:info, "(NOOP) Executing '#{command_string}' for command #{name}")
+          log(:info, "(NOOP) Environment: #{env.to_s}")
+        rescue Dopi::ConnectionError
+          log(:info, "(NOOP) Unable to connect to the node. Not possible to display the command")
+          # TODO: make it possible!!
         end
 
         def quiet

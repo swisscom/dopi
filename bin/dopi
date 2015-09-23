@@ -168,6 +168,12 @@ module Wrapper
     c.flag [:exclude_nodes_by_config]
   end
 
+  def noop_options(c)
+    c.desc 'Show only stuff the run would do but don\'t execute commands (verify commands will still be executed)'
+    c.default_value false
+    c.switch [:noop, :n]
+  end
+
   def parse_node_select_options(options)
     pattern_hash = {}
     [:nodes, :roles, :exclude_nodes, :exclude_roles].each do |key|
@@ -285,14 +291,14 @@ module Wrapper
   arg_name 'id'
   command :run do |c|
     node_select_options(c)
-
+    noop_options(c)
     c.action do |global_options,options,args|
       help_now!('Specify a plan name to run') if args.empty?
       help_now!('You can only run one plan') if args.length > 1
       pattern_list = parse_node_select_options(options)
       plan = Dopi.load_plan(args[0])
       begin
-        Dopi.run_plan(plan, pattern_list)
+        Dopi.run_plan(plan, pattern_list, options[:noop])
       rescue Dopi::StateTransitionError => e
         Dopi.log.error(e.message)
         exit_now!("Some steps are in a state where they can't be started again. Try to reset the plan.")
@@ -323,6 +329,7 @@ module Wrapper
   arg_name 'plan_file'
   command :oneshot do |c|
     node_select_options(c)
+    noop_options(c)
     c.action do |global_options,options,args|
       help_now!('Specify a plan file to add') if args.empty?
       help_now!('You can only add one plan') if args.length > 1
@@ -330,7 +337,7 @@ module Wrapper
       begin
         plan = Dopi.add_plan(args[0])
         begin
-          Dopi.run_plan(plan, pattern_list)
+          Dopi.run_plan(plan, pattern_list, options[:noop])
           sleep(2) # allow the show command to catch up
         ensure print_state(plan)
         end

@@ -23,13 +23,13 @@ module Dopi
 
     def_delegators :@step_parser, :name
 
-    def run(run_for_nodes)
+    def run(run_for_nodes, noop = false)
       if state_done?
         Dopi.log.info("Step '#{name}' is in state 'done'. Skipping")
         return
       end
       Dopi.log.info("Starting to run step '#{name}'")
-      run_commands(run_for_nodes)
+      run_commands(run_for_nodes, noop)
       Dopi.log.info("Step '#{name}' successfully finished.") if state_done?
       Dopi.log.error("Step '#{name}' failed! Stopping execution.") if state_failed?
     end
@@ -80,17 +80,17 @@ module Dopi
       end
     end
 
-    def run_commands(run_for_nodes)
+    def run_commands(run_for_nodes, noop)
       commands_copy = commands.select{|n| run_for_nodes.include?(n.node)}
       if canary_host
         pick = rand(commands_copy.length - 1)
-        commands_copy.delete_at(pick).meta_run
+        commands_copy.delete_at(pick).meta_run(noop)
       end
       unless state_failed?
         number_of_threads = max_in_flight == -1 ? commands_copy.length : max_in_flight
         Parallel.each(commands_copy, :in_threads => number_of_threads) do |command|
           raise Parallel::Break if state_failed?
-          command.meta_run
+          command.meta_run(noop)
         end
       end
     end

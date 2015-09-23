@@ -75,30 +75,34 @@ module Dopi
 
     def_delegator :@command_parser, :plugin, :name
 
-    def meta_run
-      return if skip_run?
-      state_run
+    def meta_run(noop = false)
+      return if skip_run?(noop)
+      state_run unless noop
       Timeout::timeout(plugin_timeout) do
         log(:info, "Running command #{name}") unless @is_verify_command
-        if run
-          if verify_after_run
-            verify_commands_ok? or
-              raise CommandExecutionError, "Verify commands failed to confirm a successful run"
-          end
-          state_finish
-          log(:info, "#{name} [OK]") if state_done?
+        if noop
+          run_noop
         else
-          state_fail
-          log(:info, "#{name} [FAILED]")
+          if run
+            if verify_after_run
+              verify_commands_ok? or
+                raise CommandExecutionError, "Verify commands failed to confirm a successful run"
+            end
+            state_finish
+            log(:info, "#{name} [OK]") if state_done?
+          else
+            state_fail
+            log(:info, "#{name} [FAILED]")
+          end
         end
       end
     rescue Timeout::Error
-      state_fail
       log(:error, "Command timed out (plugin_timeout is set to #{plugin_timeout})", false)
+      state_fail unless noop
     rescue => e
-      state_fail
       log(:error, "Command failed: #{e.message}", false)
       Dopi.log.error(e) if Dopi.configuration.trace
+      state_fail unless noop
     end
 
     def meta_valid?
@@ -122,19 +126,27 @@ module Dopi
       raise Dopi::CommandExecutionError, "No run method implemented in plugin #{name}"
     end
 
+    def run_noop
+      Dopi.log.error("The plugin #{name} does not support noop runs and will not show the command")
+    end
+
     def validate
       Dopi.log.warn("No 'validate' method implemented in plugin #{name}. Validation not possible")
       true
     end
 
-    def skip_run?
+    def skip_run?(noop = false)
       if state_done?
         log(:info, "Is already in state 'done'. Skipping")
         true
       elsif verify_commands.any? && verify_commands_ok?
-        log(:info, "All verify commands ok. Skipping and marked as 'done'")
-        state_run
-        state_finish
+        if noop
+          log(:info, "All verify commands ok. Skipping")
+        else
+          log(:info, "All verify commands ok. Skipping and marked as 'done'")
+          state_run
+          state_finish
+        end
         true
       else
         false
