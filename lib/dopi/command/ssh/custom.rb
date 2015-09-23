@@ -60,8 +60,12 @@ module Dopi
           @ssh_command_string = nil
         end
 
-        def ssh_command_string
-          @ssh_command_string ||= working_ssh_command_string
+        def ssh_command_string(connection_test = true)
+          @ssh_command_string ||= if connection_test
+            working_ssh_command_string
+          else
+            create_ssh_command_string(credentials.first, @node.addresses)
+          end
         end
 
         def working_ssh_command_string
@@ -72,7 +76,7 @@ module Dopi
               next
             end
             # check connection and return command string if it is working
-            c = create_ssh_command_string(credential)
+            c = create_ssh_command_string(credential, @node.address(22))
             return c if run_command(c[:env], c[:command] + ' exit')[2] == 0
             log(:warn, "Unable to login with credential #{credential.name}")
           end
@@ -81,11 +85,11 @@ module Dopi
             "Can't establish connection with node #{@node.name} with any of the given credentials #{cred_names}"
         end
 
-        def create_ssh_command_string(credential)
+        def create_ssh_command_string(credential, address)
           case credential.type
           when :username_password then
             {
-              :command => "#{sshpass_cmd}ssh #{global_options.join(' ')} #{credential.username}@#{@node.address(22)}",
+              :command => "#{sshpass_cmd}ssh #{global_options.join(' ')} #{credential.username}@#{address}",
               :env     => {'SSHPASS' => credential.password}
             }
           when :ssh_key then
@@ -120,11 +124,15 @@ module Dopi
         end
 
         def run_noop
+          reset_ssh_command_string
           log(:info, "(NOOP) Executing '#{command_string}' for command #{name}")
           log(:info, "(NOOP) Environment: #{env.to_s}")
         rescue Dopi::ConnectionError
-          log(:info, "(NOOP) Unable to connect to the node. Not possible to display the command")
-          # TODO: make it possible!!
+          reset_ssh_command_string
+          log(:info, "(NOOP) Unable to connect to the node and check what credentials/address to use. Showing example")
+          ssh_command_string(false) # generate an example ssh_command_string
+          log(:info, "(NOOP) Executing '#{command_string}' for command #{name}")
+          log(:info, "(NOOP) Environment: #{env.to_s}")
         end
 
         def quiet
