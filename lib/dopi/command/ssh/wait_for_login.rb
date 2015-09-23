@@ -10,8 +10,10 @@ module Dopi
         DEFAULT_CONNECTION_TIMEOUT = 0
         DEFAULT_INTERVAL = 10
 
-        def ssh_command_string
-          super.merge({:command => super[:command] + " -o ConnectTimeout=#{connection_timeout} -q "})
+        def ssh_command_string(connection_test = true)
+          super(connection_test).merge({
+            :command => super[:command] + " -o ConnectTimeout=#{connection_timeout} -q "
+          })
         end
 
         def exec
