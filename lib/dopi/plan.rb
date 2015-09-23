@@ -29,6 +29,9 @@ module Dopi
       :canary_host
 
     def run(node_pattern_list = :all, noop = false)
+      unless state_ready?
+        raise CommandExecutionError, "Plan is not in state 'ready'. Try to reset the plan"
+      end
       run_for_nodes = if node_pattern_list == :all
         nodes
       else
@@ -42,6 +45,8 @@ module Dopi
         step.run(run_for_nodes, noop)
         break if abort? || state_failed?
       end
+    ensure
+      state_evaluate_children
     end
 
     def abort?
