@@ -20,7 +20,10 @@ module Dopi
             begin connected = check_exit_code(run_command[2])
             rescue Dopi::NodeConnectionError, Dopi::CommandConnectionError
             end
-            sleep interval unless connected
+            unless connected
+              sleep interval
+              log(:info, "Retrying connect to node")
+            end
           end
           true
         end
