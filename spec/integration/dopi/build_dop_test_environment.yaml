@@ -1,0 +1,100 @@
+# This dop plan will setup the test environment for DOPi
+#
+# For now we will just use a bermetal type and vagrant
+# this should one day be replaced with dopv and some
+# local endpoint to create the machines.
+#
+
+name: 'build_dop_test_environment'
+max_in_flight: -1
+
+infrastructures:
+  'vagrant':
+    type: 'baremetal'
+
+nodes:
+  'puppetmaster.example.com':
+    infrastructure: 'vagrant'
+    image: 'puppetlabs/centos-6.6-64-puppet'
+  'broker.example.com':
+    infrastructure: 'vagrant'
+    image: 'puppetlabs/centos-6.6-64-puppet'
+  'linux01.example.com':
+    infrastructure: 'vagrant'
+    image: 'puppetlabs/centos-6.6-64-puppet'
+  'linux02.example.com':
+    infrastructure: 'vagrant'
+    image: 'puppetlabs/centos-6.6-64-puppet'
+  'linux03.example.com':
+    infrastructure: 'vagrant'
+    image: 'puppetlabs/centos-6.6-64-puppet'
+  'windows01.example.com':
+    infrastructure: 'vagrant'
+    image: 'opentable/win-2012r2-standard-amd64-nocm'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
+  'windows_login':
+    type: 'username_password'
+    username: 'administrator'
+    password: 'vagrant'
+
+configuration:
+  nodes:
+    'puppetmaster.example.com':
+      role: 'puppetmaster'
+    'broker.example.com':
+      role: 'mcollective_broker'
+    'windows01.example.com':
+      os: 'windows'
+  roles:
+    'puppetmaster':
+      classes:
+        - 'foreman'
+        - 'puppet'
+      foreman::foreman_url: "%{fqdn}"
+      foreman::unattended: false
+      foreman::authentication: false
+      puppet::server: true
+      puppet::autosign: true
+      puppet::server_foreman: true
+      puppet::server_rttendedeports: 'store'
+      puppet::server_external_nodes: ''
+      puppet::hiera_config: '/vagrant/vagrant/puppet/hiera.yaml'
+    'mcollective_broker':
+      classes:
+        - 'java'
+        - 'activemq'
+      java::distribution: 'jdk'
+      java::version: 'latest'
+      activemq::instances:
+        'mcollective':
+          stomp_nio_port: "%{hiera('mcollective::broker_port')}"
+          user_name: "%{hiera('mcollective::broker_user')}"
+          user_password: "%{hiera('mcollective::broker_password')}"
+  defaults:
+    role: 'base'
+    os: 'linux'
+    puppet::puppetmaster: 'puppetmaster.example.com'
+    puppet::runmode: 'none'
+    mcollective::use_node: true
+    mcollective::connector: 'activemq'
+    mcollective::broker_host: 'broker.example.com'
+    mcollective::broker_port: 61614
+    mcollective::broker_ssl: False
+    mcollective::broker_user: 'mcollective'
+    mcollective::broker_password: 'vagrant'
+    mcollective::security_provider: 'psk'
+    mcollective::security_secret: 'vagrant'
+
+steps:
+  - name: 'Create virtual machines with vagrant'
+    nodes: 'all'
+    max_in_flight: 1
+    command:
+      plugin: 'custom'
+      exec: 'vagrant'
+      arguments: "up ${DOP_NODE_FQDN}"
