@@ -129,3 +129,13 @@ steps:
       plugin: 'custom'
       exec: 'vagrant'
       arguments: "up ${DOP_NODE_FQDN}"
+
+  - name: 'Configure ssh credentials and wait until all the linux machines are online'
+    nodes_by_config: {os: 'linux'}
+    set_plugin_defaults: [{plugins: '/^ssh/', credentials: 'linux_login'}]
+    command: 'ssh/wait_for_login'
+
+  - name: 'Configure winrm credentials and wait until all the windows machines are online'
+    nodes_by_config: {os: 'windows'}
+    set_plugin_defaults: [{plugins: '/^winrm/', credentials: 'windows_login'}]
+    command: 'winrm/wait_for_login'
