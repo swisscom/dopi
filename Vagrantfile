@@ -21,6 +21,9 @@ Vagrant.configure(2) do |config|
     config.vm.define node.name do |machine|
       machine.vm.box = node.image
 
+      interface = node.interfaces.first
+      machine.vm.network "private_network", ip: interface.ip
+
       # windows/linux specific settings
       if node.name[/^windows/, 0]
         machine.vm.guest = :windows

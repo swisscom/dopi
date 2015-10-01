@@ -11,26 +11,57 @@ max_in_flight: -1
 infrastructures:
   'vagrant':
     type: 'baremetal'
+    networks:
+      'vboxnet0':
+        ip_pool:
+          from: 192.168.56.101
+          to: 192.168.56.254
+        ip_netmask: 255.255.255.0
+        ip_defgw: 192.168.56.1
 
 nodes:
   'puppetmaster.example.com':
     infrastructure: 'vagrant'
     image: 'puppetlabs/centos-6.6-64-puppet'
+    interfaces:
+      'eth0':
+        network: 'vboxnet0'
+        ip: '192.168.56.101'
   'broker.example.com':
     infrastructure: 'vagrant'
     image: 'puppetlabs/centos-6.6-64-puppet'
+    interfaces:
+      'eth0':
+        network: 'vboxnet0'
+        ip: '192.168.56.102'
   'linux01.example.com':
     infrastructure: 'vagrant'
     image: 'puppetlabs/centos-6.6-64-puppet'
+    interfaces:
+      'eth0':
+        network: 'vboxnet0'
+        ip: '192.168.56.103'
   'linux02.example.com':
     infrastructure: 'vagrant'
     image: 'puppetlabs/centos-6.6-64-puppet'
+    interfaces:
+      'eth0':
+        network: 'vboxnet0'
+        ip: '192.168.56.104'
   'linux03.example.com':
     infrastructure: 'vagrant'
     image: 'puppetlabs/centos-6.6-64-puppet'
+    interfaces:
+      'eth0':
+        network: 'vboxnet0'
+        ip: '192.168.56.105'
   'windows01.example.com':
     infrastructure: 'vagrant'
     image: 'opentable/win-2012r2-standard-amd64-nocm'
+    interfaces:
+      'eth0':
+        network: 'vboxnet0'
+        ip: '192.168.56.106'
 
 credentials:
   'linux_login':
