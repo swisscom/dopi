@@ -22,35 +22,35 @@ infrastructures:
 nodes:
   'puppetmaster.example.com':
     infrastructure: 'vagrant'
-    image: 'puppetlabs/centos-6.6-64-puppet'
+    image: 'puppetlabs/centos-7.0-64-nocm'
     interfaces:
       'eth0':
         network: 'vboxnet0'
         ip: '192.168.56.101'
   'broker.example.com':
     infrastructure: 'vagrant'
-    image: 'puppetlabs/centos-6.6-64-puppet'
+    image: 'puppetlabs/centos-7.0-64-nocm'
     interfaces:
       'eth0':
         network: 'vboxnet0'
         ip: '192.168.56.102'
   'linux01.example.com':
     infrastructure: 'vagrant'
-    image: 'puppetlabs/centos-6.6-64-puppet'
+    image: 'puppetlabs/centos-7.0-64-nocm'
     interfaces:
       'eth0':
         network: 'vboxnet0'
         ip: '192.168.56.103'
   'linux02.example.com':
     infrastructure: 'vagrant'
-    image: 'puppetlabs/centos-6.6-64-puppet'
+    image: 'puppetlabs/centos-7.0-64-nocm'
     interfaces:
       'eth0':
         network: 'vboxnet0'
         ip: '192.168.56.104'
   'linux03.example.com':
     infrastructure: 'vagrant'
-    image: 'puppetlabs/centos-6.6-64-puppet'
+    image: 'puppetlabs/centos-7.0-64-nocm'
     interfaces:
       'eth0':
         network: 'vboxnet0'
@@ -86,15 +86,15 @@ configuration:
       classes:
         - 'foreman'
         - 'puppet'
-      foreman::foreman_url: "%{fqdn}"
-      foreman::unattended: false
-      foreman::authentication: false
+      foreman::foreman_url: "%{hiera('::fqdn')}"
+      foreman::unattended: 'false'
+      foreman::authentication: 'false'
       puppet::server: true
-      puppet::autosign: true
+      puppet::autosign: '/usr/local/bin/dop-puppet-autosign'
       puppet::server_foreman: true
       puppet::server_rttendedeports: 'store'
       puppet::server_external_nodes: ''
-      puppet::hiera_config: '/vagrant/vagrant/puppet/hiera.yaml'
+      puppet::hiera_config: '/vagrant/spec/integration/dopi/hiera.yaml'
     'mcollective_broker':
       classes:
         - 'java'
@@ -107,15 +107,20 @@ configuration:
           user_name: "%{hiera('mcollective::broker_user')}"
           user_password: "%{hiera('mcollective::broker_password')}"
   defaults:
+    classes:
+      - 'firewall'
+      - 'puppet'
+      - 'mcollective'
     role: 'base'
     os: 'linux'
+    firewall::ensure: 'stopped'
     puppet::puppetmaster: 'puppetmaster.example.com'
     puppet::runmode: 'none'
     mcollective::use_node: true
     mcollective::connector: 'activemq'
     mcollective::broker_host: 'broker.example.com'
     mcollective::broker_port: 61614
-    mcollective::broker_ssl: False
+    mcollective::broker_ssl: 'false'
     mcollective::broker_user: 'mcollective'
     mcollective::broker_password: 'vagrant'
     mcollective::security_provider: 'psk'
@@ -139,3 +144,181 @@ steps:
     nodes_by_config: {os: 'windows'}
     set_plugin_defaults: [{plugins: '/^winrm/', credentials: 'windows_login'}]
     command: 'winrm/wait_for_login'
+
+  - name: 'install the puppetlabs repository'
+    nodes_by_config: {os: 'linux'}
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/etc/yum.repos.d/puppetlabs.repo'
+      plugin: 'ssh/custom'
+      exec: 'rpm'
+      arguments: '-ivh https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm'
+
+  - name: 'install puppet on all the nodes'
+    nodes_by_config: {os: 'linux'}
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/usr/bin/puppet'
+      plugin: 'ssh/custom'
+      exec: 'yum'
+      arguments: 'install -y puppet'
+
+  - name: 'Install all the needed packages on the puppetmaster'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/usr/bin/rake'
+        - plugin: 'ssh/file_exists'
+          file: '/usr/bin/bundle'
+        - plugin: 'ssh/file_exists'
+          file: '/usr/bin/git'
+        - plugin: 'ssh/file_exists'
+          file: '/usr/include/ruby.h'
+      plugin: 'ssh/custom'
+      exec: 'yum'
+      arguments: 'install -y rubygem-rake rubygem-bundler git ruby-devel'
+
+  - name: 'Install dop_common for the puppetmaster'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/custom'
+          exec: 'gem list | grep dop_common'
+      plugin: 'ssh/custom'
+      exec: 'cd /vagrant/vendor/cache/dop_common-*/ && gem build dop_common.gemspec && gem install dop_common*.gem'
+
+  - name: 'Install DOPi so we can add the plan'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/vagrant/.bundle/config'
+      plugin: 'ssh/custom'
+      exec: 'bundle'
+      arguments: 'install --local'
+      env: {BUNDLE_GEMFILE: '/vagrant/Gemfile'}
+
+  - name: 'Configure DOPi on the puppetmaster'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/etc/dop/dopi.conf'
+      plugin: 'ssh/custom'
+      exec: 'bundle'
+      arguments: 'exec dopi --hiera_yaml /vagrant/spec/integration/dopi/hiera.yaml initconfig'
+      env: {BUNDLE_GEMFILE: '/vagrant/Gemfile'}
+
+  - name: 'Add deployment plan with hiera data to the plan cache'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/var/lib/dop/plans/build_dop_test_environment.yaml'
+      plugin: 'ssh/custom'
+      exec: 'bundle'
+      arguments: 'exec dopi add /vagrant/spec/integration/dopi/build_dop_test_environment.yaml'
+      env: {BUNDLE_GEMFILE: '/vagrant/Gemfile'}
+
+  - name: 'Install the puppet module for puppet'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/etc/puppet/modules/puppet/metadata.json'
+      plugin: 'ssh/custom'
+      exec: 'puppet'
+      arguments: 'module install theforeman-puppet'
+
+  - name: 'Install the puppet module for foreman'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/etc/puppet/modules/foreman/metadata.json'
+      plugin: 'ssh/custom'
+      exec: 'puppet'
+      arguments: 'module install theforeman-foreman'
+
+  - name: 'Install the puppet module for firewall'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/etc/puppet/modules/firewall/metadata.json'
+      plugin: 'ssh/custom'
+      exec: 'puppet'
+      arguments: 'module install puppetlabs-firewall'
+
+  - name: 'Install the puppet module for java'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/etc/puppet/modules/java/metadata.json'
+      plugin: 'ssh/custom'
+      exec: 'puppet'
+      arguments: 'module install puppetlabs-java'
+
+  - name: 'Install the puppet module for activemq'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/etc/puppet/modules/activemq/metadata.json'
+      plugin: 'ssh/custom'
+      exec: 'puppet'
+      arguments: 'module install jbussdieker-activemq'
+
+  - name: 'Install the puppet module for mcollective'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/etc/puppet/modules/mcollective/metadata.json'
+      plugin: 'ssh/custom'
+      exec: 'puppet'
+      arguments: 'module install camptocamp-mcollective'
+
+  - name: 'Run puppet on puppetmaster'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/etc/httpd/conf.d/25-puppet.conf'
+      plugin: 'ssh/custom'
+      exec: 'puppet'
+      arguments: 'apply --hiera_config=/vagrant/spec/integration/dopi/hiera.yaml /vagrant/spec/integration/dopi/site.pp'
+
+  - name: 'Add puppetmaster to all hosts files'
+    nodes_by_config: {os: 'linux'}
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_contains'
+          file: '/etc/hosts'
+          pattern: 'puppetmaster.example.com'
+      plugin: 'ssh/custom'
+      exec: "echo"
+      arguments: '"192.168.56.101 puppetmaster.example.com puppetmaster" >> /etc/hosts'
+
+  - name: 'Add broker to all hosts files'
+    nodes_by_config: {os: 'linux'}
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_contains'
+          file: '/etc/hosts'
+          pattern: 'broker.example.com'
+      plugin: 'ssh/custom'
+      exec: "echo"
+      arguments: '"192.168.56.102 broker.example.com broker" >> /etc/hosts'
+
+
+  - name: 'Run puppet on the rest of the linux nodes'
+    nodes_by_config: {os: 'linux'}
+    exclude_roles: 'puppetmaster'
+    command:
+      plugin: 'ssh/puppet_agent_run'
+      arguments: '--server puppetmaster.example.com'

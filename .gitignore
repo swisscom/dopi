@@ -15,6 +15,7 @@ test/tmp
 test/version_tmp
 tmp
 .vagrant
+vendor/
 vagrant/puppet/.librarian/
 vagrant/puppet/.tmp/
 vagrant/puppet/modules/

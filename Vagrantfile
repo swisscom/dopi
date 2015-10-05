@@ -32,8 +32,13 @@ Vagrant.configure(2) do |config|
         machine.vm.hostname = node.name
       end
 
-      # disable the default folder sync
-      config.vm.synced_folder ".", "/vagrant", disabled: true
+      # disable the default folder sync on the nodes
+      # and rsync all the stuff to the puppetmaster
+      if node.name == 'puppetmaster.example.com'
+        config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ".bundle/"
+      else
+        config.vm.synced_folder ".", "/vagrant", disabled: true
+      end
     end
 
   end
