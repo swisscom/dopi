@@ -9,6 +9,7 @@ All notable changes to DOPi will be documented in this file.
 
 ### Fixed
 - Display a proper error mesage if 'dopi run' is executed with a wrong plan name
+- Improve overall DOPi performance by fixing an issue with threads
 
 ## [0.5.0] - 2015-09-16
 ### Added
