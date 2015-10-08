@@ -1,13 +1,12 @@
+name: 'fail_test_for_ouptut_parser'
+
 infrastructures:
-  baremetal: {}
+  'test':
+    type: 'baremetal'
 
 nodes:
   'linux01.example.com':
-    type: 'baremetal'
-
-plan:
-  max_in_flight: 1
-  ssh_root_pass: 'vagrant'
+    infrastructure: 'test'
 
 steps:
 

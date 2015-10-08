@@ -2,17 +2,18 @@ name: 'verify_command_tests_fail'
 max_in_flight: 1
 
 infrastructures:
-  baremetal: {}
+  'test':
+    type: 'baremetal'
 
 nodes:
   'linux01.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
 
 credentials:
-  'vagrant_login':
+  'linux_login':
     type: 'username_password'
     username: 'root'
-    password: 'vagrant'
+    password: 'puppet'
 
 steps:
 
@@ -20,7 +21,7 @@ steps:
     nodes: 'all'
     set_plugin_defaults:
       - plugins: '/^ssh/'
-        credentials: 'vagrant_login'
+        credentials: 'linux_login'
     command:
       verify_commands:
         - plugin: 'ssh/file_exists'

@@ -2,25 +2,25 @@ name: 'verify_command_tests'
 max_in_flight: 1
 
 infrastructures:
-  baremetal: {}
+  'test':
+    type: 'baremetal'
 
 nodes:
   'linux01.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
 
 credentials:
-  'vagrant_login':
+  'linux_login':
     type: 'username_password'
     username: 'root'
-    password: 'vagrant'
+    password: 'puppet'
 
 steps:
-
   - name: 'Remove the test file'
     nodes: 'all'
     set_plugin_defaults:
       - plugins: '/^ssh/'
-        credential: 'vagrant_login'
+        credential: 'linux_login'
     command:
       plugin: 'ssh/custom'
       exec: 'rm'

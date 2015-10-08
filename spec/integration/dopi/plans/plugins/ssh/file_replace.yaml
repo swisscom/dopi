@@ -1,15 +1,27 @@
+name: 'test_plugin_ssh_file_replace'
+max_in_flight: 1
+
 infrastructures:
-  baremetal: {}
+  'test':
+    type: 'baremetal'
 
 nodes:
   'linux01.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
 
-plan:
-  max_in_flight: 1
-  ssh_root_pass: 'vagrant'
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
 
 steps:
+  - name: "Configure the plugin defaults"
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugins: '/^ssh/'
+        credential: 'linux_login'
+    command: 'dummy'
 
   - name: 'Replace the server string in puppet.conf'
     nodes: 'all'

@@ -1,12 +1,14 @@
 name: 'plugin_defaults_tests'
 max_in_flight: 1
 
+
 infrastructures:
-  baremetal: {}
+  'test':
+    type: 'baremetal'
 
 nodes:
   'linux01.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
 
 steps:
   - name: 'Check if the default settings work'

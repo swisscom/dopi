@@ -1,17 +1,23 @@
 name: 'nodes_by_config'
 max_in_flight: 1
-ssh_root_pass: 'vagrant'
 
 infrastructures:
-  baremetal: {}
+  'test':
+    type: 'baremetal'
 
 nodes:
   'linux01.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
   'nonexisting01.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
   'nonexisting02.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
 
 configuration:
   hosts:
@@ -50,6 +56,7 @@ steps:
       my_alias: '/^fake/'
     command:
       plugin: 'ssh/custom'
+      credentials: 'linux_login'
       exec: 'echo'
       arguments: 'Hello World'
 
@@ -60,6 +67,7 @@ steps:
       my_alias3: 'exclude_this'
     command:
       plugin: 'ssh/custom'
+      credentials: 'linux_login'
       exec: 'echo'
       arguments: 'Hello World'
 
@@ -68,6 +76,7 @@ steps:
       my_alias4: 'only_include_this'
     command:
       plugin: 'ssh/custom'
+      credentials: 'linux_login'
       exec: 'echo'
       arguments: 'Hello World'
 
@@ -78,6 +87,7 @@ steps:
       my_alias5: 'exclude_this'
     command:
       plugin: 'ssh/custom'
+      credentials: 'linux_login'
       exec: 'echo'
       arguments: 'Hello World'
 
@@ -88,6 +98,7 @@ steps:
       my_alias7: 'exclude_this'
     command:
       plugin: 'ssh/custom'
+      credentials: 'linux_login'
       exec: 'echo'
       arguments: 'Hello World'
 
@@ -99,6 +110,7 @@ steps:
         - 'exclude_this_too'
     command:
       plugin: 'ssh/custom'
+      credentials: 'linux_login'
       exec: 'echo'
       arguments: 'Hello World'
 
