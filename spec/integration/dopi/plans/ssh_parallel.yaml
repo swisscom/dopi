@@ -1,25 +1,23 @@
-name:          'test_ssh_in_parallel'
+name: 'test_ssh_in_parallel'
 max_in_flight: -1
 
 infrastructures:
-  baremetal: {}
-
-credentials:
-  'ssh_vagrant_login':
-    type: 'username_password'
-    username: 'root'
-    password: 'vagrant'
+  'test':
+    type: 'baremetal'
 
 nodes:
   'linux01.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
   'linux02.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
   'linux03.example.com':
-    type: 'baremetal'
-    interfaces:
-      'eth0':
-        ip: '192.168.121.41'
+    infrastructure: 'test'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
 
 steps:
 
@@ -27,13 +25,13 @@ steps:
     nodes: 'all'
     command:
       plugin: 'ssh/wait_for_login'
-      credentials: 'ssh_vagrant_login'
+      credentials: 'linux_login'
 
   - name: 'Execute a command on multiple nodes'
     nodes: 'all'
     command:
       plugin: 'ssh/custom'
-      credentials: 'ssh_vagrant_login'
+      credentials: 'linux_login'
       exec: 'sleep'
       arguments: '5'
 

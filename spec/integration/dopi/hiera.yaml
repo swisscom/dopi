@@ -1,0 +1,8 @@
+:backends:
+    - dop
+:hierarchy:
+    - nodes/%{::clientcert}
+    - roles/%{::role}
+    - defaults
+:dop:
+    :plan_dir: /var/lib/dop/plans

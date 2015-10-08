@@ -1,19 +1,25 @@
 name: 'node_and_role_patterns'
 max_in_flight: 1
-ssh_root_pass: 'vagrant'
 
 infrastructures:
-  baremetal: {}
+  'test':
+    type: 'baremetal'
 
 nodes:
   'linux01.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
   'nonexisting01.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
   'nonexisting02.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
   'nonexisting03.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
 
 configuration:
   hosts:
@@ -35,6 +41,7 @@ steps:
       - '/^nonexisting.*/'
     command:
       plugin: 'ssh/custom'
+      credentials: 'linux_login'
       exec: 'echo'
       arguments: '"Hello World"'
 
@@ -45,6 +52,7 @@ steps:
       - '/^un.*/'
     command:
       plugin: 'ssh/custom'
+      credentials: 'linux_login'
       exec: 'echo'
       arguments: '"Hello World"'
 

@@ -1,14 +1,14 @@
 name: 'ssh_customs_plugin_test_deprecated'
 max_in_flight: 1
-ssh_root_pass: 'vagrant'
+ssh_root_pass: 'puppet'
 
 infrastructures:
-  baremetal: {}
+  'test':
+    type: 'baremetal'
 
 nodes:
   'linux01.example.com':
-    type: 'baremetal'
-
+    infrastructure: 'test'
 
 steps:
 

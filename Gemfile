@@ -1,5 +1,8 @@
 source 'https://rubygems.org'
-gem 'dop_common', :git => 'https://gitlab.swisscloud.io/clu-dop/dop_common.git'
+
+# Use the internal GIT repo as source for dop_common
+gem 'dop_common',
+  :git    => 'https://gitlab.swisscloud.io/clu-dop/dop_common.git'
 
 # The configuration file handling is somehow broken in GLI
 # The fixes are in github branches and pull requests are
@@ -13,7 +16,9 @@ gem 'dop_common', :git => 'https://gitlab.swisscloud.io/clu-dop/dop_common.git'
 #
 # Switch back to upstream version as soon as the changes are accepted
 # or the bugs otherwise fixed.
-gem 'gli', :git => 'https://github.com/ZeroPointEnergy/gli.git', :branch => 'merged_fixes'
+gem 'gli',
+  :git    => 'https://github.com/ZeroPointEnergy/gli.git',
+  :branch => 'merged_fixes'
 
 # Specify your gem's dependencies in dopi.gemspec
 gemspec

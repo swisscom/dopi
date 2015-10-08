@@ -1,13 +1,13 @@
 name: 'resolve_roles_on_validate'
 max_in_flight: 1
-ssh_root_pass: 'vagrant'
 
 infrastructures:
-  baremetal: {}
+  'test':
+    type: 'baremetal'
 
 nodes:
   'linux01.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
 
 configuration:
   hosts:

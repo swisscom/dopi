@@ -5,13 +5,7 @@ describe 'Basic integration test built from plan files' do
   before :all do
     Dopi.configuration.ssh_pass_auth = true
     Dopi.configuration.mco_config    = 'spec/data/mco/client.cfg'
-    Dopi.configuration.hiera_yaml    = 'spec/data/hiera/hiera.yaml'
-
-    # Setup test machines
-    setup_plan = 'spec/integration/dopi/build_vagrant_test_environment_plan.yaml'
-    plan_parser = DopCommon::Plan.new(YAML.load_file(setup_plan))
-    plan = Dopi::Plan.new(plan_parser)
-    plan.run
+    Dopi.configuration.hiera_yaml    = 'spec/integration/dopi/hiera.yaml'
   end
 
   # Create plugin tests from plugin test yaml files

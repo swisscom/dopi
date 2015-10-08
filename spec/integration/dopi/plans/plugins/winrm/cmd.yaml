@@ -3,11 +3,12 @@ max_in_flight: -1
 canary_host:   true
 
 infrastructures:
-  baremetal: {}
+  'test':
+    type: 'baremetal'
 
 nodes:
   'windows01.example.com':
-    type: 'baremetal'
+    infrastructure: 'test'
 
 credentials:
   'windows_kerberos':
