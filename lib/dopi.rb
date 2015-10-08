@@ -13,6 +13,17 @@ require "dopi/step"
 require "dopi/version"
 
 module Dopi
+
+  class PlanSaver
+    def initialize(plan)
+      @plan = plan
+    end
+
+    def update
+      Dopi.save_plan(@plan)
+    end
+  end
+
   class << self
 
     def plan_valid?(plan_file)
@@ -44,15 +55,9 @@ module Dopi
 
     def run_plan(plan, pattern_list, noop = false)
       begin
-        run_thread    = Thread.new { plan.run(pattern_list, noop) }
-        update_thread = Thread.new do
-          while run_thread.alive? do
-            Dopi.save_plan(plan) if plan.state_changed?
-          end
-          sleep(1)
-        end
-        run_thread.join
-        update_thread.join
+        plan_saver = PlanSaver.new(plan)
+        plan.add_observer(plan_saver)
+        plan.run(pattern_list, noop)
       ensure
         Dopi.save_plan(plan)
       end

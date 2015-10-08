@@ -11,7 +11,7 @@ module Dopi
     include Dopi::State
 
     attr_reader :plan_parser, :version
- 
+
     def initialize(plan_parser)
       @version = Dopi::VERSION
       @mutex = Mutex.new
@@ -46,7 +46,7 @@ module Dopi
         break if abort? || state_failed?
       end
     ensure
-      state_evaluate_children
+      update
     end
 
     def abort?
@@ -66,7 +66,7 @@ module Dopi
         validity = false unless nodes_valid?
         validity = false unless roles_valid?
       rescue Dopi::NoRoleFoundError => e
-        Dopi.log.warn(e.message) 
+        Dopi.log.warn(e.message)
       rescue => e
         Dopi.configuration.trace ? Dopi.log.error(e) : Dopi.log.error(e.message)
         Dopi.log.warn("Plan: Can't validate the command plugins because of a previous error")

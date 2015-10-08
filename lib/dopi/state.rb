@@ -2,8 +2,11 @@
 # This is a simple hierarchical state tracker which chan keep
 # track of it's state based on it's children
 #
+require 'observer'
+
 module Dopi
   module State
+    include Observable
 
     def state
       @state ||= :ready
@@ -24,6 +27,7 @@ module Dopi
 
     def state_add_child(child)
       state_children << child
+      child.add_observer(self)
     end
 
     def state_children_ready?
@@ -46,7 +50,7 @@ module Dopi
       state_children.all? {|child| child.state_done?}
     end
 
-    def state_evaluate_children
+    def update
       unless state_children.empty? || !state_auto_evaluate_children
         if    state_children_failed?       then @state = :failed
         elsif state_children_done?         then @state = :done
@@ -54,6 +58,8 @@ module Dopi
         elsif state_children_running_noop? then @state = :running_noop
         elsif state_children_ready?        then @state = :ready
         end
+        Dopi.log.debug("State of #{name} updated")
+        state_changed
       end
     end
 
@@ -65,27 +71,22 @@ module Dopi
     end
 
     def state_ready?
-      state_evaluate_children
       state == :ready
     end
 
     def state_running?
-      state_evaluate_children
       state == :running
     end
 
     def state_running_noop?
-      state_evaluate_children
       state == :running_noop
     end
 
     def state_done?
-      state_evaluate_children
       state == :done
     end
 
     def state_failed?
-      state_evaluate_children
       state == :failed
     end
 
@@ -135,17 +136,10 @@ module Dopi
       state_changed
     end
 
-    # returns if the state was changed since the last call of this function
-    def state_changed?
-      if state_children.empty?
-        !(@changed ? @changed = false : true)
-      else
-        (state_children.count{|child| child.state_changed?} > 0)
-      end
-    end
-
     def state_changed
-      @changed = true
+      Dopi.log.debug("State of #{name} changed")
+      changed
+      notify_observers
     end
 
   end
