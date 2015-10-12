@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [Unreleased]
+## [0.6.0] - 2015-10-12
 ### Added
 - Add version control to DOPi plan dumps and the possibility to update a plan
 - Add the options to include and/or exclude nodes from a run.
