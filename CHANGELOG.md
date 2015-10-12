@@ -6,6 +6,7 @@ All notable changes to DOPi will be documented in this file.
 - Add version control to DOPi plan dumps and the possibility to update a plan
 - Add the options to include and/or exclude nodes from a run.
 - Noop mode when using 'dopi run' or 'dopi oneshot'
+- Dopi now supports multiple step sets.
 
 ### Fixed
 - Display a proper error mesage if 'dopi run' is executed with a wrong plan name

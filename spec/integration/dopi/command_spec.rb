@@ -17,10 +17,12 @@ describe 'Basic integration test built from plan files' do
       it "is a valid plan file" do
         expect(plan.valid?).to be true
       end
-      plan.steps.each do |step|
-        it "successfully runs the step: '#{step.name}'" do
-          step.run(plan.nodes, false)
-          expect(step.state_done?).to be true
+      plan.step_sets.each do |step_set|
+        step_set.steps.each do |step|
+          it "successfully runs the step: '#{step.name}'" do
+            step.run(plan.nodes, false)
+            expect(step.state_done?).to be true
+          end
         end
       end
     end
@@ -35,10 +37,12 @@ describe 'Basic integration test built from plan files' do
       it "is a valid plan file" do
         expect(plan.valid?).to be true
       end
-      plan.steps.each do |step|
-        it "successfully runs the step: '#{step.name}'" do
-          step.run(plan.nodes, false)
-          expect(step.state_failed?).to be true
+      plan.step_sets.each do |step_set|
+        step_set.steps.each do |step|
+          it "successfully runs the step: '#{step.name}'" do
+            step.run(plan.nodes, false)
+            expect(step.state_failed?).to be true
+          end
         end
       end
     end

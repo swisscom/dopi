@@ -10,6 +10,7 @@ require "dopi/command"
 require "dopi/node"
 require "dopi/plan"
 require "dopi/step"
+require "dopi/step_set"
 require "dopi/version"
 
 module Dopi
@@ -53,11 +54,11 @@ module Dopi
       end
     end
 
-    def run_plan(plan, pattern_list, noop = false)
+    def run_plan(plan, options)
       begin
         plan_saver = PlanSaver.new(plan)
         plan.add_observer(plan_saver)
-        plan.run(pattern_list, noop)
+        plan.run(options)
       ensure
         Dopi.save_plan(plan)
       end
