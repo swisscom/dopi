@@ -4,7 +4,7 @@ describe 'Basic integration test built from plan files' do
 
   before :all do
     Dopi.configuration.ssh_pass_auth = true
-    Dopi.configuration.mco_config    = 'spec/data/mco/client.cfg'
+    Dopi.configuration.mco_config    = 'spec/integration/dopi/mco_client.cfg'
     Dopi.configuration.hiera_yaml    = 'spec/integration/dopi/hiera.yaml'
   end
 

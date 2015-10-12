@@ -42,8 +42,8 @@ describe Dopi::Command::Winrm do
 
   describe '#ca_trust_path' do
     it 'should return the path if specified' do
-      command = create_command({:plugin => 'winrm', :ca_trust_path => 'spec/data'})
-      expect(command.ca_trust_path).to eq('spec/data')
+      command = create_command({:plugin => 'winrm', :ca_trust_path => 'spec/unit'})
+      expect(command.ca_trust_path).to eq('spec/unit')
     end
     it 'should return nil if not specified' do
       command = create_command({:plugin => 'winrm'})

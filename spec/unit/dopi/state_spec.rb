@@ -2,6 +2,7 @@ require 'spec_helper'
 
 class StateTestKlass
   include Dopi::State
+  def name; "dummy"; end
 end
 
 describe Dopi::State do
@@ -40,7 +41,7 @@ describe Dopi::State do
 
       # No more state transitions possible (except finish)
       expect{@state.state_fail}.to       raise_error Dopi::StateTransitionError
-      expect{@state.state_reset}.to      raise_error Dopi::StateTransitionError 
+      expect{@state.state_reset}.to      raise_error Dopi::StateTransitionError
       expect{@state.state_run}.to        raise_error Dopi::StateTransitionError
       expect{@state.state_finish}.to_not raise_error
     end

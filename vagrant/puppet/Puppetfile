@@ -1,5 +1,0 @@
-forge "https://forgeapi.puppetlabs.com"
-
-mod 'dop-role_base',               :path => './dop-role_base'
-mod 'dop-role_puppetmaster',       :path => './dop-role_puppetmaster'
-mod 'dop-role_mcollective_broker', :path => './dop-role_mcollective_broker'
