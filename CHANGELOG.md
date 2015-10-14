@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.6.1] - 2015-10-14
+### Fixed
+- A bug where DOPi crashed because of a missing puppet gem
+
 ## [0.6.0] - 2015-10-12
 ### Added
 - Add version control to DOPi plan dumps and the possibility to update a plan
