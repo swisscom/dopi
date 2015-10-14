@@ -2,7 +2,6 @@
 # This class loades a deployment plan
 #
 require 'forwardable'
-require 'puppet'
 require 'hiera'
 require 'yaml'
 require 'socket'
@@ -15,7 +14,7 @@ module Dopi
     @@mutex = Mutex.new
     @@hiera = nil
     @@hiera_config = nil
-    
+
     def initialize(node_parser, plan)
       @node_parser = node_parser
       @plan = plan
@@ -68,7 +67,7 @@ module Dopi
 
     def domain
       @domain ||= name.split('.', 2)[1]
-    end 
+    end
 
     def basic_scope
       @basic_scope ||= {
