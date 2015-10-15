@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.6.2] - 2015-10-15
+### Fixed
+- Another bug where DOPi crashed because of a missing puppet gem
+
 ## [0.6.1] - 2015-10-14
 ### Fixed
 - A bug where DOPi crashed because of a missing puppet gem
