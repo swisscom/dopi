@@ -34,4 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "mcollective-client"
   spec.add_runtime_dependency "winrm"
   spec.add_runtime_dependency "parallel"
+  spec.add_runtime_dependency "deep_merge"
 end
