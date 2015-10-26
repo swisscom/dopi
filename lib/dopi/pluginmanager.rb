@@ -57,6 +57,6 @@ module Dopi
     def self.plugin_klass(plugin_name)
       @plugins[plugin_name]
     end
-    
+
   end
 end

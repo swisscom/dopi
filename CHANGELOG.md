@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [Unreleased]
+### Added
+- Dopi now filters all the secrets from the credentials out of the logs
+- Dopi will not log to a file structure (default is /var/log/dop/dopi)
+
 ## [0.6.2] - 2015-10-15
 ### Fixed
 - Another bug where DOPi crashed because of a missing puppet gem

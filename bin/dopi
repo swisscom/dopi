@@ -96,6 +96,16 @@ module Wrapper
   arg_name 'SECONDS'
   flag [:connection_check_timeout]
 
+  desc 'Directory for the log files'
+  default_value Dopi.configuration.log_dir
+  arg_name 'LOGDIR'
+  flag [:log_dir]
+
+  desc 'Log level for the logfiles'
+  default_value Dopi.configuration.log_level
+  arg_name 'LOGLEVEL'
+  flag [:log_level, :l]
+
   pre do |global,command,options,args|
     Dopi.configure do |config|
       config.trace =              global[:trace]
@@ -112,13 +122,34 @@ module Wrapper
       config.ssh_check_host_key = global[:ssh_check_host_key]
       config.mco_config         = global[:mco_config]
       config.mco_dopi_logger    = global[:mco_dopi_logger]
+      config.log_dir            = global[:log_dir]
+      config.log_level          = global[:log_level]
       config.connection_check_timeout = global[:connection_check_timeout]
     end
     ENV['GLI_DEBUG'] = 'true' if global[:trace] == true
-    Dopi.logger = Logger.new(STDERR)
-    Dopi.log.level = ::Logger.const_get(global[:verbosity].upcase)
+    # create a dummy logger and use the lowest log level configured
+    Dopi.logger = Logger.new('/dev/null')
+    file_log_level = ::Logger.const_get(global[:log_level].upcase)
+    cli_log_level = ::Logger.const_get(global[:verbosity].upcase)
+    min_log_level = file_log_level < cli_log_level ? file_log_level : cli_log_level
+    Dopi.log.level = min_log_level
+
+    # create the cli logger
+    logger = Logger.new(STDOUT)
+    logger.level = cli_log_level
+    logger.formatter = CustomFormatter.new
+    DopCommon.add_log_junction(logger)
+
+
+    Dopi.init_file_logger # init file logger
     @plan_cache = DopCommon::PlanCache.new(global[:plan_cache_dir])
     true
+  end
+
+  class CustomFormatter < Logger::Formatter
+    def call(severity, time, progname, msg)
+      "#{msg2str(msg)}\n"
+    end
   end
 
   def state(plan)

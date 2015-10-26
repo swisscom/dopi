@@ -4,6 +4,7 @@
 require 'forwardable'
 require 'yaml'
 require 'dop_common'
+require 'fileutils'
 
 module Dopi
   class Plan
@@ -31,6 +32,7 @@ module Dopi
 
     def run(options = {})
       @mutex.synchronize { @abort = false }
+      init_file_logging
       #set run option defaults
       options_defaults = {
         :run_for_nodes => :all,
@@ -41,6 +43,19 @@ module Dopi
       step_set = step_sets.find{|s| s.name == run_options[:step_set]}
       raise "Plan: Step set #{run_options[:step_set]} does not exist" if step_set.nil?
       step_set.run(run_options)
+    end
+
+    def init_file_logging
+      time = Time.now.strftime('%Y%m%d-%H%M%S')
+      plan_log_path = File.join(Dopi.configuration.log_dir, "#{time}-#{name}")
+      FileUtils.mkdir_p(plan_log_path)
+      create_file_log_device(plan_log_path, 'all')
+      nodes.each {|node| create_file_log_device(plan_log_path, node.name)}
+    end
+
+    def create_file_log_device(path, context)
+      log_file = File.join(path, context)
+      Dopi.create_context_logger(log_file, context)
     end
 
     def abort?

@@ -89,6 +89,7 @@ module Dopi
       unless state_failed?
         number_of_threads = max_in_flight == -1 ? commands_copy.length : max_in_flight
         Parallel.each(commands_copy, :in_threads => number_of_threads) do |command|
+          Dopi.log_context = command.node.name
           raise Parallel::Break if state_failed?
           command.meta_run(noop)
         end

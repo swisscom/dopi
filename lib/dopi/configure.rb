@@ -39,6 +39,7 @@ module Dopi
     attr_accessor :ssh_user, :ssh_key,
                   :ssh_pass_auth, :ssh_check_host_key
     attr_accessor :mco_config, :mco_dopi_logger
+    attr_accessor :log_dir, :log_level
 
     def initialize
       # Defaults
@@ -68,8 +69,12 @@ module Dopi
       # MCO defaults
       @mco_config = '/etc/mcollective/client.cfg'
       @mco_dopi_logger = true
+
+      # logging
+      @log_dir   = '/var/log/dop/dopi'
+      @log_level = 'DEBUG'
     end
- 
+
   end
 
 end
