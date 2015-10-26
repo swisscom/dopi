@@ -51,6 +51,8 @@ module Dopi
     end
 
     def update
+      old_state = @state
+      Dopi.log.debug("Checking if state of '#{name}' needs to be updated")
       unless state_children.empty? || !state_auto_evaluate_children
         if    state_children_failed?       then @state = :failed
         elsif state_children_done?         then @state = :done
@@ -58,8 +60,7 @@ module Dopi
         elsif state_children_running_noop? then @state = :running_noop
         elsif state_children_ready?        then @state = :ready
         end
-        Dopi.log.debug("State of #{name} updated")
-        state_changed
+        state_changed unless old_state == @state
       end
     end
 
@@ -128,16 +129,20 @@ module Dopi
     def state_reset(force = false)
       if force
         state_children.each {|child| child.state_reset(force)}
+        @state = :ready
       else
         raise Dopi::StateTransitionError, "Can't switch to ready from #{state.to_s}" unless state == :failed || state == :ready
-        state_children.each {|child| child.state_reset unless child.state_done?}
+        if state_children.any?
+          state_children.each {|child| child.state_reset unless (child.state_done? || child.state_ready?)}
+        else
+          @state = :ready
+          state_changed
+        end
       end
-      @state = :ready
-      state_changed
     end
 
     def state_changed
-      Dopi.log.debug("State of #{name} changed")
+      Dopi.log.debug("State of '#{name}' updated, notifying observers")
       changed
       notify_observers
     end
