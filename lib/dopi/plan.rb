@@ -16,7 +16,6 @@ module Dopi
     def initialize(plan_parser)
       @version = Dopi::VERSION
       @mutex = Mutex.new
-      @abort = false
       @plan_parser = plan_parser
 
       step_sets.each{|step_set| state_add_child(step_set)}
@@ -56,19 +55,6 @@ module Dopi
     def create_file_log_device(path, context)
       log_file = File.join(path, context)
       Dopi.create_context_logger(log_file, context)
-    end
-
-    def abort?
-      @mutex.synchronize { @abort }
-    end
-
-    def abort!
-      @mutex.synchronize do
-        @abort = true
-        step_sets.each do |step_set|
-           step_set.abort! if step_set.state_running?
-        end
-      end
     end
 
     # The main validation work is done in the dop_common
