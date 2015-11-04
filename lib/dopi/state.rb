@@ -164,6 +164,10 @@ module Dopi
       signal_procs << a_proc
     end
 
+    def delete_on_signal(a_proc)
+      signal_procs.delete(a_proc)
+    end
+
     def send_signal(signal)
       unless signals[signal] == true
         signal_procs.each {|p| p.call(signal)}

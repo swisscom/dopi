@@ -111,6 +111,13 @@ module Dopi
         log(:debug, "Executing #{command_string} for command #{name}")
         log(:debug, "Environment: #{env.to_s}")
         cmd_exit_code = Open3.popen3(env, command_string, :pgroup => true) do |stdin, stdout, stderr, wait_thr|
+          signal_handler = Proc.new do |signal|
+            case signal
+            when :abort then Process.kill(:TERM, wait_thr.pid)
+            when :kill  then Process.kill(:KILL, wait_thr.pid)
+            end
+          end
+          on_signal(signal_handler)
           stdin.close
           stdout_thread = Thread.new do
             until ( line = stdout.gets ).nil? do
@@ -124,9 +131,9 @@ module Dopi
               log(:error, line.gsub("\n", '').gsub("\r", ''))
             end
           end
-          stdout_thread.join
-          stderr_thread.join
-          wait_thr.value
+          exit_status = wait_thr.value
+          delete_on_signal(signal_handler)
+          exit_status
         end
         [ cmd_stdout, cmd_stderr, cmd_exit_code.exitstatus ]
       end
