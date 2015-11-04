@@ -1,4 +1,5 @@
 require "dopi/error"
+require "dopi/signal_handler"
 require "dopi/configure"
 require "dopi/log"
 require "dopi/pluginmanager"
