@@ -13,15 +13,12 @@ module Dopi
     def initialize(parsed_step_set, plan)
       @parsed_step_set = parsed_step_set
       @plan = plan
-      @mutex = Mutex.new
-      @abort = false
       steps.each{|step| state_add_child(step)}
     end
 
     def_delegators :@parsed_step_set, :name
 
     def run(run_options)
-      @mutex.synchronize { @abort = false }
       if state_done?
         Dopi.log.info("Step set #{name} is in state 'done'. Nothing to do")
         return
@@ -35,16 +32,8 @@ module Dopi
                       end
       steps.each do |step|
         step.run(run_for_nodes, run_options[:noop])
-        break if abort? || state_failed?
+        break if signals[:stop] || state_failed?
       end
-    end
-
-    def abort?
-      @mutex.synchronize { @abort }
-    end
-
-    def abort!
-      @mutex.synchronize { @abort = true }
     end
 
     # The main validation work is done in the dop_common
