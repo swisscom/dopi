@@ -94,6 +94,7 @@ module Dopi
     def state_run
       return if state == :running
       raise Dopi::StateTransitionError, "Can't switch to running from #{state.to_s}" unless state == :ready
+      reset_signals
       @state = :running
       state_changed
     end
@@ -145,6 +146,30 @@ module Dopi
       Dopi.log.debug("State of '#{name}' updated, notifying observers")
       changed
       notify_observers
+    end
+
+    def signals
+      @signals ||= Hash.new(false)
+    end
+
+    def reset_signals
+      @signals = Hash.new(false)
+    end
+
+    def signal_procs
+      @signal_procs ||= []
+    end
+
+    def on_signal(a_proc)
+      signal_procs << a_proc
+    end
+
+    def send_signal(signal)
+      unless signals[signal] == true
+        signal_procs.each {|p| p.call(signal)}
+        state_children.each {|child| child.send_signal(signal)}
+        signals[signal] = true
+      end
     end
 
   end
