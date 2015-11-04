@@ -91,6 +91,10 @@ module Dopi
         Parallel.each(commands_copy, :in_threads => number_of_threads) do |command|
           Dopi.log_context = command.node.name
           raise Parallel::Break if state_failed?
+          if signals[:stop]
+            Dopi.log.warn("Step '#{name}': Stopping thread spawning")
+            raise Parallel::Break
+          end
           command.meta_run(noop)
         end
       end
