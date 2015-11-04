@@ -10,7 +10,6 @@ module Dopi
       include Dopi::OutputParser
 
     public
-
       def validate
         log_validation_method('env_valid?', CommandParsingError)
         log_validation_method('arguments_valid?', CommandParsingError)
@@ -111,9 +110,9 @@ module Dopi
         cmd_stderr = ''
         log(:debug, "Executing #{command_string} for command #{name}")
         log(:debug, "Environment: #{env.to_s}")
-        cmd_exit_code = Open3.popen3(env, command_string) do |stdin, stdout, stderr, wait_thr|
+        cmd_exit_code = Open3.popen3(env, command_string, :pgroup => true) do |stdin, stdout, stderr, wait_thr|
           stdin.close
-          stdout_thread= Thread.new do
+          stdout_thread = Thread.new do
             until ( line = stdout.gets ).nil? do
               cmd_stdout << line
               log(:debug, line.gsub("\n", '').gsub("\r", ''))
