@@ -11,8 +11,9 @@ describe Dopi::State do
     @child_state1 = StateTestKlass.new
     @child_state2 = StateTestKlass.new
     @state = StateTestKlass.new
-    @state.state_add_child(@child_state1)
-    @state.state_add_child(@child_state2)
+    @state2 = StateTestKlass.new
+    @state2.state_add_child(@child_state1)
+    @state2.state_add_child(@child_state2)
   end
 
   describe '#new' do
@@ -89,19 +90,17 @@ describe Dopi::State do
   describe "state changes evaluated from children" do
 
     it "will fail if one of the children is failed" do
-      @state.state_run
       @child_state1.state_run
       @child_state1.state_fail
-      expect(@state.state_failed?).to eq true
+      expect(@state2.state_failed?).to eq true
     end
 
     it "will be done if all of the children are done" do
-      @state.state_run
       @child_state1.state_run
       @child_state1.state_finish
       @child_state2.state_run
       @child_state2.state_finish
-      expect(@state.state_done?).to eq true
+      expect(@state2.state_done?).to eq true
     end
 
   end
