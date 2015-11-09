@@ -28,7 +28,7 @@ module Dopi
             end
             unless connected
               sleep interval
-              return false if signals[:stop]
+              raise GracefulExit if signals[:stop]
               log(:info, "Retrying connect to node")
             end
           end

@@ -29,6 +29,9 @@ module Dopi
   class CommandExecutionError < StandardError
   end
 
+  class GracefulExit < StandardError
+  end
+
   class ConnectionError < CommandExecutionError
   end
 

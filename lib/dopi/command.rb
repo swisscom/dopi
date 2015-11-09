@@ -96,6 +96,9 @@ module Dopi
           end
         end
       end
+    rescue GracefulExit
+      log(:info, "Command excited gracefuly, resetting to ready")
+      state_reset(true) unless noop
     rescue Timeout::Error
       log(:error, "Command timed out (plugin_timeout is set to #{plugin_timeout})", false)
       state_fail unless noop
