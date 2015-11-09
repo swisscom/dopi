@@ -130,6 +130,7 @@ module Dopi
       if force
         state_children.each {|child| child.state_reset(force)}
         @state = :ready
+        state_changed
       else
         raise Dopi::StateTransitionError, "Can't switch to ready from #{state.to_s}" unless state == :failed || state == :ready
         if state_children.any?
