@@ -39,6 +39,7 @@ module Dopi
 
     def setup_signal_traps(signals)
       signals.each_with_object({}) do |signal, old_handlers|
+        Dopi.log.debug("Installing trap for signal #{signal.to_s}")
         old_handlers[signal] = Signal.trap(signal) do
           @signal_queue << { signal => Time.now }
           @self_writer.write_nonblock('.')
@@ -47,6 +48,7 @@ module Dopi
     end
 
     def teardown_signal_traps(old_handlers)
+      Dopi.log.debug("Removing trap for signal #{signal.to_s}")
       old_handlers.each do |signal, old_handler|
         Signal.trap(signal, old_handler)
       end

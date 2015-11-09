@@ -54,7 +54,7 @@ module Dopi
 
     def create_file_log_device(path, context)
       log_file = File.join(path, context)
-      Dopi.create_context_logger(log_file, context)
+      Dopi::ContextLoggers.create_context_logger(log_file, context)
     end
 
     # The main validation work is done in the dop_common
