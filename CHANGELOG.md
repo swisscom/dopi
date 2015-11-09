@@ -4,7 +4,12 @@ All notable changes to DOPi will be documented in this file.
 ## [Unreleased]
 ### Added
 - Dopi now filters all the secrets from the credentials out of the logs
-- Dopi will not log to a file structure (default is /var/log/dop/dopi)
+- Dopi will now log to a file structure (default is /var/log/dop/dopi)
+- SIGINT and SIGTERM will now try to shutdown the run gracefully. Only the second signal will send a
+  SIGTERM to the running processes. The third signal will send a SIGKILL.
+
+### Fixed
+- A bug where the state reset took extremely long
 
 ## [0.6.2] - 2015-10-15
 ### Fixed
