@@ -94,7 +94,6 @@ module Dopi
     def state_run
       return if state == :running
       raise Dopi::StateTransitionError, "Can't switch to running from #{state.to_s}" unless state == :ready
-      reset_signals
       @state = :running
       state_changed
     end
@@ -154,6 +153,7 @@ module Dopi
 
     def reset_signals
       @signals = Hash.new(false)
+      state_children.each {|child| child.reset_signals}
     end
 
     def signal_procs

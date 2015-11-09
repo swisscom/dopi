@@ -237,6 +237,7 @@ module Wrapper
   end
 
   def run_signal_handler(plan)
+    plan.reset_signals
     signal_handler_thread = Thread.new do
       Dopi.log.info("Starting signal handling")
       signal_counter = 0
