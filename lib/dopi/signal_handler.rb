@@ -48,8 +48,8 @@ module Dopi
     end
 
     def teardown_signal_traps(old_handlers)
-      Dopi.log.debug("Removing trap for signal #{signal.to_s}")
       old_handlers.each do |signal, old_handler|
+        Dopi.log.debug("Removing trap for signal #{signal.to_s}")
         Signal.trap(signal, old_handler)
       end
     end
