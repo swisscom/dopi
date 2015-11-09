@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [Unreleased]
+## [0.7.0] - 2015-11-09
 ### Added
 - Dopi now filters all the secrets from the credentials out of the logs
 - Dopi will now log to a file structure (default is /var/log/dop/dopi)
