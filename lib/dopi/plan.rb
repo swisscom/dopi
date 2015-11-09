@@ -15,7 +15,6 @@ module Dopi
 
     def initialize(plan_parser)
       @version = Dopi::VERSION
-      @mutex = Mutex.new
       @plan_parser = plan_parser
 
       step_sets.each{|step_set| state_add_child(step_set)}
@@ -30,7 +29,6 @@ module Dopi
       :canary_host
 
     def run(options = {})
-      @mutex.synchronize { @abort = false }
       init_file_logging
       #set run option defaults
       options_defaults = {
