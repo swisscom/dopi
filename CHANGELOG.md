@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [Unreleased]
+### Changed
+- The puppet_agent_run plugin timeout is now 30min per default
+
 ## [0.7.0] - 2015-11-09
 ### Added
 - Dopi now filters all the secrets from the credentials out of the logs
