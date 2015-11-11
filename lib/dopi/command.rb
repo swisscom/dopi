@@ -210,5 +210,6 @@ require 'dopi/command/winrm'
 require 'dopi/command/winrm/cmd'
 require 'dopi/command/winrm/powershell'
 require 'dopi/command/winrm/wait_for_login'
+require 'dopi/command/winrm/file_exists'
 
 # TODO: load plugins from the plugin paths

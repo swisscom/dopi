@@ -1,0 +1,38 @@
+name: 'test_powershell_exitcode_handling'
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'windows01.example.com':
+    infrastructure: 'test'
+  'linux01.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'windows_login':
+    type: 'username_password'
+    username: 'administrator'
+    password: 'vagrant'
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
+
+steps:
+
+  - name: 'Check if the plugin fails for the windows command'
+    nodes: 'windows01.example.com'
+    command:
+      plugin: 'winrm/file_exists'
+      credentials: 'windows_login'
+      file: 'C:\nonexistingfile.txt'
+
+  - name: 'Check if the plugin fails for the linux command'
+    nodes: 'linux01.example.com'
+    command:
+      plugin: 'ssh/file_exists'
+      credentials: 'linux_login'
+      file: '/nonexistingfile.txt'

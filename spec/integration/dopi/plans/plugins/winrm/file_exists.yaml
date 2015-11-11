@@ -1,0 +1,69 @@
+name: 'test_plugin_winrm_file_exists'
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'windows01.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'windows_login':
+    type: 'username_password'
+    username: 'administrator'
+    password: 'vagrant'
+
+steps:
+
+  - name: "Configure the plugin defaults"
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugins: '/^winrm/'
+        credential: 'windows_login'
+    command: 'dummy'
+
+  #
+  # Check if skipping works if the file exists
+  #
+
+  - name: 'Check if the command is skipped if the file does exist'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'winrm/file_exists'
+          file: 'C:\Windows\system.ini'
+      plugin: 'custom'
+      exec: 'fail'
+
+  #
+  # Check if the command is run if the file does not exists
+  #
+
+  - name: 'Make sure the test file is absent'
+    nodes: 'all'
+    command:
+      plugin: 'winrm/cmd'
+      exec: 'del'
+      arguments: 'C:\Windows\Temp\file_exists_test.txt'
+
+  - name: 'Check if the file is absent an write it again'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'winrm/file_exists'
+          file: 'C:\Windows\Temp\file_exists_test.txt'
+      plugin: 'winrm/cmd'
+      exec: 'echo'
+      arguments: '"file_exists test" > C:\Windows\Temp\file_exists_test.txt'
+
+  - name: 'Check if the file is there and fail if the command is run anyway'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'winrm/file_exists'
+          file: 'C:\Windows\Temp\file_exists_test.txt'
+      plugin: 'custom'
+      exec: 'fail'
+
