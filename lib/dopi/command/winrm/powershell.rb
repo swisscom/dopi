@@ -3,13 +3,10 @@ module Dopi
     class Winrm
       class Powershell < Dopi::Command::Winrm::Cmd
 
-        alias :original_exec :exec
+        # this is needed to get the unencoded string for noop and run debug
+        alias :original_command_string :command_string
 
-        def original_command_string
-          original_exec + ' ' + arguments
-        end
-
-        def exec
+        def command_string
           script = WinRM::PowershellScript.new(super)
           "powershell -encodedCommand #{script.encoded()}"
         end
