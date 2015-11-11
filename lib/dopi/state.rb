@@ -121,7 +121,7 @@ module Dopi
 
     def state_fail
       return if state == :failed
-      raise Dopi::StateTransitionError, "Can't switch to done from #{state.to_s}" unless state == :running
+      raise Dopi::StateTransitionError, "Can't switch to failed from #{state.to_s}" unless state == :running
       @state = :failed
       state_changed
     end
@@ -143,7 +143,7 @@ module Dopi
     end
 
     def state_changed
-      Dopi.log.debug("State of '#{name}' updated, notifying observers")
+      Dopi.log.debug("State of '#{name}' updated to #{@state.to_s}, notifying observers")
       changed
       notify_observers
     end

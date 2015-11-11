@@ -41,6 +41,7 @@ module Dopi
 
     # Returns true if the exit code is one we expected, otherwise false
     def check_exit_code(cmd_exit_code)
+      log(:debug, "Checking exit code '#{cmd_exit_code}'")
       exit_code_ok = case expect_exit_codes
       when 'all', 'ALL', 'All', :all then true
       when Array then expect_exit_codes.include?(cmd_exit_code)

@@ -108,6 +108,7 @@ module Dopi
       state_fail unless noop
     rescue => e
       log(:error, "Unexpected error!!! This is a Bug", false)
+      Dopi.log.error(e) if Dopi.configuration.trace
       state_fail unless noop
       raise e
     end
