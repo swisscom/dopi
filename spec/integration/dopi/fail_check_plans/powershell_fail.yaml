@@ -1,0 +1,25 @@
+name: 'test_powershell_exitcode_handling'
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'windows01.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'windows_login':
+    type: 'username_password'
+    username: 'administrator'
+    password: 'vagrant'
+
+steps:
+
+  - name: 'Check if the command is skipped if the file does exist'
+    nodes: 'all'
+    command:
+      plugin: 'winrm/powershell'
+      credentials: 'windows_login'
+      exec: 'ThisCommandDoesNotExist'
