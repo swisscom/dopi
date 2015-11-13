@@ -2,6 +2,9 @@
 All notable changes to DOPi will be documented in this file.
 
 ## [Unreleased]
+### Added
+- winrm/file_exists verify command plugin
+
 ### Changed
 - The puppet_agent_run plugin timeout is now 30min per default
 
