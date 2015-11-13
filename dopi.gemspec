@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "simplecov"
 
   spec.add_runtime_dependency "dop_common"
-  spec.add_runtime_dependency "gli"
+  spec.add_runtime_dependency "gli", '>= 2.13.3'
   spec.add_runtime_dependency "logger-colors"
   spec.add_runtime_dependency "hiera"
   spec.add_runtime_dependency "mcollective-client"
