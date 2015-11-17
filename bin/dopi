@@ -368,6 +368,7 @@ module Wrapper
         exit_now!("Some steps are in a state where they can't be started again. Try to reset the plan.")
       ensure
         print_state(plan)
+        exit_now!('Errors during plan run detected!') if plan.state_failed?
       end
     end
   end
@@ -403,7 +404,9 @@ module Wrapper
         begin
           Dopi.run_plan(plan, options)
           sleep(2) # allow the show command to catch up
-        ensure print_state(plan)
+        ensure
+          print_state(plan)
+          exit_now!('Errors during plan run detected!') if plan.state_failed?
         end
       ensure @plan_cache.remove(plan.name) unless plan.nil?
       end
