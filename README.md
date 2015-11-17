@@ -202,6 +202,8 @@ as a verify_command and vice versa.
 
 [ssh/file_exists](doc/plugins/ssh/file_exists.md)
 
+[winrm/file_contains](doc/plugins/winrm/file_contains.md)
+
 [winrm/file_exists](doc/plugins/winrm/file_exists.md)
 
 ## Example Plans
