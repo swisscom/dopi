@@ -1,0 +1,51 @@
+name: 'test_plugin_ssh_file_exists'
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'linux01.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
+
+steps:
+
+  - name: "Configure the plugin defaults"
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugins: '/^ssh/'
+        credential: 'linux_login'
+    command: 'dummy'
+
+  - name: 'deploy test file'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'echo'
+      arguments: '"Foo" > /tmp/file_contains_test'
+
+  - name: 'Check if the file contains the string'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_contains'
+          file: '/tmp/file_contains_test'
+          pattern: 'Foo'
+      plugin: 'custom'
+      exec: 'fail'
+
+  - name: 'Make sure it returns 1 if the string does not match'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/file_contains'
+      file: '/tmp/file_contains_test'
+      pattern: 'somethingelse'
+      expect_exit_codes: 1
+
