@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   # Code quality
   spec.add_development_dependency "simplecov"
 
-  spec.add_runtime_dependency "dop_common"
+  spec.add_runtime_dependency "dop_common", '0.5.0'
   spec.add_runtime_dependency "gli", '>= 2.13.3'
   spec.add_runtime_dependency "logger-colors"
   spec.add_runtime_dependency "hiera"
