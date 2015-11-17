@@ -1,13 +1,17 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [Unreleased]
+## [0.8.0] - 2015-11-17
 ### Added
 - winrm/file_exists verify command plugin
 - winrm/file_contains verify command plugin
 
 ### Changed
 - The puppet_agent_run plugin timeout is now 30min per default
+- Some debug message improvements
+
+### Fixed
+- return code should not be 0 if a dopi run fails
 
 ## [0.7.0] - 2015-11-09
 ### Added
