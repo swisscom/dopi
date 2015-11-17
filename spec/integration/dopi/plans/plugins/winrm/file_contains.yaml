@@ -1,0 +1,51 @@
+name: 'test_plugin_ssh_file_exists'
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'windows01.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'windows_login':
+    type: 'username_password'
+    username: 'administrator'
+    password: 'vagrant'
+
+steps:
+
+  - name: "Configure the plugin defaults"
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugins: '/^winrm/'
+        credential: 'windows_login'
+    command: 'dummy'
+
+  - name: 'deploy test file'
+    nodes: 'all'
+    command:
+      plugin: 'winrm/cmd'
+      exec: 'echo'
+      arguments: '"Foo" > C:\Windows\Temp\file_contains_test'
+
+  - name: 'Check if the file contains the string'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'winrm/file_contains'
+          file: 'C:\Windows\Temp\file_contains_test'
+          pattern: 'Foo'
+      plugin: 'custom'
+      exec: 'fail'
+
+  - name: 'Make sure it returns 1 if the string does not match'
+    nodes: 'all'
+    command:
+      plugin: 'winrm/file_contains'
+      file: 'C:\Windows\Temp\file_contains_test'
+      pattern: 'somethingelse'
+      expect_exit_codes: 1
+
