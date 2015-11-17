@@ -1,4 +1,4 @@
-name: 'test_plugin_ssh_file_exists'
+name: 'test_plugin_ssh_file_contains'
 max_in_flight: 1
 
 infrastructures:
