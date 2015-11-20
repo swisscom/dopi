@@ -26,7 +26,7 @@ module Dopi
 
         def global_options
           options = []
-          options << ' -o StrictHostKeyChecking=no' unless Dopi.configuration.ssh_check_host_key
+          options << ' -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' unless Dopi.configuration.ssh_check_host_key
           options << ' -q' if quiet
         end
 
