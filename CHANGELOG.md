@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.8.1] - 2015-11-23
+### Fixed
+- Make sure ssh really ignores the hosts keys if specified in the options
+
 ## [0.8.0] - 2015-11-17
 ### Added
 - winrm/file_exists verify command plugin
