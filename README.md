@@ -222,3 +222,45 @@ More can be found in the plans directory.
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
+### Run the test suit
+
+Most of the tests depend on Vagrant to create an actual test environment where the DOPi
+plugins can be tested under real conditions.
+
+To setup the test suit you need a working vagrant (https://www.vagrantup.com/) installation
+with the dop_common gem added as a plugin:
+
+    cd /tmp
+    git clone https://gitlab.swisscloud.io/clu-dop/dop_common.git
+    cd dop_common
+    gem build dop_common.gemspec
+    vagrant plugin install ./dop_common-*.gem
+
+After you install the plugin you have to setup the test machines with the rake task:
+
+    cd /path/to/dopi/
+    bundle install --path .bundle
+    bundle exec rake testenv:setup
+
+You should always rerun 'testenv:setup' is an idempotent DOPi plan and can be rerun
+to make sure your test environment is started and setup correctly.
+
+The tests will connect to the machines and for now you require some hosts file entries
+to work correctly. Add the following lines to your /etc/hosts:
+
+    # Host entries for DOPi test environment
+    192.168.56.101 puppetmaster.example.com
+    192.168.56.102 broker.example.com
+    192.168.56.103 linux01.example.com
+    192.168.56.104 linux02.example.com
+    192.168.56.105 linux03.example.com
+    192.168.56.106 windows01.example.com
+
+Now you are ready to run the test suit:
+
+    bundle exec rake
+
+If you reboot your machine or stop the test machines you can make sure the test
+environment is ready and built by simply running the setup again:
+
+    bundle exec rake testenv:setup
