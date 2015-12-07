@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [Unreleased]
+## [0.8.2] - 2015-11-07
 ### Fixed
 - Make sure log directory actually exists before creating the log file
 
