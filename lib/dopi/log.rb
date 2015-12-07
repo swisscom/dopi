@@ -16,6 +16,7 @@ module Dopi
   end
 
   def self.init_file_logger
+    FileUtils.mkdir_p(Dopi.configuration.log_dir)
     log_file = File.join(Dopi.configuration.log_dir, 'dopi.log')
     logger = Logger.new(log_file , 10, 1024000)
     logger.level = ::Logger.const_get(Dopi.configuration.log_level.upcase)
