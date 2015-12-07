@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- Make sure log directory actually exists before creating the log file
+
 ## [0.8.1] - 2015-11-23
 ### Fixed
 - Make sure ssh really ignores the hosts keys if specified in the options
