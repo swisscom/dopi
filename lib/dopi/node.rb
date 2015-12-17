@@ -1,7 +1,6 @@
 #
 # This class loades a deployment plan
 #
-require 'forwardable'
 require 'hiera'
 require 'yaml'
 require 'socket'
@@ -9,8 +8,6 @@ require 'timeout'
 
 module Dopi
   class Node
-    extend Forwardable
-
     @@mutex = Mutex.new
     @@hiera = nil
     @@hiera_config = nil
@@ -21,18 +18,40 @@ module Dopi
       @addresses = {}
     end
 
-    def_delegators :@node_parser, :name
+    def name
+      @node_parser.name
+    end
 
     def config(variable)
       resolve_external(variable) || resolve_internal(variable)
     end
 
+    def has_config?(variable, pattern)
+      pattern_match?(config(variable), pattern)
+    end
+
+    def fact(variable)
+      scope[ensure_global_namespace(variable)]
+    end
+
+    def has_fact?(variable, pattern)
+      pattern_match?(fact(variable), pattern)
+    end
+
+    def has_name?(pattern)
+      pattern_match?(name, pattern)
+    end
+
     def role
-      @role ||= config(Dopi.configuration.role_variable) || role_default
+      config(Dopi.configuration.role_variable) || role_default
+    end
+
+    def has_role?(pattern)
+      pattern_match?(role, pattern)
     end
 
     def ssh_root_pass
-      @sshpass ||= ssh_root_pass_from_hiera || @plan.ssh_root_pass
+      ssh_root_pass_from_hiera || @plan.ssh_root_pass
     end
 
     def addresses
@@ -44,7 +63,18 @@ module Dopi
         raise NodeConnectionError, "Unable to establish a connection for node #{name} on port #{port} over #{addresses.join(', ')}"
     end
 
+    def reset_address(port = nil)
+      port.nil? ? @addresses = {} : @addresses.delete(port)
+    end
+
   private
+
+    def pattern_match?(value, pattern)
+      case pattern
+      when Regexp then value =~ pattern
+      else value == pattern
+      end
+    end
 
     def ip_addresses
       @node_parser.interfaces.map{|i| [:dhcp, :none].include?(i.ip) ? nil : i.ip}.compact
@@ -94,8 +124,8 @@ module Dopi
     end
 
     def scope
-      merged_scope = facts.merge(basic_scope)
-      @scope = Hash[merged_scope.map {|fact,value| [ensure_global_namespace(fact), value ]}]
+      merged_scope = basic_scope.merge(facts)
+      Hash[merged_scope.map {|fact,value| [ensure_global_namespace(fact), value ]}]
     end
 
     def hiera

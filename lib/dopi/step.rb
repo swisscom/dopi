@@ -1,35 +1,39 @@
 #
 # Step
 #
-require 'forwardable'
 require 'parallel'
 
 module Dopi
   class Step
-    extend Forwardable
     include Dopi::State
 
     DEFAULT_MAX_IN_FLIGHT = 3
 
     attr_accessor :plan
 
-    def initialize(step_parser, plan, nodes = [])
+    def initialize(step_parser, plan)
       @step_parser = step_parser
       @plan        = plan
-      @nodes       = nodes
+      @nodes       = create_node_list(step_parser)
 
       commands.each{|command| state_add_child(command)}
     end
 
-    def_delegators :@step_parser, :name
+    def name
+      @step_parser.name
+    end
 
-    def run(run_for_nodes, noop = false)
+    def run(run_options)
       if state_done?
         Dopi.log.info("Step '#{name}' is in state 'done'. Skipping")
         return
       end
       Dopi.log.info("Starting to run step '#{name}'")
-      run_commands(run_for_nodes, noop)
+      run_for_nodes = case run_options[:run_for_nodes]
+                      when :all then nodes
+                      else create_node_list(run_options[:run_for_nodes])
+                      end
+      run_commands(run_for_nodes, run_options[:noop])
       Dopi.log.info("Step '#{name}' successfully finished.") if state_done?
       Dopi.log.error("Step '#{name}' failed! Stopping execution.") if state_failed?
     end
@@ -130,6 +134,64 @@ module Dopi
         delete_plugin_defaults
         set_plugin_defaults
         Dopi::Command.create_plugin_instance(@step_parser.command, self, node)
+      end
+    end
+
+  private
+
+    def create_node_list(filter_list)
+      list = []
+
+      # include nodes
+      list += collect_nodes(:node, filter_list.nodes)
+      list += collect_nodes(:role, filter_list.roles)
+      filter_list.nodes_by_config.each do |variable, patterns|
+        list += collect_nodes(:config, patterns, variable)
+      end
+      #filter_list.nodes_by_fact.each do |variable, patterns|
+      #  list += collect_nodes(:fact, patterns, variable)
+      #end
+
+      # exclude nodes
+      list -= collect_nodes(:exclude_node, filter_list.exclude_nodes)
+      list -= collect_nodes(:exclude_role, filter_list.exclude_roles)
+      filter_list.exclude_nodes_by_config.each do |variable, patterns|
+        list -= collect_nodes(:exclude_config, patterns, variable)
+      end
+      #filter_list.exclude_nodes_by_fact.each do |variable, patterns|
+      #  list -= collect_nodes(:exclude_fact, patterns, variable)
+      #end
+
+      list.uniq
+    end
+
+    def collect_nodes(pattern_type, patterns, variable = nil)
+      collected_nodes = []
+      [patterns].flatten.each do |pattern|
+        node_list = node_list_from_pattern(pattern_type, pattern, variable)
+        if node_list.empty?
+          pattern_s = pattern.kind_of?(Regexp) ? "/#{pattern.source}/" : pattern.to_s
+          msg = variable.nil? ? "'#{pattern_s}'" : "{'#{variable.to_s}' => '#{pattern_s}'}"
+          Dopi.log.warn("Step '#{name}': #{pattern_type.to_s} => #{msg} does not match any node!")
+        else
+          collected_nodes += node_list
+        end
+      end
+      collected_nodes
+    end
+
+    def node_list_from_pattern(pattern_type, pattern, variable = nil)
+      case pattern
+      when :all then @plan.nodes
+      else
+        @plan.nodes.select do |node|
+          case pattern_type
+          when :node, :exclude_node     then node.has_name?(pattern)
+          when :role, :exclude_role     then node.has_role?(pattern)
+          when :config, :exclude_config then node.has_config?(variable, pattern)
+          when :fact, :exclude_fact     then node.has_fact?(variable, pattern)
+          end
+        end
       end
     end
 
