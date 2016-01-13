@@ -7,9 +7,12 @@ All notable changes to DOPi will be documented in this file.
   in the steps or on the cli when running a plan.
 - Dopi will now only print warnings instead of trowing an error if a node or role does not
   exist or a pattern does not match anything in a step or on the cli.
+- Dopi will now use different default directories and config locations if run by a user so the
+  program can actually write to all the nessesary files and directories per default.
 
 ### Fixed
 - Dopi will no longer crash but print an error if the credentials list of a plugin is empty.
+- Dopi will no longer crash but print an error if the hiera.yaml is not present.
 
 ## [0.8.2] - 2015-11-07
 ### Fixed
