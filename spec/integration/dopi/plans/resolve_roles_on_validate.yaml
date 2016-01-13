@@ -10,7 +10,7 @@ nodes:
     infrastructure: 'test'
 
 configuration:
-  hosts:
+  nodes:
     'linux01.example.com':
       role: 'testrole'
 

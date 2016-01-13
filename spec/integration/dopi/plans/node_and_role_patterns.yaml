@@ -22,7 +22,7 @@ credentials:
     password: 'puppet'
 
 configuration:
-  hosts:
+  nodes:
     'linux01.example.com':
       role: 'isreal'
     'nonexisting01.example.com':

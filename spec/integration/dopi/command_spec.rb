@@ -1,12 +1,10 @@
 require 'spec_helper'
 
-describe 'Basic integration test built from plan files' do
+Dopi.configuration.ssh_pass_auth = true
+Dopi.configuration.mco_config    = 'spec/integration/dopi/mco_client.cfg'
+Dopi.configuration.hiera_yaml    = 'spec/integration/dopi/hiera.yaml'
 
-  before :all do
-    Dopi.configuration.ssh_pass_auth = true
-    Dopi.configuration.mco_config    = 'spec/integration/dopi/mco_client.cfg'
-    Dopi.configuration.hiera_yaml    = 'spec/integration/dopi/hiera.yaml'
-  end
+describe 'Basic integration test built from plan files' do
 
   # Create plugin tests from plugin test yaml files
   # and check if they run successfully
@@ -20,7 +18,7 @@ describe 'Basic integration test built from plan files' do
       plan.step_sets.each do |step_set|
         step_set.steps.each do |step|
           it "successfully runs the step: '#{step.name}'" do
-            step.run(plan.nodes, false)
+            step.run({:run_for_nodes => :all, :noop => false})
             expect(step.state_done?).to be true
           end
         end
@@ -40,7 +38,7 @@ describe 'Basic integration test built from plan files' do
       plan.step_sets.each do |step_set|
         step_set.steps.each do |step|
           it "successfully runs the step: '#{step.name}'" do
-            step.run(plan.nodes, false)
+            step.run({:run_for_nodes => :all, :noop => false})
             expect(step.state_failed?).to be true
           end
         end

@@ -20,7 +20,7 @@ credentials:
     password: 'puppet'
 
 configuration:
-  hosts:
+  nodes:
     'linux01.example.com':
       my_alias:  'realnode'
       my_alias2: 'include_this'
