@@ -138,7 +138,12 @@ module Dopi
         unless Dopi.configuration.hiera_yaml == @@hiera_config
           Dopi.log.debug("Hiera config location changed from #{@@hiera_config.to_s} to #{Dopi.configuration.hiera_yaml.to_s}")
           @@hiera_config = Dopi.configuration.hiera_yaml
-          config = YAML.load_file(@@hiera_config)
+          config = {}
+          if File.exists?(@@hiera_config)
+            config = YAML.load_file(@@hiera_config)
+          else
+            Dopi.log.error("Hiera config #{@@hiera_config} not found! Using empty config")
+          end
           config[:logger] = 'dopi'
           @@hiera = Hiera.new(:config => config)
         end
