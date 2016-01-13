@@ -30,6 +30,10 @@ module Dopi
       pattern_match?(config(variable), pattern)
     end
 
+    def config_includes?(variable, pattern)
+      [config(variable)].flatten.any?{|v| pattern_match?(v, pattern)}
+    end
+
     def fact(variable)
       scope[ensure_global_namespace(variable)]
     end

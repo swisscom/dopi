@@ -30,7 +30,7 @@ module Dopi
       end
       Dopi.log.info("Starting to run step '#{name}'")
       run_for_nodes = case run_options[:run_for_nodes]
-                      when :all then nodes
+                      when :all then @nodes
                       else create_node_list(run_options[:run_for_nodes])
                       end
       run_commands(run_for_nodes, run_options[:noop])
@@ -139,60 +139,64 @@ module Dopi
 
   private
 
-    def create_node_list(filter_list)
-      list = []
+    def create_node_list(node_filters)
+      include_list = []
+      exclude_list = []
+      filter_types = [
+        :nodes,
+        :roles,
+        :nodes_by_config
+      ]
 
-      # include nodes
-      list += collect_nodes(:node, filter_list.nodes)
-      list += collect_nodes(:role, filter_list.roles)
-      filter_list.nodes_by_config.each do |variable, patterns|
-        list += collect_nodes(:config, patterns, variable)
+      filter_types.each do |filter_type|
+        filter = node_filters.send(filter_type)
+        include_list += create_list_from_filter(filter_type, filter)
+
+        exclude_filter_type = "exclude_#{filter_type}".to_sym
+        exclude_filter = node_filters.send(exclude_filter_type)
+        exclude_list += create_list_from_filter(exclude_filter_type, exclude_filter)
       end
-      #filter_list.nodes_by_fact.each do |variable, patterns|
-      #  list += collect_nodes(:fact, patterns, variable)
-      #end
-
-      # exclude nodes
-      list -= collect_nodes(:exclude_node, filter_list.exclude_nodes)
-      list -= collect_nodes(:exclude_role, filter_list.exclude_roles)
-      filter_list.exclude_nodes_by_config.each do |variable, patterns|
-        list -= collect_nodes(:exclude_config, patterns, variable)
-      end
-      #filter_list.exclude_nodes_by_fact.each do |variable, patterns|
-      #  list -= collect_nodes(:exclude_fact, patterns, variable)
-      #end
-
-      list.uniq
+      (include_list - exclude_list).uniq
     end
 
-    def collect_nodes(pattern_type, patterns, variable = nil)
-      collected_nodes = []
-      [patterns].flatten.each do |pattern|
-        node_list = node_list_from_pattern(pattern_type, pattern, variable)
-        if node_list.empty?
-          pattern_s = pattern.kind_of?(Regexp) ? "/#{pattern.source}/" : pattern.to_s
-          msg = variable.nil? ? "'#{pattern_s}'" : "{'#{variable.to_s}' => '#{pattern_s}'}"
-          Dopi.log.warn("Step '#{name}': #{pattern_type.to_s} => #{msg} does not match any node!")
-        else
-          collected_nodes += node_list
-        end
-      end
-      collected_nodes
+     def create_list_from_filter(filter_type, filter)
+      decompose_filter(filter).collect do |variable, patterns|
+        [patterns].flatten.collect do |pattern|
+          filter_nodes(filter_type, pattern, variable)
+        end.flatten
+      end.flatten
     end
 
-    def node_list_from_pattern(pattern_type, pattern, variable = nil)
+    # returns a variable and patterns Array for a filter
+    def decompose_filter(filter)
+      case filter
+      when String, Symbol, Array then [[nil, filter]]
+      when Hash                  then filter.to_a
+      else []
+      end
+    end
+
+    def filter_nodes(filter_type, pattern, variable = nil)
       case pattern
       when :all then @plan.nodes
       else
-        @plan.nodes.select do |node|
-          case pattern_type
-          when :node, :exclude_node     then node.has_name?(pattern)
-          when :role, :exclude_role     then node.has_role?(pattern)
-          when :config, :exclude_config then node.has_config?(variable, pattern)
-          when :fact, :exclude_fact     then node.has_fact?(variable, pattern)
+        nodes_list = @plan.nodes.select do |node|
+          case filter_type
+          when :nodes, :exclude_nodes                     then node.has_name?(pattern)
+          when :roles, :exclude_roles                     then node.has_role?(pattern)
+          when :nodes_by_config, :exclude_nodes_by_config then node.config_includes?(variable, pattern)
+          when :nodes_by_fact, :exclude_nodes_by_fact     then node.has_fact?(variable, pattern)
           end
         end
+        unused_pattern_warning(filter_type, pattern, variable) if nodes_list.empty?
+        nodes_list
       end
+    end
+
+    def unused_pattern_warning(filter_type, pattern, variable = nil)
+      pattern_s = pattern.kind_of?(Regexp) ? "/#{pattern.source}/" : pattern.to_s
+      msg = variable.nil? ? "'#{pattern_s}'" : "{'#{variable.to_s}' => '#{pattern_s}'}"
+      Dopi.log.warn("Step '#{name}': #{filter_type.to_s} => #{msg} does not match any node!")
     end
 
   end
