@@ -45,7 +45,7 @@ module Dopi
         end
         winrm_service or
           raise CommandExecutionError,
-            "Unable to login with any of the given credentials: #{credentials.keys.join(', ')}"
+            "Unable to login with any of the given credentials: #{credentials.map{|c| c.name}.join(', ')}"
       end
 
       def endpoint
