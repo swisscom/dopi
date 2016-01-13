@@ -8,6 +8,9 @@ All notable changes to DOPi will be documented in this file.
 - Dopi will now only print warnings instead of trowing an error if a node or role does not
   exist or a pattern does not match anything in a step or on the cli.
 
+### Fixed
+- Dopi will no longer crash but print an error if the credentials list of a plugin is empty.
+
 ## [0.8.2] - 2015-11-07
 ### Fixed
 - Make sure log directory actually exists before creating the log file

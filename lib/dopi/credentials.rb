@@ -22,7 +22,7 @@ module Dopi
     end
 
     def credentials
-      @credentials ||= credentials_valid? ? parse_credentials : []
+      @credentials ||= credentials_valid? ? parse_credentials : {}
     end
 
   private
