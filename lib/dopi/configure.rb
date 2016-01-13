@@ -7,6 +7,7 @@
 #     config.use_hiera = true
 #   end
 #
+require 'etc'
 
 module Dopi
 
@@ -42,16 +43,28 @@ module Dopi
     attr_accessor :log_dir, :log_level
 
     def initialize
+      user = Etc.getpwuid(Process.uid)
+      is_root = user.name == 'root'
+      dopi_home = File.join(user.dir, '.dop')
+
       # Defaults
       @trace          = false
-      @config_file    = '/etc/dop/dopi.conf'
-      @plan_cache_dir = '/var/lib/dop/plans/'
+      @config_file    = is_root ?
+        '/etc/dop/dopi.conf' :
+        File.join(dopi_home, 'dopi.conf')
+      @plan_cache_dir = is_root ?
+        '/var/lib/dop/plans/' :
+        File.join(dopi_home, 'cache')
 
       # Hiera defaults
       @use_hiera  = true
-      @hiera_yaml = '/etc/puppet/hiera.yaml'
+      @hiera_yaml = is_root ?
+        '/etc/puppet/hiera.yaml' :
+        File.join(user.dir, '.puppet', 'hiera.yaml')
       @load_facts = false
-      @facts_dir  = '/var/lib/puppet/yaml/facts/'
+      @facts_dir  = is_root ?
+        '/var/lib/puppet/yaml/facts/' :
+        File.join(user.dir, '.puppet', 'var', 'yaml', 'facts')
 
       # Connection
       @connection_check_timeout = 5
@@ -62,16 +75,20 @@ module Dopi
 
       # SSH defaults
       @ssh_user = 'root'
-      @ssh_key  = File.join(ENV['HOME'], '.ssh/id_dsa')
+      @ssh_key  = File.join(user.dir, '.ssh/id_dsa')
       @ssh_pass_auth = false
       @ssh_check_host_key = false
 
       # MCO defaults
-      @mco_config = '/etc/mcollective/client.cfg'
+      @mco_config = is_root ?
+        '/etc/mcollective/client.cfg':
+        File.join(user.dir, '.mcollective')
       @mco_dopi_logger = true
 
       # logging
-      @log_dir   = '/var/log/dop/dopi'
+      @log_dir   = is_root ?
+        '/var/log/dop/dopi' :
+        File.join(dopi_home, 'log')
       @log_level = 'DEBUG'
     end
 
