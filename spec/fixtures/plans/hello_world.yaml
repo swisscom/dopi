@@ -1,0 +1,34 @@
+name: 'hello_world'
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'linux01.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
+
+steps:
+  - name: 'write hello world'
+    nodes: 'all'
+    command:
+      plugin: 'custom'
+      exec: 'echo'
+      arguments: '"hello world"'
+  - name: 'list the local dir'
+    nodes: 'all'
+    command:
+      plugin: 'custom'
+      exec: 'ls'
+  - name: 'list the environment'
+    nodes: 'all'
+    command:
+      plugin: 'custom'
+      exec: 'env'

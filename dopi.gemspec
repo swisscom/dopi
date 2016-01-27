@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "rspec-mocks"
+  spec.add_development_dependency "rspec-command"
 
   # Code quality
   spec.add_development_dependency "simplecov"

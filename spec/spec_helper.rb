@@ -7,6 +7,7 @@ end
 
 require 'dopi'
 require 'command_helper'
+require 'rspec_command'
 
 Dopi.log.level = ::Logger::FATAL
 
@@ -28,6 +29,7 @@ Dopi.log.level = ::Logger::FATAL
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   config.include CommandHelper
+  config.include RSpecCommand
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
