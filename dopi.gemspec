@@ -26,13 +26,14 @@ Gem::Specification.new do |spec|
 
   # Code quality
   spec.add_development_dependency "simplecov"
+  spec.add_development_dependency "rubocop"
 
-  spec.add_runtime_dependency "dop_common", '0.5.0'
+  spec.add_runtime_dependency "dop_common", '0.6.1'
   spec.add_runtime_dependency "gli", '>= 2.13.3'
   spec.add_runtime_dependency "logger-colors"
   spec.add_runtime_dependency "hiera"
   spec.add_runtime_dependency "mcollective-client"
-  spec.add_runtime_dependency "winrm"
+  spec.add_runtime_dependency "winrm", '1.3.4'
   spec.add_runtime_dependency "parallel"
   spec.add_runtime_dependency "deep_merge"
 end
