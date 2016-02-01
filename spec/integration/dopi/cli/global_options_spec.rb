@@ -93,27 +93,41 @@ describe 'global cli options' do
   end
 
   describe 'role_variable' do
-    pending
+    context 'role_variable is not set' do
+      command 'dopi --hiera_yaml hiera.yaml oneshot test_role_variable.yaml', :allow_error => true
+      its(:stdout) {is_expected.to include 'No role found for linux01.example.com'}
+    end
+    context 'role_default is set' do
+      command 'dopi --hiera_yaml hiera.yaml --role_variable test_role oneshot test_role_variable.yaml'
+      its(:stdout) {is_expected.to include "Step 'write hello world' successfully finished."}
+    end
   end
 
   describe 'ssh_check_host_key' do
-    pending
+    pending #Move this one to the plugin options
   end
 
   describe 'ssh_key' do
-    pending
+    pending #Deprecated
   end
 
   describe 'ssh_pass_auth' do
-    pending
+    pending #Deprecated
   end
 
   describe 'ssh_user' do
-    pending
+    pending #Deprecated
   end
 
   describe 'use_hiera' do
-    pending
+    context 'default behaviour' do
+      command 'dopi --hiera_yaml ./nothiera.yaml oneshot test_role_variable.yaml', :allow_error => true
+      its(:stdout) {is_expected.to include 'hiera.yaml not found! Using empty config'}
+    end
+    context 'Disable hiera' do
+      command 'dopi --no-use_hiera oneshot test_role_variable.yaml', :allow_error => true
+      its(:stdout) {is_expected.not_to include 'hiera.yaml not found! Using empty config'}
+    end
   end
 
   describe '--verbosity' do

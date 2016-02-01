@@ -165,6 +165,7 @@ module Dopi
     # (in case of validation) and hiera can't resolve it over the plugin,
     # but we still need the information about the node config.
     def resolve_internal(variable)
+      return nil unless Dopi.configuration.use_hiera
       begin
         hiera # make sure hiera is initialized
         answer = nil
