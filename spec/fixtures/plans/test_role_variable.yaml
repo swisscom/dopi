@@ -1,0 +1,29 @@
+name: 'test_role_variable'
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'linux01.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
+
+configuration:
+  nodes:
+    'linux01.example.com':
+      test_role: 'testnode'
+
+steps:
+  - name: 'write hello world'
+    roles: 'testnode'
+    command:
+      plugin: 'custom'
+      exec: 'echo'
+      arguments: '"hello world"'
