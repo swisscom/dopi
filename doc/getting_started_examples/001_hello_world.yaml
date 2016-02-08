@@ -1,0 +1,17 @@
+name: 'hello_world'
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'testlinux.example.com':
+    infrastructure: 'test'
+
+steps:
+  - name: 'write hello world'
+    nodes: 'all'
+    command:
+      plugin: 'custom'
+      exec: 'echo'
+      arguments: '"hello world"'

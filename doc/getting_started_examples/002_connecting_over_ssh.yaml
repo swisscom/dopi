@@ -1,0 +1,35 @@
+name: 'hello_world'
+
+credentials:
+  'test-credentials':
+    type: 'ssh_key'
+    username: 'myuser'
+    private_key: '/home/myuser/.ssh/id_rsa'
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+    networks:
+      'localhost':
+        ip_pool:
+          from: '127.0.0.2'
+          to:   '127.0.0.250'
+        ip_netmask: '255.255.255.0'
+        ip_defgw: '127.0.0.1'
+
+nodes:
+  'testlinux.example.com':
+    infrastructure: 'test'
+    interfaces:
+      'eth0':
+        network: 'localhost'
+        ip: '127.0.0.2'
+
+steps:
+  - name: 'write hello world'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/custom'
+      credentials: 'test-credentials'
+      exec: 'echo'
+      arguments: '"hello world"'

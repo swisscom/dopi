@@ -1,6 +1,20 @@
 # Dopi
 
+DOPi is the "inner" part of the Deployment Orchestrater for Puppet (DOP).
+It is the part that connects into your nodes and runs commands in a defined
+order.
+
+The main purpose of DOPi is to get your nodes into a state where they can
+run Puppet or any other config management. It will also allows you to
+orchestrate this Puppet runs so you can setup your nodes in the desired order.
+
 DOPi orchestrates puppet runs, mco calls and custom commands over different nodes
+
+DOPi uses a DOP plan file to find out what it has to run in what order on
+which nodes. To learn more about the syntax of this DOP plan file make sure
+you checkout the Documentation in [dop_common](https://gitlab.swisscloud.io/clu-dop/dop_common/blob/master/README.md).
+
+If you are new to DOPi make sure you check out the [getting started guide](doc/getting_started.md).
 
 ## Change Log
 
@@ -126,9 +140,10 @@ You can run the plan with the run command and the name:
 
 ## Plan File Format
 
-For a general description of the DOP plan file format, please see the dop_common documentation. 
-The documentation in this gem will focus on the command hashes for all the basic plugins which
-are shipped with DOPi and on how to create your own custom plugins.
+For a general description of the DOP plan file format, please see the
+[dop_common](https://gitlab.swisscloud.io/clu-dop/dop_common/blob/master/README.md)
+documentation. The documentation in this gem will focus on the command hashes for all
+the basic plugins which are shipped with DOPi and on how to create your own custom plugins.
 
 ### How to use Plugins
 
@@ -138,19 +153,39 @@ before the command and will run the command only if one of them fails.
 
 In general a plugin is specified like this:
 
-```yaml
+```YAML
     - name "My new Step"
+      nodes: 'all'
       command:
-        plugin: my_plugin_name
-        parameter1: foo
-        parameter2: bar
+        plugin: 'my_plugin_name'
+        parameter1: 'foo'
+        parameter2: 'bar'
 ```
 
 Some of the Plugins don't actually need parameters, so they can be called with the short form:
 
-```yaml
+```YAML
     - name "My new Step"
-      command: my_simple_plugin
+      nodes: 'all'
+      command: 'my_simple_plugin'
+```
+
+### Verify Commands
+
+It is usually a good idea to check if a step is required to run. This way you can make your
+plans idempotent. You can define any number of verify commands. If they all are successful
+DOPi will skip the run. There are a hand full of plugins who are written exactly for this
+purpose.
+
+```YAML
+    - name "Create file if it does not exist"
+      command:
+        verify_commands:
+          - plugin; 'ssh/file_exists'
+            file: '/tmp/somefile'
+        plugin: 'ssh/custom'
+        exec: 'echo'
+        arguments: "'Hello World' > /tmp/somefile"
 ```
 
 ### Generic Plugin Parameters
