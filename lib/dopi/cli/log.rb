@@ -28,5 +28,23 @@ module Dopi
       Dopi.init_file_logger
     end
 
+    def self.state(plan)
+      result = "[#{plan.state.to_s}] #{plan.name}\n"
+      plan.step_sets.each do |step_set|
+        result << "  [#{step_set.state.to_s}] #{step_set.name}\n"
+        step_set.steps.each do |step|
+          result << "    [#{step.state.to_s}] #{step.name}\n"
+          step.commands.each do |command|
+            result << "      [#{command.state.to_s}] #{command.node.name}\n"
+          end
+        end
+      end
+      return result
+    end
+
+    def self.print_state(plan)
+      puts state(plan)
+    end
+
   end
 end
