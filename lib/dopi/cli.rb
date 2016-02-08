@@ -3,6 +3,7 @@
 #
 require 'gli'
 require 'dopi'
+require 'dopi/cli/log'
 require 'dopi/cli/global_options'
 require 'logger/colors'
 require 'curses'
@@ -27,52 +28,14 @@ module Dopi
     arg_name 'Verbosity'
     flag [:verbosity, :v]
 
-    include Dopi::Cli::GlobalOptions
+    global_options(self)
 
     pre do |global,command,options,args|
-      Dopi.configure do |config|
-        config.trace =              global[:trace]
-        config.plan_cache_dir =     global[:plan_cache_dir]
-        config.use_hiera =          global[:use_hiera]
-        config.hiera_yaml =         global[:hiera_yaml]
-        config.facts_dir =          global[:facts_dir]
-        config.load_facts =         global[:load_facts]
-        config.role_variable =      global[:role_variable]
-        config.role_default =       global[:role_default]
-        config.ssh_user =           global[:ssh_user]
-        config.ssh_key =            global[:ssh_key]
-        config.ssh_pass_auth =      global[:ssh_pass_auth]
-        config.ssh_check_host_key = global[:ssh_check_host_key]
-        config.mco_config         = global[:mco_config]
-        config.mco_dopi_logger    = global[:mco_dopi_logger]
-        config.log_dir            = global[:log_dir]
-        config.log_level          = global[:log_level]
-        config.connection_check_timeout = global[:connection_check_timeout]
-      end
+      Dopi.configure = global
       ENV['GLI_DEBUG'] = 'true' if global[:trace] == true
-      # create a dummy logger and use the lowest log level configured
-      Dopi.logger = Logger.new('/dev/null')
-      file_log_level = ::Logger.const_get(global[:log_level].upcase)
-      cli_log_level = ::Logger.const_get(global[:verbosity].upcase)
-      min_log_level = file_log_level < cli_log_level ? file_log_level : cli_log_level
-      Dopi.log.level = min_log_level
-
-      # create the cli logger
-      logger = Logger.new(STDOUT)
-      logger.level = cli_log_level
-      logger.formatter = CustomFormatter.new
-      DopCommon.add_log_junction(logger)
-
-
-      Dopi.init_file_logger # init file logger
+      initialize_logger(global[:log_level], global[:verbosity])
       @plan_cache = DopCommon::PlanCache.new(global[:plan_cache_dir])
       true
-    end
-
-    class CustomFormatter < Logger::Formatter
-      def call(severity, time, progname, msg)
-        "#{msg2str(msg)}\n"
-      end
     end
 
     def state(plan)
