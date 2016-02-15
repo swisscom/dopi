@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.9.1] - 2016-02-15
+### Fixed
+- Private key authentication for ssh should now work again.
+
 ## [0.9.0] - 2016-01-27
 ### Added
 - Dopi will now support the loading of secrets like passwords from external sources like files
