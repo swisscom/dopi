@@ -96,7 +96,7 @@ module Dopi
             options = global_options.dup
             options << ' -o ChallengeResponseAuthentication=no'
             options << ' -o PasswordAuthentication=no'
-            options << " -i #{credential.public_key}"
+            options << " -i #{credential.private_key}"
             { :command => "ssh #{options.join(' ')} #{credential.username}@#{@node.address(22)}", :env => {}}
           end
         end
