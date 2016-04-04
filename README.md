@@ -219,6 +219,8 @@ This are the plugins generally used in steps as commands
 
 [ssh/file_replace](doc/plugins/ssh/file_replace.md)
 
+[ssh/file_deploy](doc/plugins/ssh/file_deploy.md)
+
 [mco/rpc](doc/plugins/mco/rpc.md)
 
 [winrm/cmd](doc/plugins/winrm/cmd.md)

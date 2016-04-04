@@ -1,0 +1,82 @@
+name: 'test_plugin_ssh_file_deploy'
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'linux01.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
+
+steps:
+  - name: "Configure the plugin defaults"
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugins: '/^ssh/'
+        credential: 'linux_login'
+    command: 'dummy'
+
+  - name: 'Make sure the test files are gone'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'rm'
+      arguments: 'rm -rf /tmp/test_deployed_file*'
+
+  - name: 'Make sure we can deploy a file with inline content'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/tmp/test_deployed_file_inline'
+        - plugin: 'ssh/file_contains'
+          file: '/tmp/test_deployed_file_inline'
+          pattern: 'hello world'
+      verify_after_run: true
+      plugin: 'ssh/file_deploy'
+      file: '/tmp/test_deployed_file_inline'
+      content: |
+        This is some multiline file
+        Deployed from an inline string
+        Which contains the sentence
+        hello world
+        and some other stuff
+
+  - name: 'Make sure we can deploy a file with content from a file'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/tmp/test_deployed_file_file'
+        - plugin: 'ssh/file_contains'
+          file: '/tmp/test_deployed_file_file'
+          pattern: 'hello world'
+      verify_after_run: true
+      plugin: 'ssh/file_deploy'
+      file: '/tmp/test_deployed_file_file'
+      content:
+        file: 'spec/fixtures/test_deloyed_file.txt'
+
+  - name: 'Make sure we can deploy a file with content from exec'
+    nodes: 'all'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/tmp/test_deployed_file_exec'
+        - plugin: 'ssh/file_contains'
+          file: '/tmp/test_deployed_file_exec'
+          pattern: 'hello world'
+      verify_after_run: true
+      plugin: 'ssh/file_deploy'
+      file: '/tmp/test_deployed_file_exec'
+      content:
+        exec: ['/bin/echo', 'hello world']
+
+

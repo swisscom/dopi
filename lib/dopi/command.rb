@@ -26,7 +26,7 @@ module Dopi
     def self.set_plugin_defaults(node_name, hash)
       @plugin_defaults ||= {}
       @plugin_defaults[node_name] ||= {}
-      @plugin_defaults[node_name].merge!(hash)
+      @plugin_defaults[node_name].merge!(DopCommon::HashParser.symbolize_keys(hash))
     end
 
     def self.plugin_defaults(node_name)
@@ -206,6 +206,7 @@ require 'dopi/command/ssh/wait_for_login'
 require 'dopi/command/ssh/file_contains'
 require 'dopi/command/ssh/file_exists'
 require 'dopi/command/ssh/file_replace'
+require 'dopi/command/ssh/file_deploy'
 require 'dopi/command/mco/rpc'
 require 'dopi/command/winrm'
 require 'dopi/command/winrm/cmd'
