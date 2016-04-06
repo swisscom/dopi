@@ -8,6 +8,10 @@ module Dopi
   module State
     include Observable
 
+    def to_yaml_properties
+      instance_variables - [:@signal_procs]
+    end
+
     def state
       @state ||= :ready
     end
