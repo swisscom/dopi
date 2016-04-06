@@ -27,5 +27,7 @@ namespace :spec do
   end
 end
 
+RSpec::Core::RakeTask.new(:spec)
+
 task :default => :spec
 
