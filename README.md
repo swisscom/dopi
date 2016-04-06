@@ -277,10 +277,10 @@ After you install the plugin you have to setup the test machines with the rake t
 
     cd /path/to/dopi/
     bundle install --path .bundle
-    bundle exec rake testenv:setup
+    bundle exec rake spec:prep
 
-You should always rerun 'testenv:setup' is an idempotent DOPi plan and can be rerun
-to make sure your test environment is started and setup correctly.
+You should always rerun 'spec:prep' to make sure your test environment is started
+and setup correctly.
 
 The tests will connect to the machines and for now you require some hosts file entries
 to work correctly. Add the following lines to your /etc/hosts:
