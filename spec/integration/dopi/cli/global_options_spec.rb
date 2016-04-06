@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'global cli options' do
-  fixture_file 'hiera.yaml'
+  fixture_file 'puppet'
   fixture_file 'plans'
 
   describe 'connection_check_timeout' do

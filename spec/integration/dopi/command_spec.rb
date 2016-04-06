@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 Dopi.configuration.ssh_pass_auth = true
-Dopi.configuration.mco_config    = 'spec/integration/dopi/mco_client.cfg'
-Dopi.configuration.hiera_yaml    = 'spec/integration/dopi/hiera.yaml'
+Dopi.configuration.mco_config    = 'spec/fixtures/mco_client.cfg'
+Dopi.configuration.hiera_yaml    = 'spec/fixtures/puppet/hiera.yaml'
 
 describe 'Basic integration test built from plan files' do
 

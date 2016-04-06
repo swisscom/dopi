@@ -1,0 +1,26 @@
+name: 'hello_world'
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'nonexisting01.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
+
+steps:
+  - name: 'Hello world on node'
+    nodes: 'all'
+    command:
+      plugin: 'custom'
+      credentials: 'linux_login'
+      exec: 'echo'
+      arguments: '"hello world"'
+

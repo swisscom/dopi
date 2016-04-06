@@ -1,0 +1,8 @@
+forge "https://forgeapi.puppetlabs.com"
+
+mod 'theforeman-puppet'
+mod 'theforeman-foreman'
+mod 'puppetlabs-firewall'
+mod 'puppetlabs-java'
+mod 'jbussdieker-activemq'
+mod 'camptocamp-mcollective'

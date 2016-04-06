@@ -94,7 +94,6 @@ configuration:
       puppet::server_foreman: true
       puppet::server_rttendedeports: 'store'
       puppet::server_external_nodes: ''
-      puppet::hiera_config: '/vagrant/spec/integration/dopi/hiera.yaml'
     'mcollective_broker':
       classes:
         - 'java'
@@ -165,6 +164,13 @@ steps:
       exec: 'yum'
       arguments: 'install -y puppet'
 
+  - name: 'copy the puppet configuration to the right place'
+    roles: 'puppetmaster'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'cp'
+      arguments: '-r /vagrant/spec/fixtures/puppet/* /etc/puppet/'
+
   - name: 'Install all the needed packages on the puppetmaster'
     roles: 'puppetmaster'
     command:
@@ -180,6 +186,27 @@ steps:
       plugin: 'ssh/custom'
       exec: 'yum'
       arguments: 'install -y rubygem-rake rubygem-bundler git ruby-devel'
+
+  - name: 'Install librarian-puppet'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/usr/local/bin/librarian-puppet'
+      plugin: 'ssh/custom'
+      exec: 'gem'
+      arguments: 'install librarian-puppet'
+
+  - name: 'Install all the puppet modules'
+    roles: 'puppetmaster'
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/etc/puppet/Puppetfile.lock'
+      plugin: 'ssh/custom'
+      exec: 'librarian-puppet'
+      arguments: 'install'
+      env: {LIBRARIAN_PUPPET_PUPPETFILE: '/etc/puppet/Puppetfile'}
 
   - name: 'Install dop_common for the puppetmaster'
     roles: 'puppetmaster'
@@ -201,17 +228,6 @@ steps:
       arguments: 'install --local'
       env: {BUNDLE_GEMFILE: '/vagrant/Gemfile'}
 
-  - name: 'Configure DOPi on the puppetmaster'
-    roles: 'puppetmaster'
-    command:
-      verify_commands:
-        - plugin: 'ssh/file_exists'
-          file: '/etc/dop/dopi.conf'
-      plugin: 'ssh/custom'
-      exec: 'bundle'
-      arguments: 'exec dopi --hiera_yaml /vagrant/spec/integration/dopi/hiera.yaml initconfig'
-      env: {BUNDLE_GEMFILE: '/vagrant/Gemfile'}
-
   - name: 'Add deployment plan with hiera data to the plan cache'
     roles: 'puppetmaster'
     command:
@@ -220,68 +236,8 @@ steps:
           file: '/var/lib/dop/plans/build_dop_test_environment.yaml'
       plugin: 'ssh/custom'
       exec: 'bundle'
-      arguments: 'exec dopi add /vagrant/spec/integration/dopi/build_dop_test_environment.yaml'
+      arguments: 'exec dopi add /vagrant/spec/fixtures/testenv_plan.yaml'
       env: {BUNDLE_GEMFILE: '/vagrant/Gemfile'}
-
-  - name: 'Install the puppet module for puppet'
-    roles: 'puppetmaster'
-    command:
-      verify_commands:
-        - plugin: 'ssh/file_exists'
-          file: '/etc/puppet/modules/puppet/metadata.json'
-      plugin: 'ssh/custom'
-      exec: 'puppet'
-      arguments: 'module install theforeman-puppet'
-
-  - name: 'Install the puppet module for foreman'
-    roles: 'puppetmaster'
-    command:
-      verify_commands:
-        - plugin: 'ssh/file_exists'
-          file: '/etc/puppet/modules/foreman/metadata.json'
-      plugin: 'ssh/custom'
-      exec: 'puppet'
-      arguments: 'module install theforeman-foreman'
-
-  - name: 'Install the puppet module for firewall'
-    roles: 'puppetmaster'
-    command:
-      verify_commands:
-        - plugin: 'ssh/file_exists'
-          file: '/etc/puppet/modules/firewall/metadata.json'
-      plugin: 'ssh/custom'
-      exec: 'puppet'
-      arguments: 'module install puppetlabs-firewall'
-
-  - name: 'Install the puppet module for java'
-    roles: 'puppetmaster'
-    command:
-      verify_commands:
-        - plugin: 'ssh/file_exists'
-          file: '/etc/puppet/modules/java/metadata.json'
-      plugin: 'ssh/custom'
-      exec: 'puppet'
-      arguments: 'module install puppetlabs-java'
-
-  - name: 'Install the puppet module for activemq'
-    roles: 'puppetmaster'
-    command:
-      verify_commands:
-        - plugin: 'ssh/file_exists'
-          file: '/etc/puppet/modules/activemq/metadata.json'
-      plugin: 'ssh/custom'
-      exec: 'puppet'
-      arguments: 'module install jbussdieker-activemq'
-
-  - name: 'Install the puppet module for mcollective'
-    roles: 'puppetmaster'
-    command:
-      verify_commands:
-        - plugin: 'ssh/file_exists'
-          file: '/etc/puppet/modules/mcollective/metadata.json'
-      plugin: 'ssh/custom'
-      exec: 'puppet'
-      arguments: 'module install camptocamp-mcollective'
 
   - name: 'Run puppet on puppetmaster'
     roles: 'puppetmaster'
@@ -291,7 +247,7 @@ steps:
           file: '/etc/httpd/conf.d/25-puppet.conf'
       plugin: 'ssh/custom'
       exec: 'puppet'
-      arguments: 'apply --hiera_config=/vagrant/spec/integration/dopi/hiera.yaml /vagrant/spec/integration/dopi/site.pp'
+      arguments: 'apply /etc/puppet/manifests/site.pp'
 
   - name: 'Add puppetmaster to all hosts files'
     nodes_by_config: {os: 'linux'}
@@ -314,7 +270,6 @@ steps:
       plugin: 'ssh/custom'
       exec: "echo"
       arguments: '"192.168.56.102 broker.example.com broker" >> /etc/hosts'
-
 
   - name: 'Run puppet on the rest of the linux nodes'
     nodes_by_config: {os: 'linux'}

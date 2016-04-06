@@ -1,3 +1,7 @@
+# This site.pp is the entry point for puppet in the testenv
+# It contains some workarounds to help with problems in the
+# used modules
+
 $role = hiera('role')
 
 class base {
@@ -22,7 +26,7 @@ node 'puppetmaster.example.com' {
   #file{'/etc/puppet/environments/production/manifests/': ensure => directory }
   file{'/etc/puppet/environments/production/manifests/site.pp':
     ensure => symlink,
-    target => '/vagrant/spec/integration/dopi/site.pp',
+    target => '/etc/puppet/manifests/site.pp',
   }
 
 }

@@ -1,28 +1,23 @@
 require 'rspec/core/rake_task'
 
-namespace :testenv do
-  task :package do
+namespace :spec do
+  desc 'setup the test environment (this builds multiple virtual machines with vagrant and virtualbox)'
+  task :prep do
     Bundler.with_clean_env do
+      hiera = 'spec/fixtures/puppet/hiera.yaml'
+      plan  = 'spec/fixtures/testenv_plan.yaml'
       sh('bundle package --all')
+      sh("bundle exec bin/dopi --verbosity debug --trace --hiera_yaml #{hiera} oneshot #{plan}")
     end
   end
 
-  desc 'Setup the virtual machines for testing'
-  task :setup => ['testenv:package'] do
-    hiera = 'spec/integration/dopi/hiera.yaml'
-    plan = 'spec/integration/dopi/build_dop_test_environment.yaml'
-    sh("bundle exec bin/dopi --verbosity debug --hiera_yaml #{hiera} oneshot #{plan}")
+  desc 'destory the test environment'
+  task :clean do
+    Bundler.with_clean_env do
+      sh('vagrant destroy')
+    end
   end
 
-  desc 'Sync the current DOPi to the test environment'
-  task :sync => ['testenv:package'] do
-    sh('vagrant rsync puppetmaster.example.com')
-  end
-end
-
-RSpec::Core::RakeTask.new('spec')
-
-namespace :spec do
   RSpec::Core::RakeTask.new(:unit) do |t|
     t.pattern = 'spec/unit/**/*_spec.rb'
   end
