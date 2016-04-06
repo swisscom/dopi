@@ -107,6 +107,12 @@ By default ssh will run in quiet mode and stuff like login banners will not
 appear in the output. See the documentation about the "-q" flag in the ssh
 man page for more information about this.
 
+### port (optional)
+
+`default: 22`
+
+The port to which ssh should connect
+
 ## Examples:
 
 ### Simple Example

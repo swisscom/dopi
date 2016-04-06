@@ -10,7 +10,8 @@ module Dopi
 
         def validate
           super
-          log_validation_method('quiet_valid?', CommandParsingError)
+          log_validation_method(:port_valid?, CommandParsingError)
+          log_validation_method(:quiet_valid?, CommandParsingError)
           validate_credentials
         end
 
@@ -26,6 +27,7 @@ module Dopi
 
         def global_options
           options = []
+          options << " -p #{port}"
           options << ' -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' unless Dopi.configuration.ssh_check_host_key
           options << ' -q' if quiet
         end
@@ -76,7 +78,7 @@ module Dopi
               next
             end
             # check connection and return command string if it is working
-            c = create_ssh_command_string(credential, @node.address(22))
+            c = create_ssh_command_string(credential, @node.address(port))
             return c if run_command(c[:env], c[:command] + ' exit')[2] == 0
             log(:warn, "Unable to login with credential #{credential.name}")
           end
@@ -135,15 +137,29 @@ module Dopi
           log(:info, "(NOOP) Environment: #{env.to_s}")
         end
 
+        def port
+          @port ||= port_valid? ? hash[:port].to_s : '22'
+        end
+
         def quiet
           @quiet || quiet_valid? ? hash[:quiet] : true
+        end
+
+        def port_valid?
+          return false unless hash.kind_of?(Hash)
+          return false if hash[:port].nil? # is optional
+          hash[:port].kind_of?(Fixnum) or
+            raise CommandParsingError, "Plugin #{name}: The value for port must be a number"
+          hash[:port].between?(0, 65536) or
+            raise CommandParsingError, "Plugin #{name}: The value for port must bigger than 0 and below 65536"
+          true
         end
 
         def quiet_valid?
           return false unless hash.kind_of?(Hash)
           return false if hash[:quiet].nil? # is optional
           hash[:quiet].kind_of?(TrueClass) or hash[:quiet].kind_of?(FalseClass) or
-            raise ComandParsingError, "Plugin #{name}: The value for quiet must be boolean"
+            raise CommandParsingError, "Plugin #{name}: The value for quiet must be boolean"
         end
 
       end

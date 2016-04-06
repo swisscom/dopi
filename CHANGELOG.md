@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [unreleased]
+### Added
+- plugin ssh/file_deploy to deploy files to a node
+- it is now possible to specify the port for the ssh plugin
+
 ## [0.9.1] - 2016-02-15
 ### Fixed
 - Private key authentication for ssh should now work again.
