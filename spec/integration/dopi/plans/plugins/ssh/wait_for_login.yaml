@@ -1,0 +1,44 @@
+name: 'ssh_wait_for_login'
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'linux01.example.com':
+    infrastructure: 'test'
+  'linux02.example.com':
+    infrastructure: 'test'
+  'linux03.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
+
+steps:
+
+  - name: 'Set the credentials'
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugins: '/^ssh/'
+        credential: 'linux_login'
+    command: 'dummy'
+
+  - name: 'reboot all nodes and try to login again'
+    nodes: 'all'
+    max_in_flight: 2
+    commands:
+      - plugin: 'ssh/custom'
+        exec: 'shutdown -r now'
+        expect_exit_codes: 255
+      - 'ssh/wait_for_login'
+
+  - name: 'make sure we can execute stuff again on all nodes'
+    nodes: 'all'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'echo "hello world"'

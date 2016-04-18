@@ -16,7 +16,9 @@ module Dopi
       @plan        = plan
       @nodes       = create_node_list(step_parser)
 
-      commands.each{|command| state_add_child(command)}
+      command_sets.each do |commands|
+        commands.each{|command| state_add_child(command)}
+      end
     end
 
     def name
@@ -85,21 +87,28 @@ module Dopi
     end
 
     def run_commands(run_for_nodes, noop)
-      commands_copy = commands.select{|n| run_for_nodes.include?(n.node)}
+      command_sets_copy = command_sets.select{|commands| run_for_nodes.include?(commands.first.node)}
       if canary_host
-        pick = rand(commands_copy.length - 1)
-        commands_copy.delete_at(pick).meta_run(noop)
+        pick = rand(command_sets_copy.length - 1)
+        commands = command_sets_copy.delete_at(pick)
+        commands.each do |command|
+          break if state_failed?
+          command.meta_run(noop)
+        end
       end
       unless state_failed?
-        number_of_threads = max_in_flight == -1 ? commands_copy.length : max_in_flight
-        Parallel.each(commands_copy, :in_threads => number_of_threads) do |command|
-          Dopi::ContextLoggers.log_context = command.node.name
+        number_of_threads = max_in_flight == -1 ? command_sets_copy.length : max_in_flight
+        Parallel.each(command_sets_copy, :in_threads => number_of_threads) do |commands|
+          Dopi::ContextLoggers.log_context = commands.first.node.name
           raise Parallel::Break if state_failed?
           if signals[:stop]
             Dopi.log.warn("Step '#{name}': Stopping thread spawning")
             raise Parallel::Break
           end
-          command.meta_run(noop)
+          commands.each do |command|
+            break if state_failed?
+            command.meta_run(noop)
+          end
         end
       end
     end
@@ -117,23 +126,28 @@ module Dopi
         Dopi.log.error("Step '#{name}': Nodes list is empty")
         return false
       end
-      command_plugin_valid?
+      command_plugins_valid?
     end
 
-    def command_plugin_valid?
+    def command_plugins_valid?
       begin
-        commands.first.meta_valid?
+        commands = command_sets.first
+        commands.all? do |command|
+          command.meta_valid?
+        end
       rescue PluginLoaderError => e
-        Dopi.log.error("Step '#{name}': Can't load plugin '#{@step_parser.command.plugin}': #{e.message}")
+        Dopi.log.error("Step '#{name}': Can't load plugin : #{e.message}")
         false
       end
     end
 
-    def commands
-      @commands ||= @nodes.map do |node|
+    def command_sets
+      @command_sets ||= @nodes.map do |node|
         delete_plugin_defaults
         set_plugin_defaults
-        Dopi::Command.create_plugin_instance(@step_parser.command, self, node)
+        @step_parser.commands.map do |command|
+          Dopi::Command.create_plugin_instance(command, self, node)
+        end
       end
     end
 
