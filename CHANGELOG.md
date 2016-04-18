@@ -1,10 +1,11 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [unreleased]
+## [0.10.0] - 2015-04-18
 ### Added
 - plugin ssh/file_deploy to deploy files to a node
 - it is now possible to specify the port for the ssh plugin
+- Make it possible to specify more than one command in a step
 
 ### Fixed
 - the show command does no longer crash if a plan is running
