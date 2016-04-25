@@ -16,9 +16,7 @@ module Dopi
       @plan        = plan
       @nodes       = create_node_list(step_parser)
 
-      command_sets.each do |commands|
-        commands.each{|command| state_add_child(command)}
-      end
+      command_sets.each{|command_set| state_add_child(command_set)}
     end
 
     def name
@@ -87,28 +85,21 @@ module Dopi
     end
 
     def run_commands(run_for_nodes, noop)
-      command_sets_copy = command_sets.select{|commands| run_for_nodes.include?(commands.first.node)}
+      command_sets_to_run = command_sets.select{|command_set| run_for_nodes.include?(command_set.node)}
       if canary_host
-        pick = rand(command_sets_copy.length - 1)
-        commands = command_sets_copy.delete_at(pick)
-        commands.each do |command|
-          break if state_failed?
-          command.meta_run(noop)
-        end
+        pick = rand(command_sets_to_run.length - 1)
+        command_sets_to_run.delete_at(pick).run(noop)
       end
       unless state_failed?
-        number_of_threads = max_in_flight == -1 ? command_sets_copy.length : max_in_flight
-        Parallel.each(command_sets_copy, :in_threads => number_of_threads) do |commands|
-          Dopi::ContextLoggers.log_context = commands.first.node.name
+        number_of_threads = max_in_flight == -1 ? command_sets_to_run.length : max_in_flight
+        Parallel.each(command_sets_to_run, :in_threads => number_of_threads) do |command_set|
+          Dopi::ContextLoggers.log_context = command_set.node.name
           raise Parallel::Break if state_failed?
           if signals[:stop]
             Dopi.log.warn("Step '#{name}': Stopping thread spawning")
             raise Parallel::Break
           end
-          commands.each do |command|
-            break if state_failed?
-            command.meta_run(noop)
-          end
+          command_set.run(noop)
         end
       end
     end
@@ -126,28 +117,16 @@ module Dopi
         Dopi.log.error("Step '#{name}': Nodes list is empty")
         return false
       end
-      command_plugins_valid?
-    end
-
-    def command_plugins_valid?
-      begin
-        commands = command_sets.first
-        commands.all? do |command|
-          command.meta_valid?
-        end
-      rescue PluginLoaderError => e
-        Dopi.log.error("Step '#{name}': Can't load plugin : #{e.message}")
-        false
-      end
+      # since they are identical in respect to parsing
+      # we only have to check one of them
+      command_sets.first.valid?
     end
 
     def command_sets
       @command_sets ||= @nodes.map do |node|
         delete_plugin_defaults
         set_plugin_defaults
-        @step_parser.commands.map do |command|
-          Dopi::Command.create_plugin_instance(command, self, node)
-        end
+        Dopi::CommandSet.new(@step_parser, self, node)
       end
     end
 

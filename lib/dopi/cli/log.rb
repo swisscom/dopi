@@ -34,9 +34,9 @@ module Dopi
         result << "  [#{step_set.state.to_s}] #{step_set.name}\n"
         step_set.steps.each do |step|
           result << "    [#{step.state.to_s}] #{step.name}\n"
-          step.command_sets.each do |commands|
-            result << "      #{commands.first.node.name}\n"
-            commands.each do |command|
+          step.command_sets.each do |command_set|
+            result << "      [#{command_set.state.to_s}] #{command_set.node.name}\n"
+            command_set.commands.each do |command|
               result << "        [#{command.state.to_s}] #{command.name}\n"
             end
           end
