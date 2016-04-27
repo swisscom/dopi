@@ -9,6 +9,7 @@ require 'timeout'
 module Dopi
   class Node
     @@mutex = Mutex.new
+    @@mutex_lookup = Mutex.new
     @@hiera = nil
     @@hiera_config = nil
 
@@ -166,34 +167,38 @@ module Dopi
     # but we still need the information about the node config.
     def resolve_internal(variable)
       return nil unless Dopi.configuration.use_hiera
-      begin
-        hiera # make sure hiera is initialized
-        answer = nil
-        Hiera::Backend.datasources(scope) do |source|
-          Dopi.log.debug("Hiera internal: Looking for data source #{source}")
-          data = nil
-          begin
-            data = @plan.configuration.lookup(source, variable, scope)
-          rescue DopCommon::ConfigurationValueNotFound
-            next
-          else
-            break if answer = Hiera::Backend.parse_answer(data, scope)
+      @@mutex_lookup.synchronize do
+        begin
+          hiera # make sure hiera is initialized
+          answer = nil
+          Hiera::Backend.datasources(scope) do |source|
+            Dopi.log.debug("Hiera internal: Looking for data source #{source}")
+            data = nil
+            begin
+              data = @plan.configuration.lookup(source, variable, scope)
+            rescue DopCommon::ConfigurationValueNotFound
+              next
+            else
+              break if answer = Hiera::Backend.parse_answer(data, scope)
+            end
           end
+        rescue StandardError => e
+          Dopi.log.debug(e.message)
         end
-      rescue StandardError => e
-        Dopi.log.debug(e.message)
+        Dopi.log.debug("Hiera internal: answer for variable #{variable} : #{answer}")
+        return answer
       end
-      Dopi.log.debug("Hiera internal: answer for variable #{variable} : #{answer}")
-      return answer
     end
 
     # this will try to resolve the variable over hiera directly
     def resolve_external(variable)
       return nil unless Dopi.configuration.use_hiera
-      begin hiera.lookup(variable, nil, scope)
-      rescue Psych::SyntaxError => e
-        Dopi.log.error("YAML parsing error in hiera data. Make sure you hiera yaml files are valid")
-        nil
+      @@mutex_lookup.synchronize do
+        begin hiera.lookup(variable, nil, scope)
+        rescue Psych::SyntaxError => e
+          Dopi.log.error("YAML parsing error in hiera data. Make sure you hiera yaml files are valid")
+          nil
+        end
       end
     end
 
