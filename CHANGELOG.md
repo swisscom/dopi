@@ -1,7 +1,12 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [0.10.0] - 2015-04-18
+## [0.10.1] - 2016-04-27
+##» Fixed
+- Workaround which hopefuly solves the the hiera race condition
+- Always display stacktrace if a bug was detected
+
+## [0.10.0] - 2016-04-18
 ### Added
 - plugin ssh/file_deploy to deploy files to a node
 - it is now possible to specify the port for the ssh plugin
