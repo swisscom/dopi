@@ -57,7 +57,7 @@ module Dopi
       command_sets_to_run = command_sets.select {|cs| nodes_to_run.include?(cs.node)}
 
       unless run_options[:noop]
-        run_cannary(run_options, command_sets_to_run) if canary_host
+        run_canary(run_options, command_sets_to_run) if canary_host
         run_command_sets(run_options, command_sets_to_run) unless state_failed?
       else
         command_sets_to_run.each{|command_set| command_set.run(run_options[:noop])}
@@ -69,7 +69,7 @@ module Dopi
 
     private
 
-    def run_cannary(run_options, command_sets_to_run)
+    def run_canary(run_options, command_sets_to_run)
       pick = rand(command_sets_to_run.length - 1)
       command_sets_to_run[pick].run(run_options[:noop])
     end

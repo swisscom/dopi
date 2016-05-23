@@ -6,6 +6,7 @@ module Dopi
 
     # filter a list of nodes
     def filter_nodes(nodes, filters)
+      return nodes if filters == :all
       include_list = []
       exclude_list = []
 
