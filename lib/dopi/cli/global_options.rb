@@ -44,20 +44,6 @@ module Dopi
         arg_name 'ROLE'
         flag [:role_default]
 
-        desc 'Set the default ssh user (DEPRECATED: Use the credentials hash method)'
-        default_value Dopi.configuration.ssh_user
-        arg_name 'USERNAME'
-        flag [:ssh_user]
-
-        desc 'Set the default ssh key (DEPRECATED: Use the credentials hash method)'
-        default_value Dopi.configuration.ssh_key
-        arg_name 'SSHKEY'
-        flag [:ssh_key]
-
-        desc 'Allow ssh logins with password (DEPRECATED: Use the credentials hash method)'
-        default_value Dopi.configuration.ssh_pass_auth
-        switch [:ssh_pass_auth]
-
         desc 'Force ssh to check the host keys (this is disabled by default because we usually deal with new hosts)'
         default_value Dopi.configuration.ssh_check_host_key
         switch [:ssh_check_host_key]
