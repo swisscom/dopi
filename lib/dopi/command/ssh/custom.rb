@@ -32,28 +32,6 @@ module Dopi
           options << ' -q' if quiet
         end
 
-        # This method adds the deprecated ssh_root_pass to the credentials hash
-        def credentials_with_deprecations
-          c = if File.exists?(Dopi.configuration.ssh_key)
-            credentials + [ DopCommon::Credential.new('deprecated_ssh_key', {
-              :type        => :ssh_key,
-              :username    => Dopi.configuration.ssh_user,
-              :private_key => Dopi.configuration.ssh_key
-            })]
-          else
-            credentials
-          end
-          if Dopi.configuration.ssh_pass_auth && sshpass_bin && @node.ssh_root_pass
-            c + [ DopCommon::Credential.new('deprecated_ssh_root_pass', {
-              :type     => :username_password,
-              :username => Dopi.configuration.ssh_user,
-              :password => @node.ssh_root_pass
-            })]
-          else
-            c
-          end
-        end
-
         def supported_credential_types
           [:username_password, :ssh_key]
         end
@@ -71,8 +49,7 @@ module Dopi
         end
 
         def working_ssh_command_string
-          # TODO: Replace this with the normal credentials hash once we can retire the ssh_root_pass method
-          credentials_with_deprecations.each do |credential|
+          credentials.each do |credential|
             if credential.type == :username_password && !sshpass_bin
               Dopi.log.warn('ssh password login disabled because sshpass is not installed')
               next
@@ -82,7 +59,7 @@ module Dopi
             return c if run_command(c[:env], c[:command] + ' exit')[2] == 0
             log(:warn, "Unable to login with credential #{credential.name}")
           end
-          cred_names = credentials_with_deprecations.map{|c| c.name}.join(', ')
+          cred_names = credentials.map{|c| c.name}.join(', ')
           raise CommandConnectionError,
             "Can't establish connection with node #{@node.name} with any of the given credentials #{cred_names}"
         end
