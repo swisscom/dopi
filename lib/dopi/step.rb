@@ -6,6 +6,7 @@ require 'parallel'
 module Dopi
   class Step
     include Dopi::State
+    include Dopi::NodeFilter
 
     DEFAULT_MAX_IN_FLIGHT = 3
 
@@ -14,7 +15,11 @@ module Dopi
     def initialize(step_parser, plan)
       @step_parser = step_parser
       @plan        = plan
-      @nodes       = create_node_list(step_parser)
+      @nodes       = filter_nodes(plan.nodes, step_parser)
+
+      @next_mutex   = Mutex.new
+      @notify_mutex = Mutex.new
+      @queue        = Queue.new
 
       command_sets.each{|command_set| state_add_child(command_set)}
     end
@@ -23,19 +28,125 @@ module Dopi
       @step_parser.name
     end
 
+    def valid?
+      if @nodes.empty?
+        Dopi.log.error("Step '#{name}': Nodes list is empty")
+        return false
+      end
+      # since they are identical in respect to parsing
+      # we only have to check one of them
+      command_sets.first.valid?
+    end
+
+    def command_sets
+      @command_sets ||= @nodes.map do |node|
+        delete_plugin_defaults
+        set_plugin_defaults
+        Dopi::CommandSet.new(@step_parser, self, node)
+      end
+    end
+
     def run(run_options)
       if state_done?
         Dopi.log.info("Step '#{name}' is in state 'done'. Skipping")
         return
       end
       Dopi.log.info("Starting to run step '#{name}'")
-      run_for_nodes = case run_options[:run_for_nodes]
-                      when :all then @nodes
-                      else create_node_list(run_options[:run_for_nodes])
-                      end
-      run_commands(run_for_nodes, run_options[:noop])
+
+      nodes_to_run = filter_nodes(@nodes, run_options[:run_for_nodes])
+      command_sets_to_run = command_sets.select {|cs| nodes_to_run.include?(cs.node)}
+
+      unless run_options[:noop]
+        run_cannary(run_options, command_sets_to_run) if canary_host
+        run_command_sets(run_options, command_sets_to_run) unless state_failed?
+      else
+        command_sets_to_run.each{|command_set| command_set.run(run_options[:noop])}
+      end
+
       Dopi.log.info("Step '#{name}' successfully finished.") if state_done?
       Dopi.log.error("Step '#{name}' failed! Stopping execution.") if state_failed?
+    end
+
+    private
+
+    def run_cannary(run_options, command_sets_to_run)
+      pick = rand(command_sets_to_run.length - 1)
+      command_sets_to_run[pick].run(run_options[:noop])
+    end
+
+    def run_command_sets(run_options, command_sets_to_run)
+      in_threads = max_in_flight == -1 ? command_sets_to_run.length : max_in_flight
+      pick = lambda { next_command_set(command_sets_to_run) || Parallel::Stop }
+      Parallel.each(pick, :in_threads => in_threads) do |command_set|
+        Dopi::ContextLoggers.log_context = command_set.node.name
+        command_set.run(run_options[:noop])
+        notify_done
+      end
+    end
+
+    # notify the waiting thread that a command_set has finished it's run
+    def notify_done
+      @notify_mutex.synchronize do
+        @queue.push(1)
+      end
+    end
+
+    # This method returns the next command_set which is ready
+    # to run. If no node is ready because of constrains
+    # it will block the thread until notify_done was called
+    # from a finishing thread. If no command_set is in the state
+    # ready it will return nil.
+    def next_command_set(command_sets_to_run)
+      @next_mutex.synchronize do
+        ready_command_sets = command_sets_to_run.select{|n| n.state == :ready}
+        return nil if ready_command_sets.empty?
+        loop do
+          return nil if state_failed? or signals[:stop]
+          @notify_mutex.synchronize do
+            @queue.clear
+            next_command_set = ready_command_sets.find{|cs| is_runnable?(cs.node)}
+            unless next_command_set.nil?
+              next_command_set.state_start
+              return next_command_set
+            end
+          end
+          @queue.pop # wait until a thread notifies it has finished
+        end
+      end
+    end
+
+    # check if a node is runnable or if there are constrains
+    # which prevent it from running
+    def is_runnable?(node)
+      if max_per_role
+        running_groups[node.role] < max_per_role
+      else
+        true
+      end
+    end
+
+    # return a hash with the group names as keys and the
+    # amount of running nodes as value
+    def running_groups
+      role_counter = Hash.new(0)
+      command_sets.each do |command_set|
+        if [:running, :starting].include? command_set.state
+          role_counter[command_set.node.role] += 1
+        end
+      end
+      role_counter
+    end
+
+    def max_in_flight
+      @max_in_flight ||= @step_parser.max_in_flight || @plan.max_in_flight || DEFAULT_MAX_IN_FLIGHT
+    end
+
+    def max_per_role
+      @max_per_role ||= @step_parser.max_per_role || nil
+    end
+
+    def canary_host
+      @canary_host ||= @step_parser.canary_host || @plan.canary_host
     end
 
     def delete_plugin_defaults
@@ -82,114 +193,6 @@ module Dopi
         end
         selected_plugin_names.flatten.uniq.map{|p| PluginManager.plugin_klass('dopi/command/' + p)}
       end
-    end
-
-    def run_commands(run_for_nodes, noop)
-      command_sets_to_run = command_sets.select{|command_set| run_for_nodes.include?(command_set.node)}
-      if canary_host
-        pick = rand(command_sets_to_run.length - 1)
-        command_sets_to_run.delete_at(pick).run(noop)
-      end
-      unless state_failed?
-        number_of_threads = max_in_flight == -1 ? command_sets_to_run.length : max_in_flight
-        Parallel.each(command_sets_to_run, :in_threads => number_of_threads) do |command_set|
-          Dopi::ContextLoggers.log_context = command_set.node.name
-          raise Parallel::Break if state_failed?
-          if signals[:stop]
-            Dopi.log.warn("Step '#{name}': Stopping thread spawning")
-            raise Parallel::Break
-          end
-          command_set.run(noop)
-        end
-      end
-    end
-
-    def max_in_flight
-      @max_in_flight ||= @step_parser.max_in_flight || @plan.max_in_flight || DEFAULT_MAX_IN_FLIGHT
-    end
-
-    def canary_host
-      @canary_host ||= @step_parser.canary_host || @plan.canary_host
-    end
-
-    def valid?
-      if @nodes.empty?
-        Dopi.log.error("Step '#{name}': Nodes list is empty")
-        return false
-      end
-      # since they are identical in respect to parsing
-      # we only have to check one of them
-      command_sets.first.valid?
-    end
-
-    def command_sets
-      @command_sets ||= @nodes.map do |node|
-        delete_plugin_defaults
-        set_plugin_defaults
-        Dopi::CommandSet.new(@step_parser, self, node)
-      end
-    end
-
-  private
-
-    def create_node_list(node_filters)
-      include_list = []
-      exclude_list = []
-      filter_types = [
-        :nodes,
-        :roles,
-        :nodes_by_config
-      ]
-
-      filter_types.each do |filter_type|
-        filter = node_filters.send(filter_type)
-        include_list += create_list_from_filter(filter_type, filter)
-
-        exclude_filter_type = "exclude_#{filter_type}".to_sym
-        exclude_filter = node_filters.send(exclude_filter_type)
-        exclude_list += create_list_from_filter(exclude_filter_type, exclude_filter)
-      end
-      (include_list - exclude_list).uniq
-    end
-
-     def create_list_from_filter(filter_type, filter)
-      decompose_filter(filter).collect do |variable, patterns|
-        [patterns].flatten.collect do |pattern|
-          filter_nodes(filter_type, pattern, variable)
-        end.flatten
-      end.flatten
-    end
-
-    # returns a variable and patterns Array for a filter
-    def decompose_filter(filter)
-      case filter
-      when String, Symbol, Array then [[nil, filter]]
-      when Hash                  then filter.to_a
-      else []
-      end
-    end
-
-    def filter_nodes(filter_type, pattern, variable = nil)
-      case pattern
-      when :all then @plan.nodes
-      else
-        nodes_list = @plan.nodes.select do |node|
-          case filter_type
-          when :nodes, :exclude_nodes                     then node.has_name?(pattern)
-          when :roles, :exclude_roles                     then node.has_role?(pattern)
-          when :nodes_by_config, :exclude_nodes_by_config then node.config_includes?(variable, pattern)
-          when :nodes_by_fact, :exclude_nodes_by_fact     then node.has_fact?(variable, pattern)
-          end
-        end
-        unused_pattern_warning(filter_type, pattern, variable) if nodes_list.empty?
-        nodes_list
-      end
-    end
-
-    def unused_pattern_warning(filter_type, pattern, variable = nil)
-      pattern_s = pattern.kind_of?(Regexp) ? "/#{pattern.source}/" : pattern.to_s
-      msg = variable.nil? ? "'#{pattern_s}'" : "{'#{variable.to_s}' => '#{pattern_s}'}"
-      Dopi.log.warn("Step '#{name}': #{filter_type.to_s} => #{msg} does not match any node!")
     end
 
   end

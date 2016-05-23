@@ -1,0 +1,55 @@
+name: 'test_max_per_role'
+max_in_flight: -1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'linux01.example.com':
+    infrastructure: 'test'
+  'linux02.example.com':
+    infrastructure: 'test'
+  'linux03.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
+
+configuration:
+  defaults:
+    role: 'base'
+
+steps:
+
+  - name: 'configure credentials'
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugins: '/^ssh/'
+        credentials: 'linux_login'
+    command: 'dummy'
+
+  - name: 'reboot nodes and check if the other nodes stay up'
+    nodes: 'all'
+    max_per_role: 1
+    commands:
+      - plugin: 'ssh/custom'
+        exec: 'reboot'
+        expect_exit_codes: 255
+      - plugin: 'custom'
+        exec: 'sleep'
+        arguments: '2'
+      - plugin: 'custom'
+        exec: 'ping'
+        arguments: '-w 2 -c 1 linux01.example.com || [ "$DOP_NODE_FQDN" == "linux01.example.com" ]'
+      - plugin: 'custom'
+        exec: 'ping'
+        arguments: '-w 2 -c 1 linux02.example.com || [ "$DOP_NODE_FQDN" == "linux02.example.com" ]'
+      - plugin: 'custom'
+        exec: 'ping'
+        arguments: '-w 2 -c 1 linux03.example.com || [ "$DOP_NODE_FQDN" == "linux03.example.com" ]'
+      - 'ssh/wait_for_login'
+

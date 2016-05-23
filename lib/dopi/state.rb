@@ -38,6 +38,10 @@ module Dopi
       state_children.any? {|child| child.state_ready?}
     end
 
+    def state_children_starting?
+      state_children.any? {|child| child.state_starting?}
+    end
+
     def state_children_running_noop?
       state_children.any? {|child| child.state_running_noop?}
     end
@@ -62,6 +66,7 @@ module Dopi
         elsif state_children_done?         then @state = :done
         elsif state_children_running?      then @state = :running
         elsif state_children_running_noop? then @state = :running_noop
+        elsif state_children_starting?     then @state = :starting
         elsif state_children_ready?        then @state = :ready
         end
         state_changed unless old_state == @state
@@ -77,6 +82,10 @@ module Dopi
 
     def state_ready?
       state == :ready
+    end
+
+    def state_starting?
+      state == :starting
     end
 
     def state_running?
@@ -95,16 +104,23 @@ module Dopi
       state == :failed
     end
 
+    def state_start
+      return if state == :starting
+      raise Dopi::StateTransitionError, "Can't switch to running from #{state.to_s}" unless state == :ready
+      @state = :starting
+      state_changed
+    end
+
     def state_run
       return if state == :running
-      raise Dopi::StateTransitionError, "Can't switch to running from #{state.to_s}" unless state == :ready
+      raise Dopi::StateTransitionError, "Can't switch to running from #{state.to_s}" unless state == :ready || state == :starting
       @state = :running
       state_changed
     end
 
     def state_run_noop
       return if state == :running_noop
-      raise Dopi::StateTransitionError, "Can't switch to running_noop from #{state.to_s}" unless state == :ready
+      raise Dopi::StateTransitionError, "Can't switch to running_noop from #{state.to_s}" unless state == :ready || state == :starting
       @state = :running_noop
       state_changed
     end
