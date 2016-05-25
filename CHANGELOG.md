@@ -1,8 +1,17 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.11.0] - 2016-05-25
+### Added
+- Make it possible to limit the running nodes per role with the max_per_role setting
+  This can be set per plan and be overwritten by step
+
+### Removed
+- plan subhash for max_in_flight is no longer supported and was removed
+- Setting the ssh password via ssh_root_pass is no longer supported and was removed
+
 ## [0.10.1] - 2016-04-27
-##» Fixed
+### Fixed
 - Workaround which hopefuly solves the the hiera race condition
 - Always display stacktrace if a bug was detected
 
