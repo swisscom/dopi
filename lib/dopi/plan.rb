@@ -24,8 +24,8 @@ module Dopi
       :name,
       :configuration,
       :credentials,
-      :ssh_root_pass,
       :max_in_flight,
+      :max_per_role,
       :canary_host
 
     def run(options = {})

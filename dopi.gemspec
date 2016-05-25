@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "simplecov"
   spec.add_development_dependency "rubocop"
 
-  spec.add_runtime_dependency "dop_common", '0.7.0'
+  spec.add_runtime_dependency "dop_common", '0.8.0'
   spec.add_runtime_dependency "gli", '>= 2.13.3'
   spec.add_runtime_dependency "logger-colors"
   spec.add_runtime_dependency "hiera"
@@ -37,4 +37,9 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "winrm", '1.3.4'
   spec.add_runtime_dependency "parallel"
   spec.add_runtime_dependency "deep_merge"
+
+  # curses was removed in ruby 2.1
+  if RUBY_VERSION >= '2.1'
+    spec.add_runtime_dependency 'curses'
+  end
 end

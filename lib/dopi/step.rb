@@ -9,6 +9,7 @@ module Dopi
     include Dopi::NodeFilter
 
     DEFAULT_MAX_IN_FLIGHT = 3
+    DEFAULT_MAX_PER_ROLE  = -1
 
     attr_accessor :plan
 
@@ -118,7 +119,7 @@ module Dopi
     # check if a node is runnable or if there are constrains
     # which prevent it from running
     def is_runnable?(node)
-      if max_per_role
+      if max_per_role > 0
         running_groups[node.role] < max_per_role
       else
         true
@@ -142,7 +143,7 @@ module Dopi
     end
 
     def max_per_role
-      @max_per_role ||= @step_parser.max_per_role || nil
+      @max_per_role ||= @step_parser.max_per_role || @plan.max_per_role || DEFAULT_MAX_PER_ROLE
     end
 
     def canary_host
