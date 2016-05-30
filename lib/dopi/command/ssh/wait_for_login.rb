@@ -23,7 +23,7 @@ module Dopi
         def run
           connected = false
           until connected
-            begin connected = check_exit_code(run_command[2])
+            begin connected = check_exit_code(local_command(env, command_string)[2])
             rescue Dopi::NodeConnectionError, Dopi::CommandConnectionError
             end
             unless connected

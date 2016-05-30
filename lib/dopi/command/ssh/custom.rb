@@ -56,7 +56,7 @@ module Dopi
             end
             # check connection and return command string if it is working
             c = create_ssh_command_string(credential, @node.address(port))
-            return c if run_command(c[:env], c[:command] + ' exit')[2] == 0
+            return c if local_command(c[:env], c[:command] + ' exit')[2] == 0
             log(:warn, "Unable to login with credential #{credential.name}")
           end
           cred_names = credentials.map{|c| c.name}.join(', ')

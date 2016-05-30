@@ -6,6 +6,7 @@ require 'open3'
 module Dopi
   class Command
     class Custom < Dopi::Command
+      include Dopi::Connector::Local
       include Dopi::CommandParser::ExitCode
       include Dopi::CommandParser::Output
 
@@ -23,7 +24,7 @@ module Dopi
 
       def run
         result = []
-        cmd_stdout, cmd_stderr, cmd_exit_code = run_command
+        cmd_stdout, cmd_stderr, cmd_exit_code = local_command(env, command_string)
         # Output Parser
         result << check_output(cmd_stdout)
         result << check_output(cmd_stderr)
@@ -101,41 +102,6 @@ module Dopi
       # assemble the command to execute
       def command_string
         exec + ' ' + arguments
-      end
-
-      # The command method executes the command of the step.
-      # Returns an array with stdio, sterror and exit code.
-      def run_command(env = env, command_string = command_string)
-        cmd_stdout = ''
-        cmd_stderr = ''
-        log(:debug, "Executing #{command_string} for command #{name}")
-        log(:debug, "Environment: #{env.to_s}")
-        cmd_exit_code = Open3.popen3(env, command_string, :pgroup => true) do |stdin, stdout, stderr, wait_thr|
-          signal_handler = Proc.new do |signal|
-            case signal
-            when :abort then Process.kill(:TERM, wait_thr.pid)
-            when :kill  then Process.kill(:KILL, wait_thr.pid)
-            end
-          end
-          on_signal(signal_handler)
-          stdin.close
-          stdout_thread = Thread.new do
-            until ( line = stdout.gets ).nil? do
-              cmd_stdout << line
-              log(:debug, line.gsub("\n", '').gsub("\r", ''))
-            end
-          end
-          stderr_thread = Thread.new do
-            until ( line = stderr.gets ).nil? do
-              cmd_stderr << line
-              log(:error, line.gsub("\n", '').gsub("\r", ''))
-            end
-          end
-          exit_status = wait_thr.value
-          delete_on_signal(signal_handler)
-          exit_status
-        end
-        [ cmd_stdout, cmd_stderr, cmd_exit_code.exitstatus ]
       end
 
     end
