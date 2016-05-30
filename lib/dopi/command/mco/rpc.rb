@@ -7,8 +7,8 @@ module Dopi
   class Command
     module Mco
       class Rpc < Dopi::Command
-        include Dopi::ExitCodeParser
         include MCollective::RPC
+        include Dopi::CommandParser::ExitCode
 
         def validate
           log_validation_method('options_valid?', CommandParsingError)
@@ -20,7 +20,7 @@ module Dopi
           unless Dopi::Command::Mco::Rpc > self.class && self.method(:action).owner == self.class
             log_validation_method('action_valid?', CommandParsingError)
           end
-          validate_exit_code_parser
+          validate_exit_code
         end
 
         def run
@@ -138,7 +138,7 @@ module Dopi
 
         def arguments_valid?
           hash.nil? or hash[:arguments].nil? or hash[:arguments].kind_of?(Hash) or
-            raise CommandParsingError, "The value for 'arguments' has to be a Hash" 
+            raise CommandParsingError, "The value for 'arguments' has to be a Hash"
           begin
             args = hash ? ( hash[:arguments] or {} ) : {}
             agent_ddl = MCollective::DDL.new(agent)

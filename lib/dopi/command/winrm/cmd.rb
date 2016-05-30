@@ -7,8 +7,8 @@ module Dopi
   class Command
     class Winrm
       class Cmd < Dopi::Command::Winrm
-        include Dopi::ExitCodeParser
-        include Dopi::OutputParser
+        include Dopi::CommandParser::ExitCode
+        include Dopi::CommandParser::Output
 
         def validate
           super
@@ -17,8 +17,8 @@ module Dopi
           unless Dopi::Command::Winrm::Cmd > self.class && self.method(:exec).owner == self.class
             log_validation_method('exec_valid?', CommandParsingError)
           end
-          validate_exit_code_parser
-          validate_output_parser
+          validate_exit_code
+          validate_output
         end
 
         def run

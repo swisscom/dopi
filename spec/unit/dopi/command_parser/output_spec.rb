@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-class OutputParserTestKlass
-  include Dopi::OutputParser
+class OutputTestKlass
+  include Dopi::CommandParser::Output
 
   attr_accessor :hash
 
@@ -9,10 +9,10 @@ class OutputParserTestKlass
   def log(s,m); end
 end
 
-describe Dopi::OutputParser do
+describe Dopi::CommandParser::Output do
 
   before :each do
-    @output_parser = OutputParserTestKlass.new
+    @output_parser = OutputTestKlass.new
   end
 
   describe 'parse_output' do
