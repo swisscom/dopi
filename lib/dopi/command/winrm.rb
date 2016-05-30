@@ -7,7 +7,7 @@ require 'gssapi'
 module Dopi
   class Command
     class Winrm < Dopi::Command
-      include Dopi::Credentials
+      include Dopi::CommandParser::Credentials
 
       def validate
         log_validation_method('port_valid?')

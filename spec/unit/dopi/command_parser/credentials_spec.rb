@@ -1,12 +1,12 @@
 require 'spec_helper'
 
 class CredentialsTestKlass
-  include Dopi::Credentials
+  include Dopi::CommandParser::Credentials
   attr_accessor :hash, :step
   def supported_credential_types() [:username_password] end
 end
 
-describe Dopi::Credentials do
+describe Dopi::CommandParser::Credentials do
 
   before :each do
     @credentials = CredentialsTestKlass.new

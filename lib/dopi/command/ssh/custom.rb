@@ -6,7 +6,7 @@ module Dopi
   class Command
     class Ssh
       class Custom < Dopi::Command::Custom
-        include Dopi::Credentials
+        include Dopi::CommandParser::Credentials
 
         def validate
           super
