@@ -7,17 +7,21 @@ module Dopi
   class Command
     class Custom < Dopi::Command
       include Dopi::Connector::Local
+      include Dopi::CommandParser::Exec
+      include Dopi::CommandParser::Env
+      include Dopi::CommandParser::Arguments
       include Dopi::CommandParser::ExitCode
       include Dopi::CommandParser::Output
 
     public
       def validate
-        log_validation_method('env_valid?', CommandParsingError)
-        log_validation_method('arguments_valid?', CommandParsingError)
-        # Skip validation in subclasses that overwrite the non optional methods
+        #validate_exec
+        # remove after the refactoring is complete
         unless Dopi::Command::Custom > self.class && self.method(:exec).owner == self.class
           log_validation_method('exec_valid?', CommandParsingError)
         end
+        validate_env
+        validate_arguments
         validate_exit_code
         validate_output
       end
@@ -38,66 +42,7 @@ module Dopi
         log(:info, "(NOOP) Environment: #{env.to_s}")
       end
 
-      def exec
-        @exec ||= exec_valid? ?
-          hash[:exec] : nil
-      end
-
-      def env
-        @env ||= env_valid? ?
-          env_defaults.merge(hash[:env]) : env_defaults
-      end
-
-      def arguments
-        @arguments ||= arguments_valid? ?
-          parse_arguments : ""
-      end
-
     private
-
-      def exec_valid?
-        hash[:exec] or
-          raise CommandParsingError, "No command to execute in 'exec' defined"
-        hash[:exec].kind_of?(String) or
-          raise CommandParsingError, "The value for 'exec' has to be a String"
-      end
-
-      def env_valid?
-        return false unless hash.kind_of?(Hash) # plugin may not have parameters
-        return false if hash[:env].nil? # env is optional
-        hash[:env].kind_of?(Hash) or
-          raise CommandParsingError, "The value for 'env' has to be a hash"
-      end
-
-      def env_defaults
-        { 'DOP_NODE_FQDN' => @node.name }
-      end
-
-      def arguments_valid?
-        return false unless hash.kind_of?(Hash) # plugin may not have parameters
-        return false if hash[:arguments].nil? # arguments are optional
-        hash[:arguments].kind_of?(Hash) or
-          hash[:arguments].kind_of?(Array) or
-          hash[:arguments].kind_of?(String) or
-          raise CommandParsingError, "The value for 'arguments' hast to be an Array, Hash or String"
-      end
-
-      def parse_arguments
-        case hash[:arguments]
-        when Hash   then hash[:arguments].to_a.flatten.join(' ')
-        when Array  then hash[:arguments].flatten.join(' ')
-        when String then hash[:arguments]
-        else ""
-        end
-      end
-
-      def expect_exit_codes_defaults
-        0
-      end
-
-      def parse_output_defaults
-        nil
-      end
 
       # assemble the command to execute
       def command_string

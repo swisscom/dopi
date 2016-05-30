@@ -2,10 +2,7 @@ require 'spec_helper'
 
 class OutputTestKlass
   include Dopi::CommandParser::Output
-
   attr_accessor :hash
-
-  def parse_output_defaults; nil; end
   def log(s,m); end
 end
 

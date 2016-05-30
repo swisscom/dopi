@@ -1,8 +1,8 @@
 #
 # This is a mixin for command plugins that need to parse an exit Code of some sort
 #
-# Make sure you add the validation method to the plugin validation and
-# implement the expect_exit_codes_defaults method.
+# To set plugin specific defaults you can implement the 'expect_exit_codes_defaults'
+# method which returns an array of expected exit codes
 #
 module Dopi
   module CommandParser
@@ -16,28 +16,7 @@ module Dopi
 
       def expect_exit_codes
         @expect_exit_codes ||= expect_exit_codes_valid? ?
-          hash[:expect_exit_codes] : expect_exit_codes_defaults
-      end
-
-    private
-
-      def expect_exit_codes_valid?
-        return false unless hash.kind_of?(Hash) # plugin may not have parameters
-        return false if hash[:expect_exit_codes].nil? # expect_exit_codes is optional
-        hash[:expect_exit_codes].kind_of?(Fixnum) or
-          hash[:expect_exit_codes].kind_of?(String) or
-          hash[:expect_exit_codes].kind_of?(Symbol) or
-          hash[:expect_exit_codes].kind_of?(Array) or
-          raise CommandParsingError, "The value for 'expect_exit_codes' hast to be a number or an array of numbers or :all"
-        if hash[:expect_exit_codes].kind_of?(String) || hash[:expect_exit_codes].kind_of?(Symbol)
-          ['all', 'All', 'ALL', :all].include? hash[:expect_exit_codes] or
-            raise CommandParsingError, "Unknown keyword for expect_exit_codes. This has to be a number, an array or :all"
-        end
-        if hash[:expect_exit_codes].kind_of?(Array)
-          hash[:expect_exit_codes].all?{|exit_code| exit_code.kind_of?(Fixnum)} or
-            raise CommandParsingError, "The array in 'expect_exit_codes' can only contain numbers"
-        end
-        true
+          hash[:expect_exit_codes] : create_exit_codes
       end
 
       # Returns true if the exit code is one we expected, otherwise false
@@ -62,6 +41,31 @@ module Dopi
         end
 
         exit_code_ok
+      end
+
+    private
+
+      def expect_exit_codes_valid?
+        return false unless hash.kind_of?(Hash) # plugin may not have parameters
+        return false if hash[:expect_exit_codes].nil? # expect_exit_codes is optional
+        hash[:expect_exit_codes].kind_of?(Fixnum) or
+          hash[:expect_exit_codes].kind_of?(String) or
+          hash[:expect_exit_codes].kind_of?(Symbol) or
+          hash[:expect_exit_codes].kind_of?(Array) or
+          raise CommandParsingError, "The value for 'expect_exit_codes' hast to be a number or an array of numbers or :all"
+        if hash[:expect_exit_codes].kind_of?(String) || hash[:expect_exit_codes].kind_of?(Symbol)
+          ['all', 'All', 'ALL', :all].include? hash[:expect_exit_codes] or
+            raise CommandParsingError, "Unknown keyword for expect_exit_codes. This has to be a number, an array or :all"
+        end
+        if hash[:expect_exit_codes].kind_of?(Array)
+          hash[:expect_exit_codes].all?{|exit_code| exit_code.kind_of?(Fixnum)} or
+            raise CommandParsingError, "The array in 'expect_exit_codes' can only contain numbers"
+        end
+        true
+      end
+
+      def create_exit_codes
+        respond_to?(:expect_exit_codes_defaults) ? expect_exit_codes_defaults : 0
       end
 
     end

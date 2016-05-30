@@ -3,6 +3,9 @@
 #
 # Make sure to call the validation method from the class you use the module
 #
+# To set plugin specific output parser patterns, implement the method
+# 'parse_output_defaults' which should return a hash with the patterns.
+#
 module Dopi
   module CommandParser
     module Output
@@ -49,9 +52,11 @@ module Dopi
       end
 
       def parse_output
-        @parse_output ||= parse_output_valid? ?
-          Hash[hash[:parse_output].map{|k,v| [k.to_sym, v]}] :
-          (parse_output_defaults || {})
+        if parse_output_valid?
+          Hash[hash[:parse_output].map{|k,v| [k.to_sym, v]}]
+        else
+          respond_to?(:parse_output_defaults) ? parse_output_defaults : {}
+        end
       end
 
       def error_patterns

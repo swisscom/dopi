@@ -55,32 +55,4 @@ describe Dopi::Command do
     end
   end
 
-  describe '#expect_exit_codes' do
-    it 'should return 0 if nothing is specified' do
-      command = create_command({:plugin => 'custom'})
-      expect(command.expect_exit_codes).to eq(0)
-    end
-    it 'should return a number if a number is specified' do
-      command = create_command({:plugin => 'custom', :expect_exit_codes => 3})
-      expect(command.expect_exit_codes).to eq(3)
-    end
-    it 'should return an Array of numbers if such an Array is specified' do
-      command = create_command({:plugin => 'custom', :expect_exit_codes => [0, 1, 3]})
-      expect(command.expect_exit_codes).to eq([0, 1, 3])
-    end
-    it 'should return "all" if such a String is specified' do
-      command = create_command({:plugin => 'custom', :expect_exit_codes => 'all'})
-      expect(command.expect_exit_codes).to eq('all')
-    end
-    it 'will raise and error if the value is an invalid string' do
-      command = create_command({:plugin => 'custom', :expect_exit_codes => 'foo'})
-      expect{command.expect_exit_codes}.to raise_error Dopi::CommandParsingError
-    end
-    it 'will raise and error if the Array contains a String' do
-      command = create_command({:plugin => 'custom', :expect_exit_codes => [1, 2, 'foo']})
-      expect{command.expect_exit_codes}.to raise_error Dopi::CommandParsingError
-    end
-
-  end
-
 end
