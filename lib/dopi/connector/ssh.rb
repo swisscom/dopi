@@ -48,11 +48,11 @@ module Dopi
         []
       end
 
-    private
-
       def supported_credential_types
         [:username_password, :ssh_key]
       end
+
+    private
 
       # this method checks for every credential if a login is possible
       # and will return the first one where it is possible.
