@@ -1,6 +1,34 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [unreleased] - unreleased
+
+This release has some pretty significant changes to the SSH connector. It will now encode
+the command into a base64 string which will then be decoded on the server side. This should
+prevent a lot of the headache around escaping and allow for multiline scripts.
+
+Stuff like this should now be possible:
+
+    - name: 'Execute muliline script'
+      nodes: 'all'
+      command:
+        plugin: 'ssh/custom'
+        exec: |
+          export FOO="a multiline script"
+          echo "this is ${FOO}"
+          echo "we don't care about escaping anymore" > /tmp/sometext
+          cat /tmp/sometext
+
+You can still get the old behaviour if you set "base64: false" in an ssh plugins. However I
+recommend you migrate your scripts instead, which should also make the script look cleaner.
+
+There are also some other smaller changes to the ssh connector which are listed below.
+
+### Changed
+- ssh now uses base64 to enable multiline commands and to fix the issues with escaping
+- the ssh_check_host_key cli option has gone away. This is now a plugin setting and can
+  now be set with the set_plugin_defaults or per plugin instance, which is much more flexible.
+
 ## [0.11.0] - 2016-05-25
 ### Added
 - Make it possible to limit the running nodes per role with the max_per_role setting
@@ -12,8 +40,8 @@ All notable changes to DOPi will be documented in this file.
 
 ## [0.10.1] - 2016-04-27
 ### Fixed
-- Workaround which hopefuly solves the the hiera race condition
-- Always display stacktrace if a bug was detected
+- Workaround which hopefully solves the hiera race condition
+- Always display stack trace if a bug was detected
 
 ## [0.10.0] - 2016-04-18
 ### Added
