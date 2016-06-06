@@ -37,8 +37,6 @@ module Dopi
     attr_accessor :use_hiera, :hiera_yaml, :load_facts, :facts_dir
     attr_accessor :role_variable, :role_default
     attr_accessor :connection_check_timeout
-    attr_accessor :ssh_user, :ssh_key,
-                  :ssh_pass_auth, :ssh_check_host_key
     attr_accessor :mco_config, :mco_dopi_logger
     attr_accessor :log_dir, :log_level
 
@@ -72,12 +70,6 @@ module Dopi
       # Role defaults
       @role_variable = 'role'
       @role_default  = nil
-
-      # SSH defaults
-      @ssh_user = 'root'
-      @ssh_key  = File.join(user.dir, '.ssh/id_dsa')
-      @ssh_pass_auth = false
-      @ssh_check_host_key = false
 
       # MCO defaults
       @mco_config = is_root ?

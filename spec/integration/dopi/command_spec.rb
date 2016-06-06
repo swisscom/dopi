@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-Dopi.configuration.ssh_pass_auth = true
 Dopi.configuration.mco_config    = 'spec/fixtures/mco_client.cfg'
 Dopi.configuration.hiera_yaml    = 'spec/fixtures/puppet/hiera.yaml'
 

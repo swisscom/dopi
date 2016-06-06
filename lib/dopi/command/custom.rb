@@ -1,7 +1,6 @@
 #
 # DOPi Plugin: Custom Command
 #
-require 'open3'
 
 module Dopi
   class Command
@@ -44,7 +43,6 @@ module Dopi
 
     private
 
-      # assemble the command to execute
       def command_string
         exec + ' ' + arguments
       end

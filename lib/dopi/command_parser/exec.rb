@@ -17,9 +17,9 @@ module Dopi
 
       def exec_valid?
         hash[:exec] or
-          raise CommandParsingError, "No command to execute in 'exec' defined"
+          raise CommandParsingError, "#Step #{@step.name} | Plugin #{name} | No command to execute in 'exec' defined"
         hash[:exec].kind_of?(String) or
-          raise CommandParsingError, "The value for 'exec' has to be a String"
+          raise CommandParsingError, "#Step #{@step.name} | Plugin #{name} | The value for 'exec' has to be a String"
       end
 
     end

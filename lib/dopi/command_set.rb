@@ -41,8 +41,8 @@ module Dopi
 
     def run(noop)
       commands.each do |command|
-        break if state_failed?
         command.meta_run(noop)
+        break unless command.state_done?
       end
     end
 

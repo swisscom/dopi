@@ -44,10 +44,6 @@ module Dopi
         arg_name 'ROLE'
         flag [:role_default]
 
-        desc 'Force ssh to check the host keys (this is disabled by default because we usually deal with new hosts)'
-        default_value Dopi.configuration.ssh_check_host_key
-        switch [:ssh_check_host_key]
-
         desc 'Set the MCollective client configuration.'
         default_value Dopi.configuration.mco_config
         arg_name 'FILE'

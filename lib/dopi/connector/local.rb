@@ -3,6 +3,8 @@
 # machine. It does all the signal handling and makes
 # sure processes are stopped or killed.
 #
+require 'open3'
+
 module Dopi
   module Connector
     module Local

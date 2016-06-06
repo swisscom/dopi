@@ -11,7 +11,7 @@ module Dopi
     module Env
 
       def validate_env
-        log_validation_method('env_valid?', CommandParsingError)
+        log_validation_method(:env_valid?, CommandParsingError)
       end
 
       def env
