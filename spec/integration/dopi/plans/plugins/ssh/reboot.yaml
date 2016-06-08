@@ -1,0 +1,35 @@
+name: 'ssh_customs_plugin_test'
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'linux01.example.com':
+    infrastructure: 'test'
+  'linux02.example.com':
+    infrastructure: 'test'
+  'linux03.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
+
+steps:
+
+  - name: 'Set the credentials'
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugins: '/^ssh/'
+        credential: 'linux_login'
+    command: 'dummy'
+
+  - name: 'Rebooot all nodes'
+    nodes: 'all'
+    max_per_role: 1
+    commands: 'ssh/reboot'
+
