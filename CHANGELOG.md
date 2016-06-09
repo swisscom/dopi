@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.11.1] - 2016-06-09
+- upgrade of dop_common
+
 ## [0.11.0] - 2016-05-25
 ### Added
 - Make it possible to limit the running nodes per role with the max_per_role setting
