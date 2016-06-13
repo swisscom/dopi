@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [unreleased] - unreleased
+## [0.12.0] - 2016-06-13
 
 This release has some pretty significant changes to the SSH connector. It will now encode
 the command into a base64 string which will then be decoded on the server side. This should
