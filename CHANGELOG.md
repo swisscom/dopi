@@ -29,6 +29,9 @@ There are also some other smaller changes to the ssh connector which are listed 
 - the ssh_check_host_key cli option has gone away. This is now a plugin setting and can
   now be set with the set_plugin_defaults or per plugin instance, which is much more flexible.
 
+### Added
+- ssh/reboot plugin
+
 ## [0.11.1] - 2016-06-09
 - upgrade of dop_common
 

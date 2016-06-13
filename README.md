@@ -215,6 +215,8 @@ This are the plugins generally used in steps as commands
 
 [ssh/wait_for_login](doc/plugins/ssh/wait_for_login.md)
 
+[ssh/reboot](doc/plugins/ssh/reboot.md)
+
 [ssh/puppet_agent_run](doc/plugins/ssh/puppet_agent_run.md)
 
 [ssh/file_replace](doc/plugins/ssh/file_replace.md)
