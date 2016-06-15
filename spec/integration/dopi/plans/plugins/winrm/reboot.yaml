@@ -1,0 +1,31 @@
+name: 'winrm_reboot_plugin_test'
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'windows01.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'windows_login':
+    type: 'username_password'
+    username: 'administrator'
+    password: 'vagrant'
+
+steps:
+
+  - name: "Configure the plugin defaults"
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugins: '/^winrm/'
+        credential: 'windows_login'
+    command: 'dummy'
+
+  - name: 'Rebooot all nodes'
+    nodes: 'all'
+    max_per_role: 1
+    commands: 'winrm/reboot'
+

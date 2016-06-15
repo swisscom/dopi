@@ -1,4 +1,4 @@
-name: 'ssh_customs_plugin_test'
+name: 'ssh_reboot_plugin_test'
 max_in_flight: 1
 
 infrastructures:
