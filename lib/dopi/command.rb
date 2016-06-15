@@ -215,5 +215,6 @@ require 'dopi/command/winrm/powershell'
 require 'dopi/command/winrm/wait_for_login'
 require 'dopi/command/winrm/file_contains'
 require 'dopi/command/winrm/file_exists'
+require 'dopi/command/winrm/reboot'
 
 # TODO: load plugins from the plugin paths

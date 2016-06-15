@@ -95,6 +95,10 @@ module Dopi
         basic_auth_only_valid? ? hash[:basic_auth_only] : nil
       end
 
+      def operation_timeout
+        operation_timeout_valid? ? hash[:operation_timeout] : 60
+      end
+
       def supported_credential_types
         [:username_password, :kerberos]
       end
@@ -143,6 +147,15 @@ module Dopi
         return false if hash[:basic_auth_only].nil?
         hash[:basic_auth_only].kind_of?(TrueClass) or hash[:basic_auth_only].kind_of?(FalseClass) or
           raise CommandParsingError, "The value for 'basic_auth_only' has to be true or false"
+      end
+
+      def operation_timeout_valid?
+        return false if hash.nil?
+        return false if hash[:operation_timeout].nil?
+        hash[:operation_timeout].kind_of?(Fixnum) or
+          raise CommandParsingError, 'The value for operation_timeout has to be a number'
+        hash[:operation_timeout] >= 0 or
+          raise CommandParsingError, 'The value for operation_timeout has to be positive number'
       end
 
     end

@@ -89,6 +89,22 @@ describe Dopi::Connector::Winrm do
     end
   end
 
-
+  describe '#operation_timeout' do
+    it 'should return 60 if not specified' do
+      expect(@winrm.operation_timeout).to eq(60)
+    end
+    it 'should return 120 if specified as 120' do
+      @winrm.hash = {:operation_timeout => 120}
+      expect(@winrm.operation_timeout).to eq(120)
+    end
+    it 'will raise and error if it is not a number' do
+      @winrm.hash = {:operation_timeout => 'foo'}
+      expect{@winrm.operation_timeout}.to raise_error Dopi::CommandParsingError
+    end
+    it 'will raise and error if it is not a positive number' do
+      @winrm.hash = {:operation_timeout => -20}
+      expect{@winrm.operation_timeout}.to raise_error Dopi::CommandParsingError
+    end
+  end
 
 end
