@@ -231,6 +231,8 @@ This are the plugins generally used in steps as commands
 
 [winrm/wait_for_login](doc/plugins/winrm/wait_for_login.md)
 
+[winrm/reboot](doc/plugins/winrm/reboot.md)
+
 ### Verification Plugins
 
 This are some helper plugins that check stuff on the nodes. They are
