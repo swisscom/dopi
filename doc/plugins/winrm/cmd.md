@@ -114,6 +114,12 @@ Disable the security support provider interface.
 
 Use basic auth only
 
+### operation_timeout (optional)
+
+`default: 60`
+
+Timeout for the winrm command to respond.
+
 ### expect_exit_codes (optional)
 
 `default: 0`
