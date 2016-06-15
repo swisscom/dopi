@@ -57,6 +57,7 @@ module Dopi
               :basic_auth_only => basic_auth_only,
               :ca_trust_path   => ca_trust_path
             )
+            wr.set_timeout(operation_timeout)
             wr.cmd('exit') # test connection
           rescue WinRM::WinRMAuthorizationError, GSSAPI::GssApiError => e
             log(:warn, "Unable to login with credential #{credential.name} : #{e.message}")
