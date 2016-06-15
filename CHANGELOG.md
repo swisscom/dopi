@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [unreleased] - unreleased
+
+### Added
+- operation_timeout setting for the winrm connector for long running commands
+- the very essential winrm/reboot plugin
+
 ## [0.12.0] - 2016-06-13
 
 This release has some pretty significant changes to the SSH connector. It will now encode
