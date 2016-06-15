@@ -5,19 +5,22 @@
 module Dopi
   class Command
     class Winrm
-      class WaitForLogin < Dopi::Command::Winrm::Cmd
+      class WaitForLogin < Dopi::Command
+        include Dopi::Connector::Winrm
+        include Dopi::CommandParser::ExitCode
 
-        DEFAULT_CONNECTION_TIMEOUT = 0
         DEFAULT_INTERVAL = 10
 
-        def exec
-          'exit'
+        def validate
+          validate_winrm
+          validate_exit_code
+          log_validation_method(:interval_valid?, CommandParsingError)
         end
 
         def run
           connected = false
           until connected
-            begin connected = check_exit_code(run_command[2])
+            begin connected = check_exit_code(winrm_command('exit')[2])
             rescue Dopi::NodeConnectionError, Dopi::CommandConnectionError
             end
             unless connected
@@ -28,22 +31,6 @@ module Dopi
           end
           true
         end
-
-        def validate
-          #log_validation_method('connection_timeout_valid?', CommandParsingError)
-          log_validation_method('interval_valid?', CommandParsingError)
-        end
-
-        #def connection_timeout
-        #  @connection_timeout ||= connection_timeout_valid? ?
-        #    hash[:connection_timeout] : DEFAULT_CONNECTION_TIMEOUT
-        #end
-
-        #def connection_timeout_valid?
-        #  return false if hash[:connection_timeout].nil? # is optional
-        #  hash[:connection_timeout].class == Fixnum or
-        #    raise CommandParsingError, "Plugin #{name}: the value of 'connection_timeout' has to be a number"
-        #end
 
         def interval
           @interval ||= interval_valid? ?

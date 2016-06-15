@@ -5,9 +5,27 @@
 module Dopi
   class Command
     class Winrm
-      class FileContains < Dopi::Command::Winrm::Powershell
+      class FileContains < Dopi::Command
+        include Dopi::Connector::Winrm
+        include Dopi::CommandParser::ExitCode
 
-        def exec
+        def validate
+          validate_winrm
+          validate_exit_code
+          log_validation_method('file_valid?', CommandParsingError)
+          log_validation_method('pattern_valid?', CommandParsingError)
+        end
+
+        def run
+          cmd_stdout, cmd_stderr, cmd_exit_code = winrm_powershell_command(command_string)
+          check_exit_code(cmd_exit_code)
+        end
+
+        def run_noop
+          log(:info, "(NOOP) Executing '#{command_string}' for command #{name}")
+        end
+
+        def command_string
           "if(-not(Select-String -Pattern #{pattern} -Path #{file} -Quiet)) { exit 1 }"
         end
 
@@ -19,12 +37,6 @@ module Dopi
         def pattern
           @pattern ||= pattern_valid? ?
             hash[:pattern] : nil
-        end
-
-        def validate
-          super
-          log_validation_method('file_valid?', CommandParsingError)
-          log_validation_method('pattern_valid?', CommandParsingError)
         end
 
         def file_valid?

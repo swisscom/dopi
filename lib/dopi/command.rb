@@ -108,7 +108,8 @@ module Dopi
       state_fail unless noop
     rescue => e
       log(:error, "Unexpected error!!! This is a Bug", false)
-      Dopi.log.error(e)
+      Dopi.log.error(e.message)
+      Dopi.log.error(e.backtrace)
       state_fail unless noop
       raise e
     end
@@ -209,7 +210,6 @@ require 'dopi/command/ssh/file_replace'
 require 'dopi/command/ssh/file_deploy'
 require 'dopi/command/ssh/reboot'
 require 'dopi/command/mco/rpc'
-require 'dopi/command/winrm'
 require 'dopi/command/winrm/cmd'
 require 'dopi/command/winrm/powershell'
 require 'dopi/command/winrm/wait_for_login'

@@ -5,17 +5,40 @@ require 'winrm'
 require 'gssapi'
 
 module Dopi
-  class Command
-    class Winrm < Dopi::Command
+  module Connector
+    module Winrm
       include Dopi::CommandParser::Credentials
 
-      def validate
-        log_validation_method('port_valid?')
-        log_validation_method('ssl_valid?')
-        log_validation_method('ca_trust_path_valid?')
-        log_validation_method('disable_sspi_valid?')
-        log_validation_method('basic_auth_only_valid?')
+      def validate_winrm
+        log_validation_method(:port_valid?)
+        log_validation_method(:ssl_valid?)
+        log_validation_method(:ca_trust_path_valid?)
+        log_validation_method(:disable_sspi_valid?)
+        log_validation_method(:basic_auth_only_valid?)
         validate_credentials
+      end
+
+      def winrm_command(command_string)
+        cmd_stdout = ""
+        cmd_stderr = ""
+        log(:debug, "Executing '#{command_string}' for command #{name}")
+        result = winrm.cmd(command_string) do |stdout, stderr|
+          unless stdout.nil? or stdout.empty?
+            cmd_stdout << stdout
+            log(:debug, stdout)
+          end
+          unless stderr.nil? or stderr.empty?
+            cmd_stderr << stderr
+            log(:error, stderr)
+          end
+        end
+        [cmd_stdout, cmd_stdout, result[:exitcode]]
+      end
+
+      def winrm_powershell_command(command_string)
+        log(:debug, "Unencoded Powershell command '#{command_string}'")
+        script = WinRM::PowershellScript.new(command_string)
+        winrm_command("powershell -encodedCommand #{script.encoded()}")
       end
 
       def winrm
@@ -72,11 +95,11 @@ module Dopi
         basic_auth_only_valid? ? hash[:basic_auth_only] : nil
       end
 
-    private
-
       def supported_credential_types
         [:username_password, :kerberos]
       end
+
+    private
 
       def auth_method(credential)
         case credential.type
@@ -86,18 +109,21 @@ module Dopi
       end
 
       def port_valid?
+        return false if hash.nil?
         return false if hash[:port].nil?
         hash[:port].kind_of?(Fixnum) and (hash[:port] > 0) and (hash[:port] < 65536) or
           raise CommandParsingError, "The value for 'port' has to be a number in the range of 1-65535"
       end
 
       def ssl_valid?
+        return false if hash.nil?
         return false if hash[:ssl].nil?
         hash[:ssl].kind_of?(TrueClass) or hash[:ssl].kind_of?(FalseClass) or
           raise CommandParsingError, "The value for 'ssl_valid' has to be true or false"
       end
 
       def ca_trust_path_valid?
+        return false if hash.nil?
         return false if hash[:ca_trust_path].nil?
         hash[:ca_trust_path].kind_of?(String) or
           raise CommandParsingError, "The value for ca_trust_path has to be a string"
@@ -106,12 +132,14 @@ module Dopi
       end
 
       def disable_sspi_valid?
+        return false if hash.nil?
         return false if hash[:disable_sspi].nil?
         hash[:disable_sspi].kind_of?(TrueClass) or hash[:disable_sspi].kind_of?(FalseClass) or
           raise CommandParsingError, "The value for 'disable_sspi' has to be true or false"
       end
 
       def basic_auth_only_valid?
+        return false if hash.nil?
         return false if hash[:basic_auth_only].nil?
         hash[:basic_auth_only].kind_of?(TrueClass) or hash[:basic_auth_only].kind_of?(FalseClass) or
           raise CommandParsingError, "The value for 'basic_auth_only' has to be true or false"
