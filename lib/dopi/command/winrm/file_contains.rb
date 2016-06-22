@@ -26,7 +26,7 @@ module Dopi
         end
 
         def command_string
-          "if(-not(Select-String -Pattern #{pattern} -Path #{file} -Quiet)) { exit 1 }"
+          "if(-not(Select-String -Pattern #{pattern} -Path '#{file}' -Quiet)) { exit 1 }"
         end
 
         def file

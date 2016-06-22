@@ -26,7 +26,7 @@ module Dopi
         end
 
         def command_string
-          "if(-not(Test-Path #{file})) { exit 1 }"
+          "if(-not(Test-Path '#{file}')) { exit 1 }"
         end
 
         def file
