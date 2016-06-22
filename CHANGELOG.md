@@ -4,8 +4,11 @@ All notable changes to DOPi will be documented in this file.
 ## [unreleased] - unreleased
 
 ### Added
-- operation_timeout setting for the winrm connector for long running commands
-- the very essential winrm/reboot plugin
+- New operation_timeout setting for the winrm connector for long running commands
+- The very essential winrm/reboot plugin
+
+### Fixed
+- A run will now stop in the middle of a command sets if an stop command was sent
 
 ## [0.12.0] - 2016-06-13
 
