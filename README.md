@@ -233,6 +233,8 @@ This are the plugins generally used in steps as commands
 
 [winrm/reboot](doc/plugins/winrm/reboot.md)
 
+[winrm/puppet_agent_run](doc/plugins/winrm/puppet_agent_run.md)
+
 ### Verification Plugins
 
 This are some helper plugins that check stuff on the nodes. They are
