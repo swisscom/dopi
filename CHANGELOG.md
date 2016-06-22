@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [unreleased] - unreleased
+## [0.13.0] - 2016-06-22
 
 ### Added
 - New operation_timeout setting for the winrm connector for long running commands
