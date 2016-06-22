@@ -33,7 +33,7 @@ module Dopi
           end
         end
         winrm.close
-        [cmd_stdout, cmd_stdout, result[:exitcode]]
+        [cmd_stdout, cmd_stderr, result[:exitcode]]
       end
 
       def winrm_powershell_command(command_string)
