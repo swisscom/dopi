@@ -1,0 +1,116 @@
+GIT
+  remote: https://gitlab.swisscloud.io/clu-dop/dop_common.git
+  revision: 3d16d1e54cf19651dff73be8c6bcf1432282dae5
+  tag: v0.8.1
+  specs:
+    dop_common (0.8.1)
+
+PATH
+  remote: .
+  specs:
+    dopi (0.12.0)
+      dop_common (= 0.8.1)
+      gli (~> 2)
+      hiera (~> 3)
+      logger-colors (~> 1)
+      mcollective-client (~> 2)
+      parallel (~> 1)
+      winrm (~> 1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    ast (2.3.0)
+    builder (3.2.2)
+    diff-lcs (1.2.5)
+    docile (1.1.5)
+    ffi (1.9.10)
+    gli (2.14.0)
+    gssapi (1.2.0)
+      ffi (>= 1.0.1)
+    gyoku (1.3.1)
+      builder (>= 2.1.2)
+    hiera (3.2.0)
+      json_pure
+    httpclient (2.8.0)
+    json (1.8.3)
+    json_pure (1.8.3)
+    little-plugger (1.1.4)
+    logger-colors (1.0.0)
+    logging (2.1.0)
+      little-plugger (~> 1.1)
+      multi_json (~> 1.10)
+    mcollective-client (2.8.4)
+      json
+      stomp
+      systemu
+    mixlib-shellout (2.2.6)
+    multi_json (1.12.1)
+    nori (2.6.0)
+    parallel (1.9.0)
+    parser (2.3.1.2)
+      ast (~> 2.2)
+    powerpack (0.1.1)
+    rainbow (2.1.0)
+    rake (11.2.2)
+    rspec (3.4.0)
+      rspec-core (~> 3.4.0)
+      rspec-expectations (~> 3.4.0)
+      rspec-mocks (~> 3.4.0)
+    rspec-command (1.0.1)
+      mixlib-shellout (~> 2.0)
+      rspec (~> 3.2)
+      rspec-its (~> 1.2)
+    rspec-core (3.4.4)
+      rspec-support (~> 3.4.0)
+    rspec-expectations (3.4.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-its (1.2.0)
+      rspec-core (>= 3.0.0)
+      rspec-expectations (>= 3.0.0)
+    rspec-mocks (3.4.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-support (3.4.1)
+    rubocop (0.40.0)
+      parser (>= 2.3.1.0, < 3.0)
+      powerpack (~> 0.1)
+      rainbow (>= 1.99.1, < 3.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (~> 1.0, >= 1.0.1)
+    ruby-progressbar (1.8.1)
+    rubyntlm (0.6.0)
+    simplecov (0.11.2)
+      docile (~> 1.1.0)
+      json (~> 1.8)
+      simplecov-html (~> 0.10.0)
+    simplecov-html (0.10.0)
+    stomp (1.4.0)
+    systemu (2.6.5)
+    unicode-display_width (1.0.5)
+    winrm (1.8.1)
+      builder (>= 2.1.2)
+      gssapi (~> 1.2)
+      gyoku (~> 1.0)
+      httpclient (~> 2.2, >= 2.2.0.2)
+      logging (>= 1.6.1, < 3.0)
+      nori (~> 2.0)
+      rubyntlm (~> 0.6.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler (~> 1.3)
+  dop_common!
+  dopi!
+  rake
+  rspec
+  rspec-command
+  rspec-mocks
+  rubocop
+  simplecov
+
+BUNDLED WITH
+   1.10.6
