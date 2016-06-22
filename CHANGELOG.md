@@ -6,12 +6,16 @@ All notable changes to DOPi will be documented in this file.
 ### Added
 - New operation_timeout setting for the winrm connector for long running commands
 - The very essential winrm/reboot plugin
+- The winrm/puppet_agent plugin
 
 ### Fixed
 - A run will now stop in the middle of a command sets if an stop command was sent
+- winrm/file_exists and winrm/file_contains should now work with paths with spaces
+- stderr was not returned correctly for parsing in the winrm connector
 
 ### Changed
 - Migration of the winrm plugins to the new modularized format
+- Update winrm gem to the newest version
 
 ## [0.12.0] - 2016-06-13
 
