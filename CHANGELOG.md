@@ -10,6 +10,9 @@ All notable changes to DOPi will be documented in this file.
 ### Fixed
 - A run will now stop in the middle of a command sets if an stop command was sent
 
+### Changed
+- Migration of the winrm plugins to the new modularized format
+
 ## [0.12.0] - 2016-06-13
 
 This release has some pretty significant changes to the SSH connector. It will now encode
