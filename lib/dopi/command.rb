@@ -126,10 +126,10 @@ module Dopi
       validity
     end
 
-  private
-
     def_delegator  :@command_parser, :verify_commands, :parsed_verify_commands
     def_delegators :@command_parser, :plugin_timeout, :verify_after_run
+
+  private
 
     def run
       raise Dopi::CommandExecutionError, "No run method implemented in plugin #{name}"

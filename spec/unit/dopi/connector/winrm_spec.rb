@@ -2,7 +2,7 @@ require 'spec_helper'
 
 class WinrmTestKlass
   include Dopi::Connector::Winrm
-  attr_accessor :hash
+  attr_accessor :hash, :plugin_timeout
 end
 
 describe Dopi::Connector::Winrm do
@@ -90,7 +90,8 @@ describe Dopi::Connector::Winrm do
   end
 
   describe '#operation_timeout' do
-    it 'should return 60 if not specified' do
+    it 'should return plugin_timeout - 5s if not specified' do
+      @winrm.plugin_timeout = 65
       expect(@winrm.operation_timeout).to eq(60)
     end
     it 'should return 120 if specified as 120' do

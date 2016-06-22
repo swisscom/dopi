@@ -97,7 +97,7 @@ module Dopi
       end
 
       def operation_timeout
-        operation_timeout_valid? ? hash[:operation_timeout] : 60
+        operation_timeout_valid? ? hash[:operation_timeout] : ( plugin_timeout - 5 )
       end
 
       def supported_credential_types

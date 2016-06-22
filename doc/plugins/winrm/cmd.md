@@ -116,9 +116,9 @@ Use basic auth only
 
 ### operation_timeout (optional)
 
-`default: 60`
+`default: plugin_timeout - 5s`
 
-Timeout for the winrm command to respond.
+Timeout for the winrm command to respond. This will default to the plugin_timeout - 5s
 
 ### expect_exit_codes (optional)
 
