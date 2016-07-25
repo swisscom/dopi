@@ -91,6 +91,7 @@ configuration:
       foreman::authentication: 'false'
       puppet::server: true
       puppet::autosign: '/usr/local/bin/dop-puppet-autosign'
+      puppet::autosign_mode: 'script'
       puppet::server_foreman: true
       puppet::server_rttendedeports: 'store'
       puppet::server_external_nodes: ''
@@ -202,7 +203,7 @@ steps:
     command:
       verify_commands:
         - plugin: 'ssh/file_exists'
-          file: '/etc/puppet/Puppetfile.lock'
+          file: '/etc/puppet/.librarian/puppet/config'
       plugin: 'ssh/custom'
       exec: 'librarian-puppet'
       arguments: 'install'
