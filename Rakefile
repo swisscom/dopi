@@ -25,6 +25,16 @@ namespace :spec do
   RSpec::Core::RakeTask.new(:integration) do |t|
     t.pattern = 'spec/integration/**/*_spec.rb'
   end
+
+  desc 'Run single plan file from spec/integration/dopi/plans/<name>.yaml, <name> is taken from env DOPI_TEST_PLAN'
+  RSpec::Core::RakeTask.new(:plan) do |t|
+    t.pattern = 'spec/integration/dopi/plan.rb'
+  end
+
+  desc 'Run single plan file from spec/integration/dopi/fail_check_plans/<name>.yaml and expect it to fail, <name> is taken from env DOPI_TEST_PLAN'
+  RSpec::Core::RakeTask.new(:failplan) do |t|
+    t.pattern = 'spec/integration/dopi/failplan.rb'
+  end
 end
 
 RSpec::Core::RakeTask.new(:spec)
