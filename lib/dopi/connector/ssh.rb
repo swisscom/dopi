@@ -99,6 +99,9 @@ module Dopi
           opts << '-o PasswordAuthentication=no'
           opts << "-i #{credential.private_key}"
         end
+        # Force allocation of tty, needed to propagate signals to remotely
+        # spawned processes
+        opts << '-tt'
         opts += ssh_options
         opts += ssh_options_defaults if respond_to?(:ssh_options_defaults)
         opts.join(' ')

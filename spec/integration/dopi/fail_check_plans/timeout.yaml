@@ -1,0 +1,29 @@
+name: 'test_timeout'
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'linux01.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
+
+steps:
+
+  - name: 'sleep and wait for timeout'
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugins: '/^ssh/'
+        credentials: 'linux_login'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'sleep'
+      arguments: '10'
+      plugin_timeout: 1

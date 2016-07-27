@@ -78,21 +78,25 @@ module Dopi
     def meta_run(noop = false)
       return if skip_run?(noop)
       state_run unless noop
+      # Nest timeout in itself to fix working in combination with popen3() used
+      # by command connectors
       Timeout::timeout(plugin_timeout) do
-        log(:info, "Running command #{name}") unless @is_verify_command
-        if noop
-          run_noop
-        else
-          if run
-            if verify_after_run
-              verify_commands_ok? or
-                raise CommandExecutionError, "Verify commands failed to confirm a successful run"
-            end
-            state_finish
-            log(:info, "#{name} [OK]") if state_done?
+        Timeout::timeout(plugin_timeout) do
+          log(:info, "Running command #{name}") unless @is_verify_command
+          if noop
+            run_noop
           else
-            state_fail
-            log(:info, "#{name} [FAILED]")
+            if run
+              if verify_after_run
+                verify_commands_ok? or
+                  raise CommandExecutionError, "Verify commands failed to confirm a successful run"
+              end
+              state_finish
+              log(:info, "#{name} [OK]") if state_done?
+            else
+              state_fail
+              log(:info, "#{name} [FAILED]")
+            end
           end
         end
       end
@@ -102,6 +106,7 @@ module Dopi
     rescue Timeout::Error
       log(:error, "Command timed out (plugin_timeout is set to #{plugin_timeout})", false)
       state_fail unless noop
+      send_signal(:abort)
     rescue CommandExecutionError => e
       log(:error, "Command failed: #{e.message}", false)
       Dopi.log.error(e) if Dopi.configuration.trace
