@@ -25,9 +25,9 @@ module Dopi
       command_sets.each{|command_set| state_add_child(command_set)}
     end
 
-    # Loading queue objects from yaml files results not properly initialized
-    # queues and a type error when using them. Skip queue when converting to
-    # yaml and re-create it if nil.
+    # Loading queue object from yaml files results in not properly initialized
+    # queue and a type error when using it. Skip queue when converting to yaml.
+    # Will be nil after loading from yaml and must be re-created.
     def to_yaml_properties
       super - [:@queue]
     end
@@ -203,6 +203,7 @@ module Dopi
       end
     end
 
+    # Will be skipped when dumping yaml, therefore nil after loading from yaml.
     def queue
       @queue ||= Queue.new
     end
