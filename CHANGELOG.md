@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.13.1] - 2016-08-10
+
+### Fixed
+- Dopi sometimes still tried to access /var/lib/dop when running as a user
+- Dopi failed on ruby 2.2 when running a plan from the plan cache
+- Plugin timeout did not terminate the processes correctly
+
 ## [0.13.0] - 2016-06-22
 
 ### Added
