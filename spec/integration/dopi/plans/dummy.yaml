@@ -1,0 +1,29 @@
+name: 'test_dummy'
+max_in_flight: 2
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'linux01.example.com':
+    infrastructure: 'test'
+  'linux02.example.com':
+    infrastructure: 'test'
+
+credentials:
+  'linux_login':
+    type: 'username_password'
+    username: 'root'
+    password: 'puppet'
+
+steps:
+
+  - name: 'Run true command'
+    nodes: 'all'
+    set_plugin_defaults:
+      - plugins: '/^ssh/'
+        credentials: 'linux_login'
+    command:
+      plugin: 'ssh/custom'
+      exec: 'true'

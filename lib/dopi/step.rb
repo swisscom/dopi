@@ -25,6 +25,13 @@ module Dopi
       command_sets.each{|command_set| state_add_child(command_set)}
     end
 
+    # Loading queue object from yaml files results in not properly initialized
+    # queue and a type error when using it. Skip queue when converting to yaml.
+    # Will be nil after loading from yaml and must be re-created.
+    def to_yaml_properties
+      super - [:@queue]
+    end
+
     def name
       @step_parser.name
     end
@@ -88,7 +95,7 @@ module Dopi
     # notify the waiting thread that a command_set has finished it's run
     def notify_done
       @notify_mutex.synchronize do
-        @queue.push(1)
+        queue.push(1)
       end
     end
 
@@ -104,14 +111,14 @@ module Dopi
         loop do
           return nil if state_failed? or signals[:stop]
           @notify_mutex.synchronize do
-            @queue.clear
+            queue.clear
             next_command_set = ready_command_sets.find{|cs| is_runnable?(cs.node)}
             unless next_command_set.nil?
               next_command_set.state_start
               return next_command_set
             end
           end
-          @queue.pop # wait until a thread notifies it has finished
+          queue.pop # wait until a thread notifies it has finished
         end
       end
     end
@@ -194,6 +201,11 @@ module Dopi
         end
         selected_plugin_names.flatten.uniq.map{|p| PluginManager.plugin_klass('dopi/command/' + p)}
       end
+    end
+
+    # Will be skipped when dumping yaml, therefore nil after loading from yaml.
+    def queue
+      @queue ||= Queue.new
     end
 
   end
