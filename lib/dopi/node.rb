@@ -145,6 +145,11 @@ module Dopi
           else
             Dopi.log.error("Hiera config #{@@hiera_config} not found! Using empty config")
           end
+          # set the plan_cache defaults
+          config[:dop] ||= { }
+          unless config[:dop].has_key?(:plan_cache_dir)
+            config[:dop][:plan_cache_dir] = Dopi.configuration.plan_cache_dir
+          end
           config[:logger] = 'dopi'
           @@hiera = Hiera.new(:config => config)
         end
