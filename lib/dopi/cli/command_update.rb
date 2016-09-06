@@ -14,7 +14,12 @@ module Dopi
           c.action do |global_options,options,args|
             help_now!('Specify a plan id to update') if args.empty?
             help_now!('You can only update one plan') if args.length > 1
-            puts @plan_cache.update(args[0], options[:plan])
+            plan_name = args[0]
+            if options[:plan]
+              Dopi.update_plan(options[:plan], options)
+            else
+              Dopi.update_state(plan_name, options)
+            end
           end
         end
 

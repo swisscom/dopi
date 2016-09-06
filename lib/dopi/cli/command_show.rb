@@ -14,20 +14,15 @@ module Dopi
           c.action do |global_options,options,args|
             help_now!('Specify a plan name to show') if args.empty?
             help_now!('You can only show one plan') if args.length > 1
+            plan_name = args[0]
             if options[:follow]
               begin
                 Curses.noecho
                 Curses.curs_set(0)
                 Curses.init_screen
-                plan = Dopi.load_plan(args[0])
                 while true
-                  begin
-                    reload_plan = Dopi.load_plan(args[0])
-                    plan = reload_plan if reload_plan.kind_of?(Dopi::Plan)
-                  rescue
-                  end
                   Curses.setpos(0, 0)
-                  Curses.addstr(state(plan))
+                  Curses.addstr(state(plan_name))
                   Curses.refresh
                   sleep(1)
                 end
@@ -35,7 +30,7 @@ module Dopi
                 Curses.close_screen
               end
             else
-              print_state(Dopi.load_plan(args[0]))
+              print_state(plan_name)
             end
           end
         end

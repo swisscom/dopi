@@ -14,19 +14,17 @@ describe 'running an added plan' do
   context 'in temp directory' do
     Dir.mktmpdir do |tmp|
       Dopi.configuration.plan_cache_dir = tmp
-      plan_cache = DopCommon::PlanCache.new(Dopi.configuration.plan_cache_dir)
       it 'add plan to cache' do
-        plan = Dopi.add_plan(plan_file)
-        plan_name = plan.name
+        plan_name = Dopi.add(plan_file)
       end
       it 'load plan from cache' do
-        plan = Dopi.load_plan(plan_name)
+        plan = Dopi.show(plan_name)
       end
       it 'run loaded plan' do
-        Dopi.run_plan(plan, {})
+        Dopi.run(plan_name, true, {})
       end
       it 'remove plan from cache' do
-        plan_cache.remove(plan_name)
+        Dopi.remove(plan_name)
       end
     end
   end

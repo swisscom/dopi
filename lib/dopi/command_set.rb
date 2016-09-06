@@ -47,6 +47,19 @@ module Dopi
       end
     end
 
+    def load_state(state_hash)
+      return if state_hash.empty?
+      commands.each_with_index do |command, i|
+        command.load_state(state_hash[i])
+      end
+    end
+
+    def state_hash
+      commands.map do |command|
+        command.state_hash
+      end
+    end
+
   end
 end
 

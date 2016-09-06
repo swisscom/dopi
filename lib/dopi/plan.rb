@@ -78,6 +78,23 @@ module Dopi
       end
     end
 
+    def load_state(state_hash)
+      if state_hash[:step_sets].kind_of?(Hash)
+        step_sets.each do |step_set|
+          step_set_state = state_hash[:step_sets][step_set.name] || []
+          step_set.load_state(step_set_state)
+        end
+      end
+    end
+
+    def state_hash
+      step_sets_hash = {}
+      step_sets.each do |step_set|
+        step_sets_hash[step_set.name] = step_set.state_hash
+      end
+      {:step_sets => step_sets_hash}
+    end
+
   private
 
     def_delegator  :@plan_parser, :nodes,     :parsed_nodes

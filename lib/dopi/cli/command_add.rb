@@ -10,8 +10,9 @@ module Dopi
           c.action do |global_options,options,args|
             help_now!('Specify a plan file to add') if args.empty?
             help_now!('You can only add one plan') if args.length > 1
-            plan = Dopi.add_plan(args[0])
-            puts plan.name
+            plan_file = args[0]
+            plan_name = Dopi.add(plan_file)
+            puts plan_name
           end
         end
 

@@ -75,8 +75,8 @@ describe 'global cli options' do
     it 'should create the directory' do
       expect(Dir.entries(temp_path)).to include 'plan_cache'
     end
-    it 'should write to the log file in the directory' do
-      cached_plan = File.join(temp_path, 'plan_cache', 'hello_world.yaml')
+    it 'should add the plan to the cache' do
+      cached_plan = File.join(temp_path, 'plan_cache', 'hello_world', 'plan')
       expect(File.exists?(cached_plan)).to be true
     end
   end
@@ -101,22 +101,6 @@ describe 'global cli options' do
       command 'dopi --hiera_yaml hiera.yaml --role_variable test_role oneshot test_role_variable.yaml'
       its(:stdout) {is_expected.to include "Step 'write hello world' successfully finished."}
     end
-  end
-
-  describe 'ssh_check_host_key' do
-    pending #Move this one to the plugin options
-  end
-
-  describe 'ssh_key' do
-    pending #Deprecated
-  end
-
-  describe 'ssh_pass_auth' do
-    pending #Deprecated
-  end
-
-  describe 'ssh_user' do
-    pending #Deprecated
   end
 
   describe 'use_hiera' do

@@ -25,16 +25,15 @@ module Dopi
             help_now!('Specify a plan name to run') if args.empty?
             help_now!('You can only run one plan') if args.length > 1
             options[:run_for_nodes] = parse_node_select_options(options)
-            plan = Dopi.load_plan(args[0])
-            run_signal_handler(plan)
+            plan_name = args[0]
             begin
-              Dopi.run_plan(plan, options)
+              Dopi.run(plan_name, options)
             rescue Dopi::StateTransitionError => e
               Dopi.log.error(e.message)
               exit_now!("Some steps are in a state where they can't be started again. Try to reset the plan.")
             ensure
-              print_state(plan)
-              exit_now!('Errors during plan run detected!') if plan.state_failed?
+              print_state(plan_name)
+              #exit_now!('Errors during plan run detected!') if plan.state_failed?
             end
           end
         end
@@ -47,17 +46,14 @@ module Dopi
             help_now!('Specify a plan file to add') if args.empty?
             help_now!('You can only add one plan') if args.length > 1
             options[:run_for_nodes] = parse_node_select_options(options)
+            plan_file = args[0]
+            plan_name = Dopi.add(plan_file)
             begin
-              plan = Dopi.add_plan(args[0])
-              run_signal_handler(plan)
-              begin
-                Dopi.run_plan(plan, options)
-                sleep(2) # allow the show command to catch up
-              ensure
-                print_state(plan)
-                exit_now!('Errors during plan run detected!') if plan.state_failed?
-              end
-            ensure @plan_cache.remove(plan.name) unless plan.nil?
+              Dopi.run(plan_name, options)
+            ensure
+              print_state(plan_name)
+              Dopi.remove(plan_name)
+              #exit_now!('Errors during plan run detected!') if plan.state_failed?
             end
           end
         end

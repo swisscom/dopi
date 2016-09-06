@@ -51,7 +51,7 @@ module Dopi
         '/etc/dop/dopi.conf' :
         File.join(dopi_home, 'dopi.conf')
       @plan_cache_dir = is_root ?
-        '/var/lib/dop/plans/' :
+        '/var/lib/dop/cache' :
         File.join(dopi_home, 'cache')
 
       # Hiera defaults
@@ -61,7 +61,7 @@ module Dopi
         File.join(user.dir, '.puppet', 'hiera.yaml')
       @load_facts = false
       @facts_dir  = is_root ?
-        '/var/lib/puppet/yaml/facts/' :
+        '/var/lib/puppet/yaml/facts' :
         File.join(user.dir, '.puppet', 'var', 'yaml', 'facts')
 
       # Connection

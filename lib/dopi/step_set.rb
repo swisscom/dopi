@@ -53,5 +53,18 @@ module Dopi
       end
     end
 
+    def load_state(state_hash)
+      return if state_hash.empty?
+      steps.each_with_index do |step, i|
+        step.load_state(state_hash[i])
+      end
+    end
+
+    def state_hash
+      steps.map do |step|
+        step.state_hash
+      end
+    end
+
   end
 end

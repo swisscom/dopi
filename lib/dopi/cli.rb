@@ -6,7 +6,6 @@ require 'dopi'
 require 'dopi/cli/log'
 require 'dopi/cli/global_options'
 require 'dopi/cli/node_selection'
-require 'dopi/cli/signal_handler'
 require 'dopi/cli/command_run'
 require 'dopi/cli/command_validate'
 require 'dopi/cli/command_add'
@@ -44,7 +43,6 @@ module Dopi
       Dopi.configure = global
       ENV['GLI_DEBUG'] = 'true' if global[:trace] == true
       initialize_logger(global[:log_level], global[:verbosity])
-      @plan_cache = DopCommon::PlanCache.new(global[:plan_cache_dir])
       true
     end
 

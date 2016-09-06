@@ -28,7 +28,8 @@ module Dopi
       Dopi.init_file_logger
     end
 
-    def self.state(plan)
+    def self.state(plan_name)
+      plan = Dopi.show(plan_name)
       result = "[#{plan.state.to_s}] #{plan.name}\n"
       plan.step_sets.each do |step_set|
         result << "  [#{step_set.state.to_s}] #{step_set.name}\n"
@@ -45,8 +46,8 @@ module Dopi
       return result
     end
 
-    def self.print_state(plan)
-      puts state(plan)
+    def self.print_state(plan_name)
+      puts state(plan_name)
     end
 
   end

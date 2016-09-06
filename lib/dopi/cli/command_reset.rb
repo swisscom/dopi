@@ -14,10 +14,8 @@ module Dopi
           c.action do |global_options,options,args|
             help_now!('Specify a plan name to run') if args.empty?
             help_now!('You can only run one plan') if args.length > 1
-            plan = Dopi.load_plan(args[0])
-            plan.state_reset_with_children(options[:force])
-            Dopi.save_plan(plan)
-            print_state(plan)
+            plan_name = args[0]
+            Dopi.reset(plan_name, options[:force])
           end
         end
 

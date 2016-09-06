@@ -134,6 +134,18 @@ module Dopi
     def_delegator  :@command_parser, :verify_commands, :parsed_verify_commands
     def_delegators :@command_parser, :plugin_timeout, :verify_after_run
 
+    def load_state(state_hash)
+      command_state = state_hash[:command_state] || :ready
+      unless command_state == :ready
+        @state = command_state
+        state_changed
+      end
+    end
+
+    def state_hash
+      {:command_state => @state}
+    end
+
   private
 
     def run

@@ -8,9 +8,10 @@ module Dopi
         arg_name 'name'
         command :remove do |c|
           c.action do |global_options,options,args|
-            help_now!('Specify a plan id to remove') if args.empty?
+            help_now!('Specify a plan name to remove') if args.empty?
             help_now!('You can only remove one plan') if args.length > 1
-            @plan_cache.remove(args[0])
+            plan_name = args[0]
+            Dopi.remove(plan_name)
           end
         end
 

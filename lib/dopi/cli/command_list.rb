@@ -7,7 +7,7 @@ module Dopi
         desc 'Show the list of plans in the dopi plan cache'
         command :list do |c|
           c.action do |global_options,options,args|
-            puts @plan_cache.list()
+            puts Dopi.list
           end
         end
 

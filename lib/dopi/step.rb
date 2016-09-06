@@ -75,6 +75,21 @@ module Dopi
       Dopi.log.error("Step '#{name}' failed! Stopping execution.") if state_failed?
     end
 
+    def load_state(state_hash)
+      command_sets.each do |command_set|
+        command_set_state = state_hash[command_set.name] || []
+        command_set.load_state(command_set_state)
+      end
+    end
+
+    def state_hash
+      command_sets_hash = {}
+      command_sets.each do |command_set|
+        command_sets_hash[command_set.name] = command_set.state_hash
+      end
+      command_sets_hash
+    end
+
     private
 
     def run_canary(run_options, command_sets_to_run)
