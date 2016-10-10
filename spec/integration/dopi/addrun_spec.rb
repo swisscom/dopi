@@ -13,17 +13,17 @@ plan = nil
 describe 'running an added plan' do
   context 'in temp directory' do
     Dir.mktmpdir do |tmp|
-      Dopi.configuration.plan_cache_dir = tmp
-      it 'add plan to cache' do
+      Dopi.configuration.plan_store_dir = tmp
+      it 'add plan to store' do
         plan_name = Dopi.add(plan_file)
       end
-      it 'load plan from cache' do
+      it 'load plan from store' do
         plan = Dopi.show(plan_name)
       end
       it 'run loaded plan' do
         Dopi.run(plan_name, true, {})
       end
-      it 'remove plan from cache' do
+      it 'remove plan from store' do
         Dopi.remove(plan_name)
       end
     end

@@ -68,16 +68,16 @@ describe 'global cli options' do
     pending
   end
 
-  describe 'plan_cache_dir' do
+  describe 'plan_store_dir' do
     before :each do
-      command "dopi --plan_cache_dir ./plan_cache add hello_world.yaml"
+      command "dopi --plan_store_dir ./plan_store add hello_world.yaml"
     end
     it 'should create the directory' do
-      expect(Dir.entries(temp_path)).to include 'plan_cache'
+      expect(Dir.entries(temp_path)).to include 'plan_store'
     end
-    it 'should add the plan to the cache' do
-      cached_plan = File.join(temp_path, 'plan_cache', 'hello_world', 'plan')
-      expect(File.exists?(cached_plan)).to be true
+    it 'should add the plan to the plan_store' do
+      stored_plan = File.join(temp_path, 'plan_store', 'hello_world')
+      expect(File.exists?(stored_plan)).to be true
     end
   end
 

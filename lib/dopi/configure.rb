@@ -33,7 +33,7 @@ module Dopi
   end
 
   class Configuration
-    attr_accessor :trace, :config_file, :plan_cache_dir
+    attr_accessor :trace, :config_file, :plan_store_dir
     attr_accessor :use_hiera, :hiera_yaml, :load_facts, :facts_dir
     attr_accessor :role_variable, :role_default
     attr_accessor :connection_check_timeout
@@ -50,7 +50,7 @@ module Dopi
       @config_file    = is_root ?
         '/etc/dop/dopi.conf' :
         File.join(dopi_home, 'dopi.conf')
-      @plan_cache_dir = is_root ?
+      @plan_store_dir = is_root ?
         '/var/lib/dop/cache' :
         File.join(dopi_home, 'cache')
 

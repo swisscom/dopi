@@ -11,10 +11,10 @@ module Dopi
         default_value Dopi.configuration.trace
         switch [:trace, :t]
 
-        desc 'Specify the directory where DOPi will cache data about the plans'
-        default_value Dopi.configuration.plan_cache_dir
+        desc 'Specify the directory where DOPi will store the plans and their state'
+        default_value Dopi.configuration.plan_store_dir
         arg_name 'DIR'
-        flag [:plan_cache_dir, :p]
+        flag [:plan_store_dir, :s]
 
         desc 'Use Hiera to get the role for the nodes'
         default_value Dopi.configuration.use_hiera

@@ -33,42 +33,42 @@ module Dopi
 
   def self.add(plan_file)
     raise StandardError, 'Plan not valid; did not add' unless valid?(plan_file)
-    plan_cache.add(plan_file)
+    plan_store.add(plan_file)
   end
 
   def self.update_plan(plan_file, options = {})
     raise StandardError, 'Plan not valid; did not add' unless valid?(plan_file)
-    plan_name = plan_cache.update(plan_file)
+    plan_name = plan_store.update(plan_file)
     update_state(plan_name, options)
   end
 
   def self.update_state(plan_name, options = {})
-    plan_cache.run_lock(plan_name) do
-      state_store = Dopi::StateStore.new(plan_name, plan_cache)
+    plan_store.run_lock(plan_name) do
+      state_store = Dopi::StateStore.new(plan_name, plan_store)
       state_store.update(options)
     end
   end
 
   def self.remove(plan_name)
-    plan_cache.remove(plan_name)
+    plan_store.remove(plan_name)
   end
 
   def self.list
-    plan_cache.list
+    plan_store.list
   end
 
   # TODO: this returns a plan with loaded state at the moment.
   # THIS MAY BE CHANGED IN THE FUTURE!!
   def self.show(plan_name)
-    state_store = Dopi::StateStore.new(plan_name, plan_cache)
+    state_store = Dopi::StateStore.new(plan_name, plan_store)
     plan = get_plan(plan_name)
     plan.load_state(state_store.state_hash)
     plan
   end
 
   def self.run(plan_name, signal_handling = false, options = {})
-    plan_cache.run_lock(plan_name) do
-      state_store = Dopi::StateStore.new(plan_name, plan_cache)
+    plan_store.run_lock(plan_name) do
+      state_store = Dopi::StateStore.new(plan_name, plan_store)
       plan = get_plan(plan_name)
       plan.load_state(state_store.state_hash)
       run_signal_handler(plan) if signal_handling
@@ -83,8 +83,8 @@ module Dopi
   end
 
   def self.reset(plan_name, force = false)
-    plan_cache.run_lock(plan_name) do
-      state_store = Dopi::StateStore.new(plan_name, plan_cache)
+    plan_store.run_lock(plan_name) do
+      state_store = Dopi::StateStore.new(plan_name, plan_store)
       plan = get_plan(plan_name)
       plan.load_state(state_store.state_hash)
       plan.state_reset_with_children(force)
@@ -94,18 +94,18 @@ module Dopi
 
 private
 
-  def self.plan_cache
-    @plan_cache ||= DopCommon::PlanCache.new(Dopi.configuration.plan_cache_dir)
+  def self.plan_store
+    @plan_store ||= DopCommon::PlanStore.new(Dopi.configuration.plan_store_dir)
   end
 
   def self.get_plan(plan_name)
     raise StandardError, 'Please update the plan state, there are pending updates' if pending_updates?(plan_name)
-    plan_parser = plan_cache.get_plan(plan_name)
+    plan_parser = plan_store.get_plan(plan_name)
     Dopi::Plan.new(plan_parser)
   end
 
   def self.pending_updates?(plan_name)
-    state_store = Dopi::StateStore.new(plan_name, plan_cache)
+    state_store = Dopi::StateStore.new(plan_name, plan_store)
     state_store.pending_updates?
   end
 

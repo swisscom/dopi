@@ -5,15 +5,15 @@
 module Dopi
   class StateStore
 
-    def initialize(plan_name, plan_cache)
-      @plan_cache  = plan_cache
+    def initialize(plan_name, plan_store)
+      @plan_store  = plan_store
       @plan_name   = plan_name
-      @state_store = @plan_cache.state_store(plan_name, 'dopi')
+      @state_store = @plan_store.state_store(plan_name, 'dopi')
     end
 
     def update(options = {})
       @state_store.update do |plan_diff|
-        Dopi.log.debug("Updating plan #{@plan_name}. This is the diff:")
+      Dopi.log.debug("Updating plan #{@plan_name}. This is the diff:")
         Dopi.log.debug(plan_diff.to_s)
 
         plan_diff.each do |patch|
