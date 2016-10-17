@@ -58,6 +58,10 @@ module Dopi
       state_children.all? {|child| child.state_done?}
     end
 
+    def state_children_partial?
+      state_partial? || state_children.any?{|c| c.state_children_partial?}
+    end
+
     def update
       old_state = @state
       Dopi.log.debug("Checking if state of '#{name}' needs to be updated")
@@ -102,6 +106,13 @@ module Dopi
 
     def state_failed?
       state == :failed
+    end
+
+    def state_partial?
+      [:failed, :done, :running, :running_noop, :starting, :ready].each do |s|
+        return false if state_children.all?{|c| c.state == s}
+      end
+      return true
     end
 
     def state_start

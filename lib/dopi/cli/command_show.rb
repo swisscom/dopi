@@ -65,7 +65,6 @@ module Dopi
       end
       Curses.attrset(attr)
       Curses.addstr(string)
-      #Curses.clrtoeol
       Curses.attrset(Curses.color_pair(2))
     end
 
@@ -73,37 +72,35 @@ module Dopi
       plan = Dopi.show(plan_name)
       Curses.setpos(0, 0)
       Curses.attrset(Curses.color_pair(1))
-      Curses.addstr(' ' + plan.name + ' ')
-      Curses.addstr('[' + plan.state.to_s + ']')
+      Curses.addstr("DOPi #{Dopi::VERSION} - #{plan.name} [ #{plan.state.to_s} ]".ljust(Curses.cols))
       Curses.setpos(1, 0)
       Curses.attrset(Curses.color_pair(2))
-      no_collapse = plan.state != :running
       plan.step_sets.each do |step_set|
-        draw_step_set(step_set, no_collapse)
+        draw_step_set(step_set)
       end
     end
 
-    def self.draw_step_set(step_set, no_collapse = false)
+    def self.draw_step_set(step_set)
       str_state_color(step_set.state, ' - [' + step_set.state.to_s + '] ' + step_set.name + "\n")
-      if no_collapse or step_set.state == :running
+      if step_set.state_running? or step_set.state_children_partial?
         step_set.steps.each do |step|
-          draw_step(step, no_collapse)
+          draw_step(step)
         end
       end
     end
 
-    def self.draw_step(step, no_collapse = false)
+    def self.draw_step(step)
       str_state_color(step.state, '   - [' + step.state.to_s + '] ' + step.name + "\n")
-      if no_collapse or step.state == :running
+      if step.state_running? or step.state_children_partial?
         step.command_sets.each do |command_set|
-          draw_command_set(command_set, no_collapse)
+          draw_command_set(command_set)
         end
       end
     end
 
-    def self.draw_command_set(command_set, no_collapse = false)
+    def self.draw_command_set(command_set)
       str_state_color(command_set.state, "     - [ #{command_set.state.to_s} ] #{command_set.node.name}\n")
-      if no_collapse or command_set.state == :running
+      if command_set.state_running? or command_set.state_children_partial?
         command_set.commands.each do |command|
           str_state_color(command.state, "       - [ #{command.state.to_s} ] #{command.name}\n")
         end
