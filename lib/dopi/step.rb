@@ -11,7 +11,7 @@ module Dopi
     DEFAULT_MAX_IN_FLIGHT = 3
     DEFAULT_MAX_PER_ROLE  = -1
 
-    attr_accessor :plan
+    attr_accessor :plan, :nodes
 
     def initialize(step_parser, plan)
       @step_parser = step_parser
