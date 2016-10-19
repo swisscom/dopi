@@ -74,6 +74,7 @@ module Dopi
     end
 
     def_delegator :@command_parser, :plugin, :name
+    def_delegator :@command_parser, :title, :title
 
     def meta_run(noop = false)
       return if skip_run?(noop)

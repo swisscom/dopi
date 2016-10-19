@@ -38,7 +38,7 @@ module Dopi
           step.command_sets.each do |command_set|
             result << "      [#{command_set.state.to_s}] #{command_set.name}\n"
             command_set.commands.each do |command|
-              result << "        [#{command.state.to_s}] #{command.name}\n"
+              result << "        [#{command.state.to_s}] #{command.title}\n"
             end
           end
         end

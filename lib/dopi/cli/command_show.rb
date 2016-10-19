@@ -11,10 +11,6 @@ module Dopi
           c.default_value false
           c.switch [:follow, :f]
 
-          c.desc 'NEWFANCYEPERIMENTALDISPLAYWEEEEEEEEE'
-          c.default_value false
-          c.switch [:new, :n]
-
           c.action do |global_options,options,args|
             help_now!('Specify a plan name to show') if args.empty?
             help_now!('You can only show one plan') if args.length > 1
@@ -33,12 +29,7 @@ module Dopi
                 Curses.init_pair(6, Curses::COLOR_RED, Curses::COLOR_BLACK)
                 while true
                   Curses.clear
-                  if options[:new]
-                    draw_screen(plan_name)
-                  else
-                    Curses.setpos(0, 0)
-                    Curses.addstr(state(plan_name))
-                  end
+                  draw_screen(plan_name)
                   Curses.refresh
                   sleep(1)
                 end
@@ -102,7 +93,7 @@ module Dopi
       str_state_color(command_set.state, "     - [ #{command_set.state.to_s} ] #{command_set.node.name}\n")
       if command_set.state_running? or command_set.state_children_partial?
         command_set.commands.each do |command|
-          str_state_color(command.state, "       - [ #{command.state.to_s} ] #{command.name}\n")
+          str_state_color(command.state, "       - [ #{command.state.to_s} ] #{command.title}\n")
         end
       end
     end
