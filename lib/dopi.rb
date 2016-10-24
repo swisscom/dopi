@@ -66,16 +66,22 @@ module Dopi
     plan
   end
 
-  def self.run(plan_name, signal_handling = false, options = {})
+  def self.run(plan_name, options = {})
     plan_store.run_lock(plan_name) do
       state_store = Dopi::StateStore.new(plan_name, plan_store)
       plan = get_plan(plan_name)
       plan.load_state(state_store.state_hash)
-      run_signal_handler(plan) if signal_handling
+      manager = nil
+      if block_given?
+        manager = Thread.new { yield(plan) }
+      else
+        run_signal_handler(plan)
+      end
       begin
         state_store_observer = Dopi::StateStoreObserver.new(plan, state_store)
         plan.add_observer(state_store_observer)
         plan.run(options)
+        manager.join if manager
       ensure
         state_store_observer.update
       end
@@ -89,6 +95,13 @@ module Dopi
       plan.load_state(state_store.state_hash)
       plan.state_reset_with_children(force)
       state_store.persist_state(plan)
+    end
+  end
+
+  def self.on_state_change(plan_name)
+    state_store = Dopi::StateStore.new(plan_name, plan_store)
+    state_store.on_change do
+      yield
     end
   end
 

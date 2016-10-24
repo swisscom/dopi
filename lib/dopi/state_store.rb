@@ -13,7 +13,7 @@ module Dopi
 
     def update(options = {})
       @state_store.update do |plan_diff|
-      Dopi.log.debug("Updating plan #{@plan_name}. This is the diff:")
+        Dopi.log.debug("Updating plan #{@plan_name}. This is the diff:")
         Dopi.log.debug(plan_diff.to_s)
 
         plan_diff.each do |patch|
@@ -27,7 +27,10 @@ module Dopi
 
     def persist_state(plan)
       @state_store.transaction do
-        @state_store[:state] = plan.state_hash
+        plan_state = plan.state_hash
+        Dopi.log.debug('Persisting plan state:')
+        Dopi.log.debug(plan_state)
+        @state_store[:state] = plan_state
       end
     end
 
@@ -110,7 +113,7 @@ module Dopi
       @state_store = state_store
     end
 
-    def update
+    def update(notify_only = false)
       @state_store.persist_state(@plan)
     end
 

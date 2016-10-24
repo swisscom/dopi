@@ -1,3 +1,4 @@
+
 module Dopi
   module Cli
 
@@ -27,11 +28,12 @@ module Dopi
                 Curses.init_pair(4, Curses::COLOR_GREEN, Curses::COLOR_BLACK)
                 Curses.init_pair(5, Curses::COLOR_YELLOW, Curses::COLOR_BLACK)
                 Curses.init_pair(6, Curses::COLOR_RED, Curses::COLOR_BLACK)
-                while true
+                draw_screen(plan_name)
+                Curses.refresh
+                Dopi.on_state_change(plan_name) do
                   Curses.clear
                   draw_screen(plan_name)
                   Curses.refresh
-                  sleep(1)
                 end
               ensure
                 Curses.close_screen

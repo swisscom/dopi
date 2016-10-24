@@ -131,6 +131,7 @@ steps:
     nodes: 'all'
     max_in_flight: 1
     command:
+      title: 'vagrant up'
       plugin: 'custom'
       exec: 'vagrant'
       arguments: "up ${DOP_NODE_FQDN}"

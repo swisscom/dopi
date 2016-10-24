@@ -62,18 +62,32 @@ module Dopi
       state_partial? || state_children.any?{|c| c.state_children_partial?}
     end
 
-    def update
-      old_state = @state
-      Dopi.log.debug("Checking if state of '#{name}' needs to be updated")
-      unless state_children.empty? || !state_auto_evaluate_children
-        if    state_children_failed?       then @state = :failed
-        elsif state_children_done?         then @state = :done
-        elsif state_children_running?      then @state = :running
-        elsif state_children_running_noop? then @state = :running_noop
-        elsif state_children_starting?     then @state = :starting
-        elsif state_children_ready?        then @state = :ready
+    def update_mutex
+      @upate_mutex || Mutex.new
+    end
+
+    def update(notify_only)
+      update_mutex.synchronize do
+        unless notify_only
+          old_state = @state
+          Dopi.log.debug("Checking if state of '#{name}' needs to be updated")
+          unless state_children.empty? || !state_auto_evaluate_children
+            if    state_children_failed?       then @state = :failed
+            elsif state_children_done?         then @state = :done
+            elsif state_children_running?      then @state = :running
+            elsif state_children_running_noop? then @state = :running_noop
+            elsif state_children_starting?     then @state = :starting
+            elsif state_children_ready?        then @state = :ready
+            end
+            if old_state == @state
+              state_changed(true)
+            else
+              state_changed(false)
+            end
+          end
+        else
+          state_changed(true)
         end
-        state_changed unless old_state == @state
       end
     end
 
@@ -173,10 +187,10 @@ module Dopi
       end
     end
 
-    def state_changed
+    def state_changed(notify_only = false)
       Dopi.log.debug("State of '#{name}' updated to #{@state.to_s}, notifying observers")
       changed
-      notify_observers
+      notify_observers(notify_only)
     end
 
     def signals
