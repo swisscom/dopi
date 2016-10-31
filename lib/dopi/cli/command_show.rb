@@ -12,6 +12,10 @@ module Dopi
           c.default_value false
           c.switch [:follow, :f]
 
+          c.desc 'Display all details of the tree'
+          c.default_value false
+          c.switch [:detailed, :d]
+
           c.action do |global_options,options,args|
             help_now!('Specify a plan name to show') if args.empty?
             help_now!('You can only show one plan') if args.length > 1
@@ -28,18 +32,18 @@ module Dopi
                 Curses.init_pair(4, Curses::COLOR_GREEN, Curses::COLOR_BLACK)
                 Curses.init_pair(5, Curses::COLOR_YELLOW, Curses::COLOR_BLACK)
                 Curses.init_pair(6, Curses::COLOR_RED, Curses::COLOR_BLACK)
-                draw_screen(plan_name)
+                draw_screen(plan_name, options[:detailed])
                 Curses.refresh
                 Dopi.on_state_change(plan_name) do
                   Curses.clear
-                  draw_screen(plan_name)
+                  draw_screen(plan_name, options[:detailed])
                   Curses.refresh
                 end
               ensure
                 Curses.close_screen
               end
             else
-              print_state(plan_name)
+              print_state(plan_name, options[:detailed])
             end
           end
         end
@@ -61,7 +65,7 @@ module Dopi
       Curses.attrset(Curses.color_pair(2))
     end
 
-    def self.draw_screen(plan_name)
+    def self.draw_screen(plan_name, detailed)
       plan = Dopi.show(plan_name)
       Curses.setpos(0, 0)
       Curses.attrset(Curses.color_pair(1))
@@ -69,31 +73,31 @@ module Dopi
       Curses.setpos(1, 0)
       Curses.attrset(Curses.color_pair(2))
       plan.step_sets.each do |step_set|
-        draw_step_set(step_set)
+        draw_step_set(step_set, detailed)
       end
     end
 
-    def self.draw_step_set(step_set)
+    def self.draw_step_set(step_set, detailed)
       str_state_color(step_set.state, ' - [' + step_set.state.to_s + '] ' + step_set.name + "\n")
-      if step_set.state_running? or step_set.state_children_partial?
+      if detailed or step_set.state_running? or step_set.state_children_partial?
         step_set.steps.each do |step|
-          draw_step(step)
+          draw_step(step, detailed)
         end
       end
     end
 
-    def self.draw_step(step)
+    def self.draw_step(step, detailed)
       str_state_color(step.state, '   - [' + step.state.to_s + '] ' + step.name + "\n")
-      if step.state_running? or step.state_children_partial?
+      if detailed or step.state_running? or step.state_children_partial?
         step.command_sets.each do |command_set|
-          draw_command_set(command_set)
+          draw_command_set(command_set, detailed)
         end
       end
     end
 
-    def self.draw_command_set(command_set)
+    def self.draw_command_set(command_set, detailed)
       str_state_color(command_set.state, "     - [ #{command_set.state.to_s} ] #{command_set.node.name}\n")
-      if command_set.state_running? or command_set.state_children_partial?
+      if detailed or command_set.state_running? or command_set.state_children_partial?
         command_set.commands.each do |command|
           str_state_color(command.state, "       - [ #{command.state.to_s} ] #{command.title}\n")
         end
