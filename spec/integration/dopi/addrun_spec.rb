@@ -21,7 +21,7 @@ describe 'running an added plan' do
         plan = Dopi.show(plan_name)
       end
       it 'run loaded plan' do
-        Dopi.run(plan_name, true, {})
+        Dopi.run(plan_name)
       end
       it 'remove plan from store' do
         Dopi.remove(plan_name)
