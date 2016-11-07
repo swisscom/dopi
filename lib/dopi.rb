@@ -49,8 +49,8 @@ module Dopi
     end
   end
 
-  def self.remove(plan_name)
-    plan_store.remove(plan_name)
+  def self.remove(plan_name, remove_state = false)
+    plan_store.remove(plan_name, remove_state)
   end
 
   def self.list

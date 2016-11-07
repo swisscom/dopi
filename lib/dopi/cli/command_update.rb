@@ -7,6 +7,13 @@ module Dopi
         desc 'Update the plan and/or the plan state for a given plan yaml or plan name.'
         arg_name 'plan'
         command :update do |c|
+          c.desc 'Remove the existing DOPi state and start with a clean state'
+          c.default_value false
+          c.switch [:clear, :c]
+
+          c.desc 'Ignore the update and set the state version to the latest version'
+          c.default_value false
+          c.switch [:ignore, :i]
 
           c.action do |global_options,options,args|
             help_now!('Specify a plan name or  to update') if args.empty?

@@ -12,17 +12,19 @@ module Dopi
     end
 
     def update(options = {})
-      @state_store.update do |plan_diff|
-        Dopi.log.debug("Updating plan #{@plan_name}. This is the diff:")
-        Dopi.log.debug(plan_diff.to_s)
-
-        plan_diff.each do |patch|
-          match ||= update_rule_steps(patch)
-          unless match
-            Dopi.log.debug("No rule matched, ignoring patch: #{patch.to_s}")
-          end
-        end
+      if options[:clear]
+        clear(options)
+      elsif options[:ignore]
+        ignore(options)
+      else
+        update_state(options)
       end
+    rescue DopCommon::UnknownVersionError => e
+      Dopi.log.warn("The state has an unknown plan version #{e.message}.")
+      Dopi.log.warn("Please update with the 'clear' or 'ignore' option")
+    rescue => e
+      Dopi.log.error("An error occured during update: #{e.message}")
+      Dopi.log.error("Please update with the 'clear' or 'ignore' option")
     end
 
     def persist_state(plan)
@@ -45,6 +47,38 @@ module Dopi
     end
 
   private
+
+    def clear(options)
+      @state_store.transaction do
+        Dopi.log.debug("Clearing the state for plan #{@plan_name}")
+        ver = @plan_store.show_versions(@plan_name).last
+        plan = Dopi::Plan.new(@plan_store.get_plan(@plan_name))
+        @state_store[:state] = plan.state_hash
+        @state_store[:version] = ver
+      end
+    end
+
+    def ignore(options)
+      @state_store.transaction do
+        ver = @plan_store.show_versions(@plan_name).last
+        Dopi.log.debug("Ignoring update and setting state version of plan #{@plan_name} to #{ver}")
+        @state_store[:version] = ver
+      end
+    end
+
+    def update_state(options)
+      @state_store.update do |plan_diff|
+        Dopi.log.debug("Updating plan #{@plan_name}. This is the diff:")
+        Dopi.log.debug(plan_diff.to_s)
+
+        plan_diff.each do |patch|
+          match ||= update_rule_steps(patch)
+          unless match
+            Dopi.log.debug("No rule matched, ignoring patch: #{patch.to_s}")
+          end
+        end
+      end
+    end
 
     def update_rule_steps(patch)
       match = /^steps\.?(\w*)\[(\d+)\](.*)/.match(patch[1])
