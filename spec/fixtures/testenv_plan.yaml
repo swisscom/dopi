@@ -127,15 +127,6 @@ configuration:
     mcollective::security_secret: 'vagrant'
 
 steps:
-  - name: 'Create virtual machines with vagrant'
-    nodes: 'all'
-    max_in_flight: 1
-    command:
-      title: 'vagrant up'
-      plugin: 'custom'
-      exec: 'vagrant'
-      arguments: "up ${DOP_NODE_FQDN}"
-
   - name: 'Configure ssh credentials and wait until all the linux machines are online'
     nodes_by_config: {os: 'linux'}
     set_plugin_defaults: [{plugins: '/^ssh/', credentials: 'linux_login'}]

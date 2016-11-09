@@ -4,6 +4,7 @@ namespace :spec do
   desc 'setup the test environment (this builds multiple virtual machines with vagrant and virtualbox)'
   task :prep do
     Bundler.with_clean_env do
+      sh('vagrant up')
       hiera = 'spec/fixtures/puppet/hiera.yaml'
       plan  = 'spec/fixtures/testenv_plan.yaml'
       sh('bundle package --all')
