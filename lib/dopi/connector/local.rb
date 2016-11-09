@@ -16,7 +16,7 @@ module Dopi
         cmd_stderr = ''
         log(:debug, "Executing #{command_string} for command #{name}")
         log(:debug, "Environment: #{env.to_s}")
-        cmd_exit_code = Open3.popen3(env, command_string, :pgroup => true) do |stdin, stdout, stderr, wait_thr|
+        cmd_exit_code = Open3.popen3(merged_env(env), command_string, :pgroup => true, :unsetenv_others => true) do |stdin, stdout, stderr, wait_thr|
           signal_handler = Proc.new do |signal|
             case signal
             when :abort then Process.kill(:TERM, wait_thr.pid)
@@ -44,6 +44,15 @@ module Dopi
           exit_status
         end
         [ cmd_stdout, cmd_stderr, cmd_exit_code.exitstatus ]
+      end
+
+    private
+
+      def merged_env(env)
+        {
+          'HOME' => ENV['HOME'],
+          'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+        }.merge(env)
       end
 
     end
