@@ -52,7 +52,7 @@ module Dopi
               Dopi.run(plan_name, options)
             ensure
               print_state(plan_name)
-              Dopi.remove(plan_name)
+              Dopi.remove(plan_name, true)
               #exit_now!('Errors during plan run detected!') if plan.state_failed?
             end
           end
