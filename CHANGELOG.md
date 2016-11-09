@@ -1,6 +1,23 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.14.0] - 2016-11-09
+
+WARNING: This version introduces a new plan store which is incompatible with the old plan store. If you used the plan store of DOPi you will have to re-add all your plans with the new version. There is no automatic migration.
+
+WARNING: The state update feature is in a very early version and there may be corner cases where it does not work as expected. Please always make sure to check the state after an update to verify if the update did what you expected. If you encounter such a case please file a bug report. A workaround is to update the plan with the "--clear" switch which will reset the state, which resembles the old behavior.
+
+### Changed
+- Complete re-implementation of the plan store
+- Implementation of a proper plan cache to speed up hiera lookups
+- The state of a plan will now be updated if a plan is updated
+- Complete re-implementation of the state store, which now has a write lock, transactions and atomic updates.
+- The update command has a new syntax and the new options clear and ignore to influence how the state should be updated in the case of an error
+- remove will now just remove the plan but the state will be preserved
+- The show command will now collapse steps per default and only show partial or running steps as expanded. There is a new switch "detailed" to show the full tree
+- The show command has a new curses UI for the follow function which will update automatically with inotify if the state changes
+- Complete rewrite of the DOPi library API
+
 ## [0.13.1] - 2016-08-10
 
 ### Fixed
