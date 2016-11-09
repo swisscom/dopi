@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.14.1] - Unreleased
+
+### Fixed
+- The local command executer now clears the environment before executing a command. The only variables set are HOME and PATH with some sane defaults.
+
 ## [0.14.0] - 2016-11-09
 
 WARNING: This version introduces a new plan store which is incompatible with the old plan store. If you used the plan store of DOPi you will have to re-add all your plans with the new version. There is no automatic migration.
