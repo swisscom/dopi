@@ -18,6 +18,9 @@ WARNING: The state update feature is in a very early version and there may be co
 - The show command has a new curses UI for the follow function which will update automatically with inotify if the state changes
 - Complete rewrite of the DOPi library API
 
+## Added
+- It is now possible to set a title for a command to get a more meaningful output in the show command
+
 ## [0.13.1] - 2016-08-10
 
 ### Fixed
