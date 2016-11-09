@@ -11,7 +11,7 @@ GIT
 PATH
   remote: .
   specs:
-    dopi (0.13.1)
+    dopi (0.14.0)
       curses (~> 1)
       dop_common (= 0.9.0)
       gli (~> 2)
