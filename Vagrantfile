@@ -48,7 +48,7 @@ Vagrant.configure(2) do |config|
     machine.vm.box = 'puppetlabs/centos-6.6-64-nocm'
     machine.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ".bundle/"
     machine.vm.provision 'shell', inline: 'yum install -y gcc git epel-release centos-release-scl'
-    machine.vm.provision 'shell', inline: 'yum install -y ncurses-devel'
+    machine.vm.provision 'shell', inline: 'yum install -y ncurses-devel sshpass'
     machine.vm.provision 'shell', inline: 'yum install -y rh-ruby22 rh-ruby22-ruby-devel rh-ruby22-rubygem-bundler'
   end
 
@@ -56,7 +56,7 @@ Vagrant.configure(2) do |config|
     machine.vm.box = 'puppetlabs/centos-7.0-64-nocm'
     machine.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ".bundle/"
     machine.vm.provision 'shell', inline: 'yum install -y gcc git centos-release-scl'
-    machine.vm.provision 'shell', inline: 'yum install -y ncurses-devel'
+    machine.vm.provision 'shell', inline: 'yum install -y ncurses-devel sshpass'
     machine.vm.provision 'shell', inline: 'yum install -y rh-ruby22 rh-ruby22-ruby-devel rh-ruby22-rubygem-bundler'
   end
 
