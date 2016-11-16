@@ -1,10 +1,11 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [0.14.1] - Unreleased
+## [0.14.1] - 2016-11-16
 
 ### Fixed
 - The local command executer now clears the environment before executing a command. The only variables set are HOME and PATH with some sane defaults.
+- Fixes to the content loader from an executable from dop_common
 
 ## [0.14.0] - 2016-11-09
 

@@ -1,9 +1,9 @@
 GIT
   remote: https://gitlab.swisscloud.io/clu-dop/dop_common.git
-  revision: b5a29ef1d6b55fb96403fb5ea4ad5a36b56e5ec0
-  tag: v0.9.0
+  revision: 638def7c29b4421935a8810991989b0768784f91
+  tag: v0.9.1
   specs:
-    dop_common (0.9.0)
+    dop_common (0.9.1)
       hashdiff
       lockfile
       rb-inotify
@@ -11,9 +11,9 @@ GIT
 PATH
   remote: .
   specs:
-    dopi (0.14.0)
+    dopi (0.14.1)
       curses (~> 1)
-      dop_common (= 0.9.0)
+      dop_common (= 0.9.1)
       gli (~> 2)
       hiera (~> 3)
       logger-colors (~> 1)
