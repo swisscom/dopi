@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.14.2] - 2016-11-23
+
+### Fixed
+- Assign a proper pty to stdin of processes to prevent the tcgetattr errors of some platforms
+
 ## [0.14.1] - 2016-11-16
 
 ### Fixed
