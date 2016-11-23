@@ -11,7 +11,7 @@ module Dopi
           c.default_value false
           c.switch [:clear, :c]
 
-          c.desc 'Ignore the update and set the state version to the latest version'
+          c.desc 'Ignore the update and keep the state as it is, only update the internal version string'
           c.default_value false
           c.switch [:ignore, :i]
 
