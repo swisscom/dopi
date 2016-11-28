@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.14.3] - 2016-11-28
+
+### Fixed
+- Bump version of dop_common to get fixes for various bugs:
+  - Add zero padding to the version string for the plan store
+  - Removed a misleading error message when a plan was updated and the state was still new
+  - Add lower version boundry for hashdiff to make sure the fixed version is used
+
 ## [0.14.2] - 2016-11-23
 
 ### Fixed
