@@ -3,9 +3,9 @@
 #
 require 'gli'
 require 'dopi'
+require 'dop_common/cli/node_selection'
 require 'dopi/cli/log'
 require 'dopi/cli/global_options'
-require 'dopi/cli/node_selection'
 require 'dopi/cli/command_run'
 require 'dopi/cli/command_validate'
 require 'dopi/cli/command_add'

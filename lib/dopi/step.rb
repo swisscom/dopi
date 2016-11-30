@@ -6,7 +6,7 @@ require 'parallel'
 module Dopi
   class Step
     include Dopi::State
-    include Dopi::NodeFilter
+    include DopCommon::NodeFilter
 
     DEFAULT_MAX_IN_FLIGHT = 3
     DEFAULT_MAX_PER_ROLE  = -1

@@ -2,7 +2,7 @@ module Dopi
   module Cli
 
     def self.run_options(command)
-      node_select_options(command)
+      DopCommon::Cli.node_select_options(command)
 
       command.desc 'Show only stuff the run would do but don\'t execute commands (verify commands will still be executed)'
       command.default_value false
@@ -24,7 +24,7 @@ module Dopi
           c.action do |global_options,options,args|
             help_now!('Specify a plan name to run') if args.empty?
             help_now!('You can only run one plan') if args.length > 1
-            options[:run_for_nodes] = parse_node_select_options(options)
+            options[:run_for_nodes] = DopCommon::Cli.parse_node_select_options(options)
             plan_name = args[0]
             begin
               Dopi.run(plan_name, options)
@@ -45,7 +45,7 @@ module Dopi
           c.action do |global_options,options,args|
             help_now!('Specify a plan file to add') if args.empty?
             help_now!('You can only add one plan') if args.length > 1
-            options[:run_for_nodes] = parse_node_select_options(options)
+            options[:run_for_nodes] = DopCommon::Cli.parse_node_select_options(options)
             plan_file = args[0]
             plan_name = Dopi.add(plan_file)
             begin
