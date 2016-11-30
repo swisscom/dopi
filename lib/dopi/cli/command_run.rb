@@ -33,7 +33,7 @@ module Dopi
               exit_now!("Some steps are in a state where they can't be started again. Try to reset the plan.")
             ensure
               print_state(plan_name)
-              #exit_now!('Errors during plan run detected!') if plan.state_failed?
+              exit_now!('Errors during plan run detected!') if Dopi.show(plan_name).state_failed?
             end
           end
         end
@@ -52,8 +52,9 @@ module Dopi
               Dopi.run(plan_name, options)
             ensure
               print_state(plan_name)
+              failed = Dopi.show(plan_name).state_failed?
               Dopi.remove(plan_name, true)
-              #exit_now!('Errors during plan run detected!') if plan.state_failed?
+              exit_now!('Errors during plan run detected!') if failed
             end
           end
         end

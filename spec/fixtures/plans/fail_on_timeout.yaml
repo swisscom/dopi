@@ -1,0 +1,20 @@
+name: 'fail_on_timeout'
+
+infrastructures:
+  baremetal:
+    type: 'baremetal'
+
+nodes:
+  linux01.example.com:
+    infrastructure: 'baremetal'
+
+steps:
+  default:
+    - name: 'fail on timeout'
+      nodes: 'all'
+      max_per_role: 1
+      command:
+        - plugin: 'custom'
+          plugin_timeout: 1
+          exec: 'sleep 4'
+
