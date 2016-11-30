@@ -33,9 +33,11 @@ module Dopi
         end
 
         def reboot_cmd
-          @reboot_cmd ||= reboot_cmd_valid? ? hash[:reboot_cmd] : 'shutdown -r now')
+          @reboot_cmd ||= reboot_cmd_valid? ? hash[:reboot_cmd] : 'shutdown -r now'
         end
+
         private
+
         def reboot_cmd_valid?
           return false if hash[:reboot_cmd].nil? # is optional
           hash[:reboot_cmd].class == String or
