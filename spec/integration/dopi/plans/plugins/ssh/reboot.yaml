@@ -30,6 +30,14 @@ steps:
 
   - name: 'Rebooot all nodes'
     nodes: 'all'
+    exclude_nodes: 'linux01.example.com'
     max_per_role: 1
     commands: 'ssh/reboot'
+
+  - name: 'Rebooot all nodes'
+    nodes: 'linux01.example.com'
+    max_per_role: 1
+    commands:
+      plugin: 'ssh/reboot'
+      reboot_cmd: 'reboot'
 
