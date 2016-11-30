@@ -5,9 +5,12 @@ require 'hiera'
 require 'yaml'
 require 'socket'
 require 'timeout'
+require 'forwardable'
 
 module Dopi
   class Node
+    extend Forwardable
+
     @@mutex = Mutex.new
     @@mutex_lookup = Mutex.new
     @@hiera = nil
@@ -19,9 +22,9 @@ module Dopi
       @addresses = {}
     end
 
-    def name
-      @node_parser.name
-    end
+    def_delegators :@node_parser,
+      :name,
+      :has_name?
 
     def config(variable)
       resolve_external(variable) || resolve_internal(variable)
@@ -41,10 +44,6 @@ module Dopi
 
     def has_fact?(variable, pattern)
       pattern_match?(fact(variable), pattern)
-    end
-
-    def has_name?(pattern)
-      pattern_match?(name, pattern)
     end
 
     def role
