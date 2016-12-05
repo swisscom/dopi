@@ -59,7 +59,7 @@ module Dopi
     end
 
     def addresses
-      [ name, ip_addresses ].flatten
+      [ @node_parser.fqdn, ip_addresses ].flatten
     end
 
     def address(port)
@@ -95,26 +95,18 @@ module Dopi
       false
     end
 
-    def hostname
-      @hostname ||= name.split('.', 2)[0]
-    end
-
-    def domain
-      @domain ||= name.split('.', 2)[1]
-    end
-
     def basic_scope
       @basic_scope ||= {
-        '::fqdn' => name,
-        '::clientcert' => name,
-        '::hostname' => hostname,
-        '::domain' => domain
+        '::fqdn' => @node_parser.fqdn,
+        '::clientcert' => @node_parser.fqdn,
+        '::hostname' => @node_parser.hostname,
+        '::domain' => @node_parser.domainname
       }
     end
 
     def facts
       return {} unless Dopi.configuration.load_facts
-      facts_yaml = File.join(Dopi.configuration.facts_dir, name + '.yaml')
+      facts_yaml = File.join(Dopi.configuration.facts_dir, @node_parser.fqdn + '.yaml')
       if File.exists? facts_yaml
         YAML.load_file(facts_yaml).values
       else
