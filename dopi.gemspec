@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'simplecov'
   spec.add_development_dependency 'rubocop'
 
-  spec.add_runtime_dependency 'dop_common', '~> 0.9', '>= 0.9.2'
+  spec.add_runtime_dependency 'dop_common', '~> 0.10', '>= 0.10.0'
   spec.add_runtime_dependency 'gli', '~> 2'
   spec.add_runtime_dependency 'logger-colors', '~> 1'
   spec.add_runtime_dependency 'hiera', '~> 3'
