@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [unreleased] - unreleased
+### Added
+- The reboot command of the ssh/reboot plugin can now be adjusted with 'reboot_cmd'
+
+### Changed
+- The node filter functionality was moved to dop_common
+
 ## [0.14.3] - 2016-11-28
 
 ### Fixed
