@@ -6,7 +6,12 @@ again. The command will finish if DOPi is again able to login after the reboot.
 
 ## Plugin Settings:
 
-There are currently no settings for this plugin
+### reboot_cmd (optional)
+
+`default: shutdown -r now`
+
+The command which gets executed to reboot the machine
+
 
 ## Example
 
