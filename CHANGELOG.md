@@ -1,12 +1,16 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [unreleased] - unreleased
+## [0.15.0] - 2016-12-07
+### Fixed
+- Dopi will now return the correct exit code again if the run failed 
+
 ### Added
 - The reboot command of the ssh/reboot plugin can now be adjusted with 'reboot_cmd'
 
 ### Changed
 - The node filter functionality was moved to dop_common
+- The remove command will now keep dopv and remove dopi state per default. There are two new options to change the behaviour
 
 ## [0.14.3] - 2016-11-28
 
