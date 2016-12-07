@@ -48,8 +48,8 @@ module Dopi
     end
   end
 
-  def self.remove(plan_name, remove_state = false)
-    plan_store.remove(plan_name, remove_state)
+  def self.remove(plan_name, remove_dopi_state = true, remove_dopv_state = false)
+    plan_store.remove(plan_name, remove_dopi_state, remove_dopv_state)
   end
 
   def self.list
