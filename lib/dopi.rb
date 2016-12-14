@@ -39,6 +39,7 @@ module Dopi
     raise StandardError, 'Plan not valid; did not add' unless valid?(plan_file)
     plan_name = plan_store.update(plan_file)
     update_state(plan_name, options)
+    plan_name
   end
 
   def self.update_state(plan_name, options = {})
@@ -66,6 +67,7 @@ module Dopi
   end
 
   def self.run(plan_name, options = {})
+    update_state(plan_name)
     plan_store.run_lock(plan_name) do
       state_store = Dopi::StateStore.new(plan_name, plan_store)
       plan = get_plan(plan_name)
