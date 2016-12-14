@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.15.1] - 2016-12-14
+### Fixed
+- Fix the workflow and automatically update the plan before a run
+
+### Added
+- Update flag for the add command to make sure we can always add a plan even if it exists
+
 ## [0.15.0] - 2016-12-07
 ### Fixed
 - Dopi will now return the correct exit code again if the run failed 
