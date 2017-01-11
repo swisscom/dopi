@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.15.2] - 2017-01-11
+### Fixed
+- Fix the slow start when using passwords from external tools
+
 ## [0.15.1] - 2016-12-14
 ### Fixed
 - Fix the workflow and automatically update the plan before a run
