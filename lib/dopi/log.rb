@@ -16,10 +16,10 @@ module Dopi
   end
 
   def self.init_file_logger
-    FileUtils.mkdir_p(Dopi.configuration.log_dir)
-    log_file = File.join(Dopi.configuration.log_dir, 'dopi.log')
+    FileUtils.mkdir_p(DopCommon.config.log_dir)
+    log_file = File.join(DopCommon.config.log_dir, 'dopi.log')
     logger = Logger.new(log_file , 10, 1024000)
-    logger.level = ::Logger.const_get(Dopi.configuration.log_level.upcase)
+    logger.level = ::Logger.const_get(DopCommon.config.log_level.upcase)
     logger.formatter = file_logger_formatter
     DopCommon.add_log_junction(logger)
   end
@@ -56,7 +56,7 @@ module Dopi
     def self.create_context_logger(logdev, filter_context)
       @mutex.synchronize do
         logger = Logger.new(logdev)
-        logger.level = ::Logger.const_get(Dopi.configuration.log_level.upcase)
+        logger.level = ::Logger.const_get(DopCommon.config.log_level.upcase)
         @context_loggers[filter_context] = logger
       end
     end

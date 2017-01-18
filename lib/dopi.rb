@@ -1,6 +1,6 @@
+require 'dop_common'
 require "dopi/error"
 require "dopi/signal_handler"
-require "dopi/configure"
 require "dopi/log"
 require "dopi/pluginmanager"
 require "dopi/state"
@@ -109,7 +109,7 @@ module Dopi
 private
 
   def self.plan_store
-    @plan_store ||= DopCommon::PlanStore.new(Dopi.configuration.plan_store_dir)
+    @plan_store ||= DopCommon::PlanStore.new(DopCommon.config.plan_store_dir)
   end
 
   def self.get_plan(plan_name)

@@ -30,7 +30,7 @@ module Dopi
     subcommand_option_handling :normal
     arguments :strict
 
-    config_file Dopi.configuration.config_file
+    config_file DopCommon.config.config_file
 
     desc 'Verbosity of the command line tool'
     default_value 'INFO'
@@ -40,7 +40,7 @@ module Dopi
     global_options(self)
 
     pre do |global,command,options,args|
-      Dopi.configure = global
+      DopCommon.configure = global
       ENV['GLI_DEBUG'] = 'true' if global[:trace] == true
       initialize_logger(global[:log_level], global[:verbosity])
       true

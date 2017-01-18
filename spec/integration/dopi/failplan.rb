@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-Dopi.configuration.mco_config    = 'spec/fixtures/mco_client.cfg'
-Dopi.configuration.hiera_yaml    = 'spec/fixtures/puppet/hiera.yaml'
+DopCommon.config.mco_config    = 'spec/fixtures/mco_client.cfg'
+DopCommon.config.hiera_yaml    = 'spec/fixtures/puppet/hiera.yaml'
 
 describe 'Run specific plan that should fail' do
 

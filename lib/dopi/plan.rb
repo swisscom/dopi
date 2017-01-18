@@ -44,7 +44,7 @@ module Dopi
 
     def init_file_logging
       time = Time.now.strftime('%Y%m%d-%H%M%S')
-      plan_log_path = File.join(Dopi.configuration.log_dir, "#{time}-#{name}")
+      plan_log_path = File.join(DopCommon.config.log_dir, "#{time}-#{name}")
       FileUtils.mkdir_p(plan_log_path)
       create_file_log_device(plan_log_path, 'all')
       nodes.each {|node| create_file_log_device(plan_log_path, node.name)}
@@ -62,7 +62,7 @@ module Dopi
       validity = false unless step_sets.all?{|step_set| step_set.valid? }
       validity
     rescue => e
-      Dopi.configuration.trace ? Dopi.log.error(e) : Dopi.log.error(e.message)
+      DopCommon.config.trace ? Dopi.log.error(e) : Dopi.log.error(e.message)
       Dopi.log.warn("Plan: Can't validate the command plugins because of a previous error")
     end
 

@@ -47,7 +47,7 @@ module Dopi
     end
 
     def role
-      config(Dopi.configuration.role_variable) || role_default
+      config(DopCommon.config.role_variable) || role_default
     end
 
     def has_role?(pattern)
@@ -85,7 +85,7 @@ module Dopi
     end
 
     def connection_possible?(address, port)
-      Timeout::timeout(Dopi.configuration.connection_check_timeout.to_i) do
+      Timeout::timeout(DopCommon.config.connection_check_timeout.to_i) do
         TCPSocket.new(address, port).close
       end
       Dopi.log.debug("Connection test with #{address}:#{port} for node #{name} ok")
@@ -105,8 +105,8 @@ module Dopi
     end
 
     def facts
-      return {} unless Dopi.configuration.load_facts
-      facts_yaml = File.join(Dopi.configuration.facts_dir, @node_parser.fqdn + '.yaml')
+      return {} unless DopCommon.config.load_facts
+      facts_yaml = File.join(DopCommon.config.facts_dir, @node_parser.fqdn + '.yaml')
       if File.exists? facts_yaml
         YAML.load_file(facts_yaml).values
       else
@@ -127,9 +127,9 @@ module Dopi
     def hiera
       @@mutex.synchronize do
         # Create a new Hiera object if the config has changed
-        unless Dopi.configuration.hiera_yaml == @@hiera_config
-          Dopi.log.debug("Hiera config location changed from #{@@hiera_config.to_s} to #{Dopi.configuration.hiera_yaml.to_s}")
-          @@hiera_config = Dopi.configuration.hiera_yaml
+        unless DopCommon.config.hiera_yaml == @@hiera_config
+          Dopi.log.debug("Hiera config location changed from #{@@hiera_config.to_s} to #{DopCommon.config.hiera_yaml.to_s}")
+          @@hiera_config = DopCommon.config.hiera_yaml
           config = {}
           if File.exists?(@@hiera_config)
             config = YAML.load_file(@@hiera_config)
@@ -139,7 +139,7 @@ module Dopi
           # set the plan_store defaults
           config[:dop] ||= { }
           unless config[:dop].has_key?(:plan_store_dir)
-            config[:dop][:plan_store_dir] = Dopi.configuration.plan_store_dir
+            config[:dop][:plan_store_dir] = DopCommon.config.plan_store_dir
           end
           config[:logger] = 'dopi'
           @@hiera = Hiera.new(:config => config)
@@ -149,8 +149,8 @@ module Dopi
     end
 
     def role_default
-      if Dopi.configuration.role_default
-        Dopi.configuration.role_default
+      if DopCommon.config.role_default
+        DopCommon.config.role_default
       else
         Dopi.log.warn("No role found for #{name} and no default role defined.")
         '-'
@@ -162,7 +162,7 @@ module Dopi
     # (in case of validation) and hiera can't resolve it over the plugin,
     # but we still need the information about the node config.
     def resolve_internal(variable)
-      return nil unless Dopi.configuration.use_hiera
+      return nil unless DopCommon.config.use_hiera
       @@mutex_lookup.synchronize do
         begin
           hiera # make sure hiera is initialized
@@ -188,7 +188,7 @@ module Dopi
 
     # this will try to resolve the variable over hiera directly
     def resolve_external(variable)
-      return nil unless Dopi.configuration.use_hiera
+      return nil unless DopCommon.config.use_hiera
       @@mutex_lookup.synchronize do
         begin hiera.lookup(variable, nil, scope)
         rescue Psych::SyntaxError => e

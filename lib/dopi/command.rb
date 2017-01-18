@@ -110,7 +110,7 @@ module Dopi
       send_signal(:abort)
     rescue CommandExecutionError => e
       log(:error, "Command failed: #{e.message}", false)
-      Dopi.log.error(e) if Dopi.configuration.trace
+      Dopi.log.error(e) if DopCommon.config.trace
       state_fail unless noop
     rescue => e
       log(:error, "Unexpected error!!! This is a Bug", false)

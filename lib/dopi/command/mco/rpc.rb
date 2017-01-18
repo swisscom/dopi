@@ -26,7 +26,7 @@ module Dopi
         def run
           result_ok = true
           flags = {
-            :configfile      => Dopi.configuration.mco_config,
+            :configfile      => DopCommon.config.mco_config,
             :options         => options,
             :exit_on_failure => false
           }
@@ -77,7 +77,7 @@ module Dopi
 
         def options_defaults
           MCollective::Util.default_options.merge({
-            :config => Dopi.configuration.mco_config
+            :config => DopCommon.config.mco_config
           })
         end
 
