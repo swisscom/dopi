@@ -11,11 +11,6 @@ module Dopi
   class Node
     extend Forwardable
 
-    @@mutex = Mutex.new
-    @@mutex_lookup = Mutex.new
-    @@hiera = nil
-    @@hiera_config = nil
-
     def initialize(node_parser, plan)
       @node_parser = node_parser
       @plan = plan
@@ -32,10 +27,6 @@ module Dopi
       :has_fact?,
       :role,
       :has_role?
-
-    def ssh_root_pass
-      ssh_root_pass_from_hiera || @plan.ssh_root_pass
-    end
 
     def addresses
       [ @node_parser.fqdn, ip_addresses ].flatten
@@ -65,10 +56,6 @@ module Dopi
     rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Timeout::Error, SocketError
       Dopi.log.debug("Connection test with #{address}:#{port} for node #{name} failed")
       false
-    end
-
-    def ssh_root_pass_from_hiera
-      resolve_external('ssh_root_pass')
     end
 
   end
