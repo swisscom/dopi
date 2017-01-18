@@ -32,7 +32,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'dop_common', '~> 0.11', '>= 0.11.0'
   spec.add_runtime_dependency 'gli', '~> 2'
   spec.add_runtime_dependency 'logger-colors', '~> 1'
-  spec.add_runtime_dependency 'hiera', '~> 3'
   spec.add_runtime_dependency 'mcollective-client', '~> 2'
   spec.add_runtime_dependency 'winrm', '~> 1'
   spec.add_runtime_dependency 'parallel', '~> 1'
