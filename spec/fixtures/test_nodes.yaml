@@ -1,0 +1,45 @@
+nodes:
+  'puppetmaster.example.com':
+    infrastructure: 'vagrant'
+    image: 'puppetlabs/centos-7.0-64-nocm'
+    interfaces:
+      'eth0':
+        network: 'vboxnet0'
+        ip: '192.168.56.101'
+  'broker.example.com':
+    infrastructure: 'vagrant'
+    image: 'puppetlabs/centos-7.0-64-nocm'
+    interfaces:
+      'eth0':
+        network: 'vboxnet0'
+        ip: '192.168.56.102'
+  'linux01.example.com':
+    infrastructure: 'vagrant'
+    image: 'puppetlabs/centos-7.0-64-nocm'
+    interfaces:
+      'eth0':
+        network: 'vboxnet0'
+        ip: '192.168.56.103'
+  'linux02.example.com':
+    infrastructure: 'vagrant'
+    image: 'puppetlabs/centos-7.0-64-nocm'
+    interfaces:
+      'eth0':
+        network: 'vboxnet0'
+        ip: '192.168.56.104'
+  'linux03.example.com':
+    infrastructure: 'vagrant'
+    image: 'puppetlabs/centos-7.0-64-nocm'
+    interfaces:
+      'eth0':
+        network: 'vboxnet0'
+        ip: '192.168.56.105'
+  'windows01.example.com':
+    infrastructure: 'vagrant'
+    image: 'opentable/win-2012r2-standard-amd64-nocm'
+    interfaces:
+      'eth0':
+        network: 'vboxnet0'
+        ip: '192.168.56.106'
+
+

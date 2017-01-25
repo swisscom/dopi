@@ -1,0 +1,54 @@
+configuration:
+  nodes:
+    'puppetmaster.example.com':
+      role: 'puppetmaster'
+    'broker.example.com':
+      role: 'mcollective_broker'
+    'windows01.example.com':
+      os: 'windows'
+  roles:
+    'puppetmaster':
+      classes:
+        - 'foreman'
+        - 'puppet'
+      foreman::foreman_url: "%{hiera('::fqdn')}"
+      foreman::unattended: 'false'
+      foreman::authentication: 'false'
+      puppet::server: true
+      puppet::autosign: '/usr/local/bin/dop-puppet-autosign'
+      puppet::autosign_mode: 'script'
+      puppet::server_foreman: true
+      puppet::server_rttendedeports: 'store'
+      puppet::server_external_nodes: ''
+    'mcollective_broker':
+      classes:
+        - 'java'
+        - 'activemq'
+      java::distribution: 'jdk'
+      java::version: 'latest'
+      activemq::instances:
+        'mcollective':
+          stomp_nio_port: "%{hiera('mcollective::broker_port')}"
+          user_name: "%{hiera('mcollective::broker_user')}"
+          user_password: "%{hiera('mcollective::broker_password')}"
+  defaults:
+    classes:
+      - 'firewall'
+      - 'puppet'
+      - 'mcollective'
+    role: 'base'
+    os: 'linux'
+    firewall::ensure: 'stopped'
+    puppet::puppetmaster: 'puppetmaster.example.com'
+    puppet::runmode: 'none'
+    mcollective::use_node: true
+    mcollective::connector: 'activemq'
+    mcollective::broker_host: 'broker.example.com'
+    mcollective::broker_port: 61614
+    mcollective::broker_ssl: 'false'
+    mcollective::broker_user: 'mcollective'
+    mcollective::broker_password: 'vagrant'
+    mcollective::security_provider: 'psk'
+    mcollective::security_secret: 'vagrant'
+
+
