@@ -24,20 +24,21 @@ require "dopi/version"
 
 module Dopi
 
-  def self.valid?(plan_file)
-    plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
+  def self.valid?(raw_plan)
+    hash, _ = plan_store.read_plan_file(raw_plan)
+    plan_parser = DopCommon::Plan.new(hash)
     plan = Dopi::Plan.new(plan_parser)
     plan.valid?
   end
 
-  def self.add(plan_file)
-    raise StandardError, 'Plan not valid; did not add' unless valid?(plan_file)
-    plan_store.add(plan_file)
+  def self.add(raw_plan)
+    raise StandardError, 'Plan not valid; did not add' unless valid?(raw_plan)
+    plan_store.add(raw_plan)
   end
 
-  def self.update_plan(plan_file, options = {})
-    raise StandardError, 'Plan not valid; did not add' unless valid?(plan_file)
-    plan_name = plan_store.update(plan_file)
+  def self.update_plan(raw_plan, options = {})
+    raise StandardError, 'Plan not valid; did not add' unless valid?(raw_plan)
+    plan_name = plan_store.update(raw_plan)
     update_state(plan_name, options)
     plan_name
   end
