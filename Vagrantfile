@@ -10,7 +10,7 @@ require 'dop_common'
 
 DOP_PLAN = 'spec/fixtures/testenv_plan.yaml'
 
-hash = YAML.load_file(DOP_PLAN)
+hash = YAML.load(DopCommon::PreProcessor.load_plan(DOP_PLAN))
 plan = DopCommon::Plan.new(hash)
 
 Vagrant.configure(2) do |config|
