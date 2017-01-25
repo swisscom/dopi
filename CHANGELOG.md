@@ -1,6 +1,18 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.16.0] - unreleased
+
+IMPORTANT: the config file which used to be under /etc/dop/dopi.conf is now under /etc/dop/dop.conf
+because it will now be used by all dop projects and not just by dopi. Make sure you adjust your
+installation when updating to > 0.16.
+
+### Added
+- it is now possible to include other files in the plan. by using include: path/to/file.yaml
+
+### Changes
+- A lot of functionality was moved to dop_common to make use of it in all the dop projects
+
 ## [0.15.2] - 2017-01-11
 ### Fixed
 - Fix the slow start when using passwords from external tools
