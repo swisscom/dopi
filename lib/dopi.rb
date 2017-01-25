@@ -1,6 +1,5 @@
 require 'dop_common'
 require "dopi/error"
-require "dopi/signal_handler"
 require "dopi/log"
 require "dopi/pluginmanager"
 require "dopi/state"
@@ -129,7 +128,7 @@ private
     signal_handler_thread = Thread.new do
       Dopi.log.info("Starting signal handling")
       signal_counter = 0
-      Dopi::SignalHandler.new.handle_signals(:INT, :TERM) do
+      DopCommon::SignalHandler.new.handle_signals(:INT, :TERM) do
         signal_counter += 1
         case signal_counter
         when 1
