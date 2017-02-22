@@ -34,9 +34,11 @@ module Dopi
       options_defaults = {
         :run_for_nodes => :all,
         :noop          => false,
-        :step_set      => 'default'
+        :step_set      => 'default',
+        :node_info     => {},
       }
       run_options = options_defaults.merge(options)
+      nodes.each{|node| node.node_info = run_options[:node_info][node.fqdn] || {}}
       step_set = step_sets.find{|s| s.name == run_options[:step_set]}
       raise "Plan: Step set #{run_options[:step_set]} does not exist" if step_set.nil?
       step_set.run(run_options)

@@ -70,6 +70,12 @@ module Dopi
     update_state(plan_name)
     plan_store.run_lock(plan_name) do
       state_store = Dopi::StateStore.new(plan_name, plan_store)
+      dopv_state_store = plan_store.state_store(plan_name, 'dopv')
+      dopv_state_store.transaction(true) do
+        dopv_node_info = dopv_state_store[:nodes] || {}
+        api_node_info  = options[:node_info] || {}
+        options[:node_info] = dopv_node_info.merge(api_node_info)
+      end
       plan = get_plan(plan_name)
       plan.load_state(state_store.state_hash)
       manager = nil

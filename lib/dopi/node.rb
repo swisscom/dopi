@@ -11,14 +11,18 @@ module Dopi
   class Node
     extend Forwardable
 
+    attr_accessor :node_info
+
     def initialize(node_parser, plan)
       @node_parser = node_parser
       @plan = plan
       @addresses = {}
+      @node_info = {}
     end
 
     def_delegators :@node_parser,
       :name,
+      :fqdn,
       :has_name?,
       :config,
       :has_config?,
@@ -29,7 +33,7 @@ module Dopi
       :has_role?
 
     def addresses
-      [ @node_parser.fqdn, ip_addresses ].flatten
+      [ fqdn, plan_ip_addresses, node_info_ip_addresses ].flatten.uniq
     end
 
     def address(port)
@@ -43,8 +47,12 @@ module Dopi
 
   private
 
-    def ip_addresses
+    def plan_ip_addresses
       @node_parser.interfaces.map{|i| [:dhcp, :none].include?(i.ip) ? nil : i.ip}.compact
+    end
+
+    def node_info_ip_addresses
+      node_info[:ip_addresses] || []
     end
 
     def connection_possible?(address, port)
