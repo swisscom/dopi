@@ -9,6 +9,7 @@ installation when updating to > 0.16.
 
 ### Added
 - it is now possible to include other files in the plan. by using include: path/to/file.yaml
+- Use the node info from Dopv to get floating IPs or dynamic IPs for some providers.
 
 ### Changes
 - A lot of functionality was moved to dop_common to make use of it in all the dop projects
