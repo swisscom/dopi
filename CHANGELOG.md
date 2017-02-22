@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [0.16.0] - unreleased
+## [0.16.0] - 2017-02-22
 
 IMPORTANT: the config file which used to be under /etc/dop/dopi.conf is now under /etc/dop/dop.conf
 because it will now be used by all dop projects and not just by dopi. Make sure you adjust your
