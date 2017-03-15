@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.description   = %q{DOPi orchestrates puppet runs, mco calls and custom commands over different nodes}
   spec.summary       = %q{DOPi orchestrates puppet runs, mco calls and custom commands over different nodes}
   spec.homepage      = ''
-  spec.license       = 'MIT'
+  spec.license       = 'Apache-2.0'
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
