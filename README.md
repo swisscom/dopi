@@ -12,7 +12,7 @@ DOPi orchestrates puppet runs, mco calls and custom commands over different node
 
 DOPi uses a DOP plan file to find out what it has to run in what order on
 which nodes. To learn more about the syntax of this DOP plan file make sure
-you checkout the Documentation in [dop_common](https://gitlab.swisscloud.io/clu-dop/dop_common/blob/master/README.md).
+you checkout the Documentation in [dop_common](https://github.com/swisscom/dop_common).
 
 If you are new to DOPi make sure you check out the [getting started guide](doc/getting_started.md).
 
@@ -141,7 +141,7 @@ You can run the plan with the run command and the name:
 ## Plan File Format
 
 For a general description of the DOP plan file format, please see the
-[dop_common](https://gitlab.swisscloud.io/clu-dop/dop_common/blob/master/README.md)
+[dop_common](https://github.com/swisscom/dop_common/blob/master/README.md)
 documentation. The documentation in this gem will focus on the command hashes for all
 the basic plugins which are shipped with DOPi and on how to create your own custom plugins.
 
@@ -274,7 +274,7 @@ To setup the test suit you need a working vagrant (https://www.vagrantup.com/) i
 with the dop_common gem added as a plugin:
 
     cd /tmp
-    git clone https://gitlab.swisscloud.io/clu-dop/dop_common.git
+    git clone https://github.com/swisscom/dop_common.git
     cd dop_common
     gem build dop_common.gemspec
     vagrant plugin install ./dop_common-*.gem
