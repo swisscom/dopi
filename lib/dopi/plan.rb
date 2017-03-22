@@ -11,7 +11,7 @@ module Dopi
     extend Forwardable
     include Dopi::State
 
-    attr_reader :plan_parser, :version
+    attr_reader :plan_parser, :version, :context_logger
 
     def initialize(plan_parser)
       @version = Dopi::VERSION
@@ -29,32 +29,25 @@ module Dopi
       :canary_host
 
     def run(options = {})
-      init_file_logging
-      #set run option defaults
       options_defaults = {
         :run_for_nodes => :all,
         :noop          => false,
         :step_set      => 'default',
         :node_info     => {},
+        :run_id        => Time.now.strftime('%Y%m%d-%H%M%S'),
       }
       run_options = options_defaults.merge(options)
+
+      context_log_path = File.join(DopCommon.config.log_dir, "#{run_options[:run_id]}-#{name}")
+      node_names = nodes.map{|n| n.name}
+      @context_logger = DopCommon::ThreadContextLogger.new(context_log_path, node_names)
+
       nodes.each{|node| node.node_info = run_options[:node_info][node.fqdn] || {}}
       step_set = step_sets.find{|s| s.name == run_options[:step_set]}
       raise "Plan: Step set #{run_options[:step_set]} does not exist" if step_set.nil?
       step_set.run(run_options)
-    end
-
-    def init_file_logging
-      time = Time.now.strftime('%Y%m%d-%H%M%S')
-      plan_log_path = File.join(DopCommon.config.log_dir, "#{time}-#{name}")
-      FileUtils.mkdir_p(plan_log_path)
-      create_file_log_device(plan_log_path, 'all')
-      nodes.each {|node| create_file_log_device(plan_log_path, node.name)}
-    end
-
-    def create_file_log_device(path, context)
-      log_file = File.join(path, context)
-      Dopi::ContextLoggers.create_context_logger(log_file, context)
+    ensure
+      @context_logger.cleanup
     end
 
     # The main validation work is done in the dop_common

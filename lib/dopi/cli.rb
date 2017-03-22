@@ -4,6 +4,8 @@
 require 'gli'
 require 'dopi'
 require 'dop_common/cli/node_selection'
+require 'dop_common/cli/log'
+require 'dop_common/cli/global_options'
 require 'dopi/cli/log'
 require 'dopi/cli/global_options'
 require 'dopi/cli/command_run'
@@ -32,17 +34,13 @@ module Dopi
 
     config_file DopCommon.config.config_file
 
-    desc 'Verbosity of the command line tool'
-    default_value 'INFO'
-    arg_name 'Verbosity'
-    flag [:verbosity, :v]
-
+    DopCommon::Cli.global_options(self)
     global_options(self)
 
     pre do |global,command,options,args|
       DopCommon.configure = global
       ENV['GLI_DEBUG'] = 'true' if global[:trace] == true
-      initialize_logger(global[:log_level], global[:verbosity])
+      DopCommon::Cli.initialize_logger('dopi.log', global[:log_level], global[:verbosity], global[:trace])
       true
     end
 

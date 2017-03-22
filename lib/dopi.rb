@@ -60,6 +60,7 @@ module Dopi
   # TODO: this returns a plan with loaded state at the moment.
   # THIS MAY BE CHANGED IN THE FUTURE!!
   def self.show(plan_name)
+    ensure_plan_exists(plan_name)
     state_store = Dopi::StateStore.new(plan_name, plan_store)
     plan = get_plan(plan_name)
     plan.load_state(state_store.state_hash)
@@ -67,6 +68,7 @@ module Dopi
   end
 
   def self.run(plan_name, options = {})
+    ensure_plan_exists(plan_name)
     update_state(plan_name)
     plan_store.run_lock(plan_name) do
       state_store = Dopi::StateStore.new(plan_name, plan_store)
@@ -96,6 +98,7 @@ module Dopi
   end
 
   def self.reset(plan_name, force = false)
+    ensure_plan_exists(plan_name)
     plan_store.run_lock(plan_name) do
       state_store = Dopi::StateStore.new(plan_name, plan_store)
       plan = get_plan(plan_name)
@@ -106,6 +109,7 @@ module Dopi
   end
 
   def self.on_state_change(plan_name)
+    ensure_plan_exists(plan_name)
     state_store = Dopi::StateStore.new(plan_name, plan_store)
     state_store.on_change do
       yield
@@ -150,6 +154,12 @@ private
       end
     end
     signal_handler_thread.abort_on_exception = true
+  end
+
+  def self.ensure_plan_exists(plan_name)
+    unless plan_store.list.include?(plan_name)
+      raise StandardError, "The plan #{plan_name} does not exist in the plan store"
+    end
   end
 
 end

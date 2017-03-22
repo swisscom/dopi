@@ -11,6 +11,8 @@ describe 'Basic integration test built from plan files' do
     describe plan_file do
       plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
       plan = Dopi::Plan.new(plan_parser)
+      node_names = plan.nodes.map{|n| n.name}
+      plan.instance_variable_set(:@context_logger, DopCommon::ThreadContextLogger.new('/tmp/dopi_test', node_names))
       it "is a valid plan file" do
         expect(plan.valid?).to be true
       end
@@ -31,6 +33,8 @@ describe 'Basic integration test built from plan files' do
     describe plan_file do
       plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
       plan = Dopi::Plan.new(plan_parser)
+      node_names = plan.nodes.map{|n| n.name}
+      plan.instance_variable_set(:@context_logger, DopCommon::ThreadContextLogger.new('/tmp/dopi_test', node_names))
       it "is a valid plan file" do
         expect(plan.valid?).to be true
       end
@@ -51,6 +55,8 @@ describe 'Basic integration test built from plan files' do
     describe plan_file do
       plan_parser = DopCommon::Plan.new(YAML.load_file(plan_file))
       plan = Dopi::Plan.new(plan_parser)
+      node_names = plan.nodes.map{|n| n.name}
+      plan.instance_variable_set(:@context_logger, DopCommon::ThreadContextLogger.new('/tmp/dopi_test', node_names))
       it "is not a valid plan file" do
         expect(plan.valid?).to be false
       end

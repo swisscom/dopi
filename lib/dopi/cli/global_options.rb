@@ -7,15 +7,6 @@ module Dopi
 
     def self.global_options(base)
       base.class_eval do
-        desc 'Show stacktrace on crash'
-        default_value DopCommon.config.trace
-        switch [:trace, :t]
-
-        desc 'Specify the directory where DOPi will store the plans and their state'
-        default_value DopCommon.config.plan_store_dir
-        arg_name 'DIR'
-        flag [:plan_store_dir, :s]
-
         desc 'Use Hiera to get the role for the nodes'
         default_value DopCommon.config.use_hiera
         switch [:use_hiera, :h]
@@ -57,16 +48,6 @@ module Dopi
         default_value DopCommon.config.connection_check_timeout
         arg_name 'SECONDS'
         flag [:connection_check_timeout]
-
-        desc 'Directory for the log files'
-        default_value DopCommon.config.log_dir
-        arg_name 'LOGDIR'
-        flag [:log_dir]
-
-        desc 'Log level for the logfiles'
-        default_value DopCommon.config.log_level
-        arg_name 'LOGLEVEL'
-        flag [:log_level, :l]
       end
     end
 

@@ -101,7 +101,7 @@ module Dopi
       in_threads = max_in_flight == -1 ? command_sets_to_run.length : max_in_flight
       pick = lambda { next_command_set(command_sets_to_run) || Parallel::Stop }
       Parallel.each(pick, :in_threads => in_threads) do |command_set|
-        Dopi::ContextLoggers.log_context = command_set.node.name
+        plan.context_logger.log_context = command_set.node.name
         command_set.run(run_options[:noop])
         notify_done
       end
