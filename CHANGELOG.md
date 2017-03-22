@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.17.0] - unreleased
+### Added
+- The log format of the trace output now uses the formatter from dopv which is now in dop_common
+
+## Other
+- Some more code was moved to dop_common because it is of use for all dop parts
+
 ## [0.16.0] - 2017-02-22
 
 IMPORTANT: the config file which used to be under /etc/dop/dopi.conf is now under /etc/dop/dop.conf
