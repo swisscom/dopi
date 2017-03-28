@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [0.17.0] - unreleased
+## [0.17.0] - 2017-03-28
 ### Added
 - The log format of the trace output now uses the formatter from dopv which is now in dop_common
 
