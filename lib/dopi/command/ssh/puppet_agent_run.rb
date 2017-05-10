@@ -6,56 +6,32 @@ module Dopi
     class Ssh
       class PuppetAgentRun < Dopi::Command
         include Dopi::Connector::Ssh
-        include Dopi::CommandParser::Env
-        include Dopi::CommandParser::Arguments
-        include Dopi::CommandParser::ExitCode
-        include Dopi::CommandParser::Output
+        include Dopi::CommandParser::PuppetRun
 
       public
+        def validate
+          validate_ssh
+          validate_puppet_run
+        end
 
         def initialize(command_parser, step, node, is_verify_command)
           command_parser.overwrite_defaults = { :plugin_timeout => 1800 }
           super(command_parser, step, node, is_verify_command)
         end
 
-        def validate
-          validate_ssh
-          validate_env
-          validate_arguments
-          validate_exit_code
-          validate_output
+        def puppet_bin
+          '/usr/bin/puppet'
         end
 
-        def run
-          cmd_stdout, cmd_stderr, cmd_exit_code = ssh_command(env, command_string)
-          check_output(cmd_stdout) &&
-            check_output(cmd_stderr) &&
-            check_exit_code(cmd_exit_code)
+        def check_run_lock
+          ssh_command(env, "test -f $(#{puppet_bin} config print statedir)/agent_catalog_run.lock")
         end
 
-        def run_noop
-          log(:info, "(NOOP) Executing '#{command_string}' for command #{name}")
-        end
-
-        def expect_exit_codes_defaults
-          [ 0, 2 ]
-        end
-
-        def parse_output_defaults
-          { :error => [
-              '^Error:'
-            ],
-            :warning => [
-              '^Warning:'
-            ]
-          }
+        def puppet_run
+          ssh_command(env, "#{puppet_bin} agent --test --color false #{arguments}")
         end
 
       private
-
-        def command_string
-          "puppet agent --test --color false #{arguments}"
-        end
 
       end
     end
