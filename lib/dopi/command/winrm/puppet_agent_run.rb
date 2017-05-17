@@ -1,59 +1,44 @@
 #
-# WinRM Puppet Agent Plugin
+# SSH custom command
 #
 module Dopi
   class Command
     class Winrm
       class PuppetAgentRun < Dopi::Command
         include Dopi::Connector::Winrm
-        include Dopi::CommandParser::Arguments
-        include Dopi::CommandParser::ExitCode
-        include Dopi::CommandParser::Output
+        include Dopi::CommandParser::PuppetRun
 
       public
+        def validate
+          validate_winrm
+          validate_puppet_run
+        end
 
         def initialize(command_parser, step, node, is_verify_command)
           command_parser.overwrite_defaults = { :plugin_timeout => 1800 }
           super(command_parser, step, node, is_verify_command)
         end
 
-        def validate
-          validate_winrm
-          validate_arguments
-          validate_exit_code
-          validate_output
+        def puppet_bin
+          'puppet'
         end
 
-        def run
-          cmd_stdout, cmd_stderr, cmd_exit_code = winrm_powershell_command(command_string)
-          check_output(cmd_stdout) &&
-            check_output(cmd_stderr) &&
-            check_exit_code(cmd_exit_code)
+        def check_run_lock_b
+          false
         end
 
-        def run_noop
-          log(:info, "(NOOP) Executing '#{command_string}' for command #{name}")
+        def check_run_lock
+          winrm_powershell_command <<-cmd
+            $Statedir = #{puppet_bin} config print statedir
+            if(-not( Test-Path "$Statedir/agent_catalog_run.lock" )) { exit 1 }
+          cmd
         end
 
-        def expect_exit_codes_defaults
-          [ 0, 2 ]
-        end
-
-        def parse_output_defaults
-          { :error => [
-              '^Error:'
-            ],
-            :warning => [
-              '^Warning:'
-            ]
-          }
+        def puppet_run
+          winrm_powershell_command("#{puppet_bin} agent --test --color false #{arguments}")
         end
 
       private
-
-        def command_string
-          "puppet agent --test --color false #{arguments}"
-        end
 
       end
     end

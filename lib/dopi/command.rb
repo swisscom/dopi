@@ -114,6 +114,7 @@ module Dopi
       state_fail unless noop
     rescue => e
       log(:error, "Unexpected error!!! This is a Bug", false)
+      Dopi.log.error(e.class)
       Dopi.log.error(e.message)
       Dopi.log.error(e.backtrace)
       state_fail unless noop

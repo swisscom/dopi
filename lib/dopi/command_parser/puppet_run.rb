@@ -40,6 +40,7 @@ module Dopi
       def run
         runs = 0
         loop do
+          raise GracefulExit if signals[:stop]
           if check_run_lock_wrapper
             if wait_if_already_running
               log(:info, "Puppet run already in progress, waiting 10s to check again if finished")
