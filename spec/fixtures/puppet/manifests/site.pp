@@ -7,6 +7,11 @@ $role = hiera('role')
 class base {
   hiera_include('classes')
 
+  file{'/tmp/testfile':
+    ensure  => present,
+    content => "testdata",
+  }
+
   file{'/usr/libexec/mcollective/':            ensure => directory}
   file{'/usr/libexec/mcollective/mcollective': ensure => directory}
 }

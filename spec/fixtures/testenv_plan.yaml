@@ -34,7 +34,7 @@ steps:
       exec: 'rpm'
       arguments: '-ivh https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm'
 
-  - name: 'install puppet on all the nodes'
+  - name: 'install puppet on all the linux nodes'
     nodes_by_config: {os: 'linux'}
     command:
       verify_commands:
@@ -43,6 +43,41 @@ steps:
       plugin: 'ssh/custom'
       exec: 'yum'
       arguments: 'install -y puppet'
+
+  - name: 'install puppet on all the linux nodes'
+    nodes_by_config: {os: 'linux'}
+    command:
+      verify_commands:
+        - plugin: 'ssh/file_exists'
+          file: '/usr/bin/puppet'
+      plugin: 'ssh/custom'
+      exec: 'yum'
+      arguments: 'install -y puppet'
+
+  - name: 'Install chocolatey on all the windows nodes'
+    nodes_by_config: {os: 'windows'}
+    command:
+      verify_commands:
+        - title:  'Check if chocolatey is installed'
+          plugin: 'winrm/powershell'
+          exec:   'choco -?'
+      plugin: 'winrm/powershell'
+      exec: |
+        $Policy = Get-ExecutionPolicy
+        If ($Policy -eq "Restricted") {
+          Set-ExecutionPolicy AllSigned
+        }
+        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+  - name: 'Install puppet on all the windows nodes'
+    nodes_by_config: {os: 'windows'}
+    command:
+      verify_commands:
+        - title:  'Check if puppet is installed'
+          plugin: 'winrm/powershell'
+          exec:   'puppet help'
+      plugin: 'winrm/powershell'
+      exec:   'choco install -y puppet'
 
   - name: 'copy the puppet configuration to the right place'
     roles: 'puppetmaster'
@@ -129,7 +164,7 @@ steps:
       exec: 'puppet'
       arguments: 'apply /etc/puppet/manifests/site.pp'
 
-  - name: 'Add puppetmaster to all hosts files'
+  - name: 'Add puppetmaster to all hosts files on linux'
     nodes_by_config: {os: 'linux'}
     command:
       verify_commands:
@@ -139,6 +174,19 @@ steps:
       plugin: 'ssh/custom'
       exec: "echo"
       arguments: '"192.168.56.101 puppetmaster.example.com puppetmaster" >> /etc/hosts'
+
+  - name: 'Add puppetmaster to all hosts files on windows'
+    nodes_by_config: {os: 'windows'}
+    command:
+      verify_commands:
+        - plugin: 'winrm/file_contains'
+          file: 'C:\Windows\System32\Drivers\etc\hosts'
+          pattern: 'puppetmaster.example.com'
+      plugin: 'winrm/powershell'
+      exec: "Add-Content"
+      arguments:
+        - 'C:\Windows\System32\Drivers\etc\hosts'
+        - '"`n192.168.56.101 puppetmaster.example.com puppetmaster"'
 
   - name: 'Add broker to all hosts files'
     nodes_by_config: {os: 'linux'}
@@ -157,3 +205,14 @@ steps:
     command:
       plugin: 'ssh/puppet_agent_run'
       arguments: '--server puppetmaster.example.com'
+
+# There is an issue with the domain name which gets not set
+# by Vagrant
+#  - name: "run puppet on the windows nodes"
+#    nodes_by_config: {os: 'windows'}
+#    command:
+#      - plugin: 'winrm/puppet_agent_run'
+#        arguments: '--server puppetmaster.example.com'
+#        rerun_on_change: true
+#        rerun_on_error: true
+#        max_rerun: 3
