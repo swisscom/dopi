@@ -18,59 +18,63 @@ module Dopi
         validate_credentials
       end
 
-      def winrm_command(command_string)
+      def winrm_command(command_string, use_shell = :cmd)
         cmd_stdout = ""
         cmd_stderr = ""
         log(:debug, "Executing '#{command_string}' for command #{name}")
-        result = winrm.run_cmd(command_string) do |stdout, stderr|
-          unless stdout.nil? or stdout.empty?
-            cmd_stdout << stdout
-            log(:debug, stdout)
+        winrm.shell(use_shell) do |shell|
+          result = shell.run(command_string) do |stdout, stderr|
+            unless stdout.nil? or stdout.empty?
+              cmd_stdout << stdout
+              log(:debug, stdout)
+            end
+            unless stderr.nil? or stderr.empty?
+              cmd_stderr << stderr
+              log(:error, stderr)
+            end
           end
-          unless stderr.nil? or stderr.empty?
-            cmd_stderr << stderr
-            log(:error, stderr)
-          end
+          return [cmd_stdout, cmd_stderr, result.exitcode]
         end
-        winrm.close
-        [cmd_stdout, cmd_stderr, result[:exitcode]]
       end
 
       def winrm_powershell_command(command_string)
-        log(:debug, "Unencoded Powershell command '#{command_string}'")
-        script = WinRM::PowershellScript.new(command_string)
-        winrm_command("powershell -encodedCommand #{script.encoded()}")
+        winrm_command(command_string, :powershell)
       end
 
       def winrm
-        working_command_executor = nil
+        working_winrm_connection = nil
         credentials.each do |credential|
           begin
-            winrm_web_service = WinRM::WinRMWebService.new(
-              endpoint,
-              auth_method(credential),
-              :realm           => credential.realm,
-              :service         => credential.service,
-              :keytab          => credential.keytab,
-              :user            => credential.username,
-              :pass            => credential.password,
-              :disable_sspi    => disable_sspi,
-              :basic_auth_only => basic_auth_only,
-              :ca_trust_path   => ca_trust_path
+            winrm_connection = WinRM::Connection.new(
+              :endpoint          => endpoint,
+              :transport         => auth_method(credential),
+              :realm             => credential.realm,
+              :service           => credential.service,
+              :keytab            => credential.keytab,
+              :user              => credential.username,
+              :password          => credential.password,
+              :disable_sspi      => disable_sspi,
+              :basic_auth_only   => basic_auth_only,
+              :ca_trust_path     => ca_trust_path,
+              :operation_timeout => operation_timeout,
             )
-            winrm_web_service.set_timeout(operation_timeout)
-            command_executor = WinRM::CommandExecutor.new(winrm_web_service)
-            command_executor.open
-            command_executor.run_cmd('exit') # test connection
+            winrm_connection.shell(:cmd) do |shell|
+              output = shell.run('exit') # test connection
+              if output.exitcode == 0
+                working_winrm_connection = winrm_connection
+              end
+            end
           rescue WinRM::WinRMAuthorizationError, GSSAPI::GssApiError => e
             log(:warn, "Unable to login with credential #{credential.name} : #{e.message}")
           rescue SocketError => e
             raise CommandConnectionError,
               "A problem occurred while trying to connect to node #{@node.name} : #{e.message}"
-          else working_command_executor = command_executor
+          rescue WinRM::WinRMWMIError => e
+            raise CommandExecutionError,
+              "A problem occurred while trying to connect to node #{@node.name} : #{e.message}"
           end
         end
-        working_command_executor or
+        working_winrm_connection or
           raise CommandExecutionError,
             "Unable to login with any of the given credentials: #{credentials.map{|c| c.name}.join(', ')}"
       end

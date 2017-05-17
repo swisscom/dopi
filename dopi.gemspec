@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'gli', '~> 2'
   spec.add_runtime_dependency 'logger-colors', '~> 1'
   spec.add_runtime_dependency 'mcollective-client', '~> 2'
-  spec.add_runtime_dependency 'winrm', '~> 1'
+  spec.add_runtime_dependency 'winrm', '~> 2'
   spec.add_runtime_dependency 'parallel', '~> 1'
 
   # curses was removed in ruby 2.1
