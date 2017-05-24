@@ -96,7 +96,13 @@ module Dopi
               log(:info, "#{name} [OK]") if state_done?
             else
               state_fail
-              log(:info, "#{name} [FAILED]")
+              if @is_verify_command
+                log(:info, "#{name} [FAILED]")
+              else
+                log(:error, "#{name} [FAILED]")
+                log_file = @step.plan.context_logger.current_log_file
+                log(:error, "Check the log file #{log_file} for the full debug log of the node")
+              end
             end
           end
         end
@@ -110,6 +116,8 @@ module Dopi
       send_signal(:abort)
     rescue CommandExecutionError => e
       log(:error, "Command failed: #{e.message}", false)
+      log_file = @step.plan.context_logger.current_log_file
+      log(:error, "Check the log file #{log_file} for the full debug log of the node", false)
       Dopi.log.error(e) if DopCommon.config.trace
       state_fail unless noop
     rescue => e
