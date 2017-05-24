@@ -1,6 +1,15 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.18.0] - unreleased
+### Changed
+- Updated the winrm gem to version 2 and migrated the connector to use the new interface
+- The puppet_agent_run plugin for ssh and winrm got an update. It is now possible to configure
+  reruns if there are changes or errors. For more details see the plugin documentation.
+
+### Fixed
+- Winrm now closes the connections correctly.
+
 ## [0.17.0] - 2017-03-28
 ### Added
 - The log format of the trace output now uses the formatter from dopv which is now in dop_common
