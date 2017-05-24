@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   # Code quality
   spec.add_development_dependency 'simplecov'
 
-  spec.add_runtime_dependency 'dop_common', '~> 0.13', '>= 0.13.0'
+  spec.add_runtime_dependency 'dop_common', '~> 0.15', '>= 0.15.0'
   spec.add_runtime_dependency 'gli', '~> 2'
   spec.add_runtime_dependency 'logger-colors', '~> 1'
   spec.add_runtime_dependency 'mcollective-client', '~> 2'

@@ -1,7 +1,11 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
-## [0.18.0] - unreleased
+## [0.18.1] - 2017-05-24
+### Fixed
+- Update dependencies
+
+## [0.18.0] - 2017-05-24
 ### Changed
 - Updated the winrm gem to version 2 and migrated the connector to use the new interface
 - The puppet_agent_run plugin for ssh and winrm got an update. It is now possible to configure
