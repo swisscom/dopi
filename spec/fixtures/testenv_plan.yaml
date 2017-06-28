@@ -130,7 +130,7 @@ steps:
         - plugin: 'ssh/custom'
           exec: 'gem list | grep dop_common'
       plugin: 'ssh/custom'
-      exec: 'cd /vagrant/vendor/cache/dop_common-*/ && gem build dop_common.gemspec && gem install dop_common*.gem'
+      exec: 'gem install dop_common'
 
   - name: 'Install DOPi so we can add the plan'
     roles: 'puppetmaster'
@@ -148,7 +148,7 @@ steps:
     command:
       verify_commands:
         - plugin: 'ssh/file_exists'
-          file: '/var/lib/dop/plans/build_dop_test_environment.yaml'
+          file: '/var/lib/dop/cache/build_dop_test_environment/dopi.yaml'
       plugin: 'ssh/custom'
       exec: 'bundle'
       arguments: 'exec dopi add /vagrant/spec/fixtures/testenv_plan.yaml'
