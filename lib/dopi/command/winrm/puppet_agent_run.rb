@@ -19,14 +19,6 @@ module Dopi
           super(command_parser, step, node, is_verify_command)
         end
 
-        def puppet_bin
-          'puppet'
-        end
-
-        def check_run_lock_b
-          false
-        end
-
         def check_run_lock
           winrm_powershell_command <<-cmd
             $Statedir = #{puppet_bin} config print statedir

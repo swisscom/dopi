@@ -2,6 +2,8 @@
 # This is a mixin for command plugins that need to parse puppet_run specific
 # options and for some methods to wrap the rerun logic.
 #
+require 'pathname'
+
 module Dopi
   module CommandParser
     module PuppetRun
@@ -19,6 +21,7 @@ module Dopi
         log_validation_method('rerun_on_error_valid?', CommandParsingError)
         log_validation_method('max_rerun_valid?', CommandParsingError)
         log_validation_method('wait_if_already_running_valid?', CommandParsingError)
+        log_validation_method('puppet_bin_valid?', CommandParsingError)
       end
 
       def rerun_on_change
@@ -35,6 +38,10 @@ module Dopi
 
       def wait_if_already_running
         @wait_if_already_running ||= wait_if_already_running_valid? ? hash[:wait_if_already_running] : true
+      end
+
+      def puppet_bin
+        @puppet_bin ||= puppet_bin_valid? ? hash[:puppet_bin] : 'puppet'
       end
 
       def run
@@ -142,6 +149,17 @@ module Dopi
         return false if hash[:wait_if_already_running].nil? # is optional
         hash[:wait_if_already_running].kind_of?(TrueClass) or hash[:wait_if_already_running].kind_of?(FalseClass) or
           raise CommandParsingError, "Plugin #{name}: The value for 'wait_if_already_running' must be boolean"
+      end
+
+      def puppet_bin_valid?
+        return false unless hash.kind_of?(Hash)
+        return false if hash[:puppet_bin].nil? # is optional
+        begin
+          Pathname.new(hash[:puppet_bin]).absolute? or hash[:puppet_bin][/[a-zA-Z]+:\\/] or hash[:puppet_bin][/\\\\\w+/] or
+            raise CommandParsingError, "Plugin #{name}: The path for 'puppet_bin' has to be absolute"
+        rescue ArgumentError => e
+          raise CommandParsingError, "Plugin #{name}: The value in 'puppet_bin' is not a valid file path: #{e.message}"
+        end
       end
 
     end

@@ -19,10 +19,6 @@ module Dopi
           super(command_parser, step, node, is_verify_command)
         end
 
-        def puppet_bin
-          '/usr/bin/puppet'
-        end
-
         def check_run_lock
           ssh_command(env, "test -f $(#{puppet_bin} config print statedir)/agent_catalog_run.lock")
         end
