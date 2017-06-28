@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to DOPi will be documented in this file.
 
+## [0.18.2] - 2017-06-28
+### Fixed
+- Puppet should now use the puppet in the search path per default
+- The puppet binary can now be configured with puppet_bin
+
 ## [0.18.1] - 2017-05-24
 ### Fixed
 - Update dependencies
