@@ -8,7 +8,7 @@ namespace :spec do
       hiera = 'spec/fixtures/puppet/hiera.yaml'
       plan  = 'spec/fixtures/testenv_plan.yaml'
       sh('bundle package --all')
-      sh("bundle exec bin/dopi --verbosity debug --trace --hiera_yaml #{hiera} oneshot #{plan}")
+      sh("bundle exec bin/dopi --hiera_yaml #{hiera} oneshot #{plan}")
     end
   end
 
