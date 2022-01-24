@@ -22,7 +22,7 @@ GEM
       lockfile (~> 2)
       rb-inotify (~> 0.9)
     erubis (2.7.0)
-    ffi (1.9.18)
+    ffi (1.15.5)
     gli (2.16.0)
     gssapi (1.2.0)
       ffi (>= 1.0.1)
