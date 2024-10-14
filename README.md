@@ -1,3 +1,6 @@
+> [!NOTE]
+> DEPRECATED - no longer maintained!
+
 # Dopi
 
 DOPi is the "inner" part of the Deployment Orchestrater for Puppet (DOP).
